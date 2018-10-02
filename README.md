@@ -28,7 +28,7 @@ Host: lambdaschool.com
 ```
 ---
 
-The steps that your client needs to execute are the following:
+For this sprint challenge, all your code should be implemented in the `client.c` file. Whenever you update your code, rerun `make` in order to compile a new executable. The steps that your client will need to execute are the following:
 
 1. Parse the input URL.
    * Your client should be able to handle URLs such as `localhost:3490/d20` and `www.google.com:80/`. Input URLs need to be broken down into `hostname`, `port`, and `path`. The `hostname` is everything before the colon (but doesn't include `http://` or `https://` if either are present), the `port` is the number after the colon ending at the backslash, and the `path` is everything after the backslash.
