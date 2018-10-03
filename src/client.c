@@ -9,16 +9,21 @@
 
 #define BUFSIZE 4096 // max number of bytes we can get at once
 
-// struct to hold all three pieces of a URL
+/**
+ * Struct to hold all three pieces of a URL
+ */
 typedef struct urlinfo_t {
   char *hostname;
   char *port;
   char *path;
 } urlinfo_t;
 
-/*
-  Tokenize the given URL into hostname, path, and port.
-  Store these in a urlinfo_t struct and return the struct.
+/**
+ * Tokenize the given URL into hostname, path, and port.
+ *
+ * url: The input URL to parse.
+ *
+ * Store hostname, path, and port in a urlinfo_t struct and return the struct.
 */
 urlinfo_t *parse_url(char *url)
 {
@@ -47,9 +52,15 @@ urlinfo_t *parse_url(char *url)
   return urlinfo;
 }
 
-/*
-  Constructs a GET request from the hostname, port, and path inputs.
-  Send the constructed GET request down via the socket file descriptor.
+/**
+ * Constructs and sends an HTTP request
+ *
+ * fd:
+ * hostname: The hostname string.
+ * port:     The port string.
+ * path:     The path string.
+ *
+ * Return the value from the send() function.
 */
 int send_request(int fd, char *hostname, char *port, char *path)
 {
