@@ -60,7 +60,7 @@ For this sprint challenge, all your code should be implemented in the `client.c`
 ### Rubric
 
 Your cURL client will be considered complete when it satisfies the following:
-1. Your client can successfully execute `./client localhost:3490/d20` (don't forget to start up your web server implementation in another terminal window) and prints out the correct response to `stdout`, something like:
+1. Your client can successfully request any resource that your web server implementation is capable of serving, i.e., it can successfully execute `./client localhost:3490/d20`, `./client localhost:3490/index.html`, and any other URL that your web server implementation is capable of serving up. Don't forget to start up your web server implementation in another terminal window. Your client should print out the correct response to `stdout`, something like:
 ```
 HTTP/1.1 200 OK
 Date: Tue Oct  2 11:41:43 2018
@@ -71,7 +71,7 @@ Content-Type: text/plain
 17
 
 ```
-2. Your client can successfully execute `./client www.google.com:80/` (don't forget the trailing backslash) and print out the contents of Google's homepage to `stdout`. If successful, you'll get back a whole mess of gobbledegook in the body of the response, with a header that will look something like this:
+2. Your client can successfully make a request to a non-local host, such as Google, Facebook, Reddit, etc. It doesn't necessarily need to successfully get back the HTML contents of the page, but your client should receive back a header response with some sort of HTTP status code and other metadata. For example, executing `./client www.google.com:80/` should return back a 200 status code with all the HTML that makes up Google's homepage and print it all to `stdout`. The response header will look something like this:
 ```
 HTTP/1.1 200 OK
 Date: Tue, 02 Oct 2018 18:44:13 GMT
