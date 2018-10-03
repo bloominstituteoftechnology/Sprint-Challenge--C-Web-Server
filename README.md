@@ -20,12 +20,7 @@ Content-Type: text/html
 
 <!DOCTYPE html><html><head><title>Lambda School ...
 ```
-Now that we're implementing a client, our client will instead need to construct requests, which take the form:
-```
-GET /example HTTP/1.1
-Host: lambdaschool.com
-
-```
+Now that we're implementing a client, our client will instead need to construct requests.
 ---
 
 For this sprint challenge, all your code should be implemented in the `client.c` file. Whenever you update your code, rerun `make` in order to compile a new executable. The steps that your client will need to execute are the following:
