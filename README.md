@@ -55,7 +55,8 @@ For this sprint challenge, all your code should be implemented in the `client.c`
 
 ### Rubric
 
-Your cURL client will be considered complete when it satisfies the following:
+Your cURL client will receive a 2 when it satisfies the following:
+
 1. Your client can successfully request any resource that your web server implementation is capable of serving, i.e., it can successfully execute `./client localhost:3490/d20`, `./client localhost:3490/index.html`, and any other URL that your web server implementation is capable of serving up. Don't forget to start up your web server implementation in another terminal window. Your client should print out the correct response to `stdout`, something like:
 ```
 HTTP/1.1 200 OK
@@ -87,6 +88,9 @@ Connection: close
 ```
 
 ## Stretch Goals
+
+In order to earn a score of 3, complete at least one of the following stretch goals:
+
 1. Make the URL parsing logic more robust.
    * The specified URL parsing logic is really brittle. The most glaring hole is the fact that oftentimes, URLs don't actually include the port number. In such cases, clients just assume a default port number of 80. Improve the URL parsing logic such that it can handle being passed a URL without a port number, such as `www.google.com/`. 
    * Also improve the parsing logic so that it can receive URLs prepended with `http://` or `https://`. Such URLs should not be treated any differently by the client, you'll just need to strip them off the input URL so that they don't become part of the hostname. 
