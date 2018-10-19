@@ -41,6 +41,7 @@ For this sprint challenge, all your code should be implemented in the `client.c`
    The connection should be closed, otherwise some servers will simply hang and not return a response, since they're expecting more data from our client.
 3. Connect to the server.
    * All of the networking logic that you'll need to connect to an arbitrary server is provided in the `lib.h` and `lib.c` files. All you have to do call the `get_socket()` function in order to get a socket that you can then send and receive data from using the `send` and `recv` system calls. 
+   * Make sure that your web server implementation (built during project days 1 & 2 from Web Server I) is running in another ternimal window when testing local requests.
 4. Send the request string down the socket.
    * Hopefully that's pretty self-explanatory.
 5. Receive the response from the server and print it to `stdout`.
@@ -57,7 +58,7 @@ For this sprint challenge, all your code should be implemented in the `client.c`
 
 Your cURL client will receive a 2 when it satisfies the following:
 
-1. Your client can successfully request any resource that your web server implementation is capable of serving, i.e., it can successfully execute `./client localhost:3490/d20`, `./client localhost:3490/index.html`, and any other URL that your web server implementation is capable of serving up. Don't forget to start up your web server implementation in another terminal window. Your client should print out the correct response to `stdout`, something like:
+1. Your client can successfully request any resource that your web server implementation (built during project days 1 & 2 from Web Server I) is capable of serving, i.e., it can successfully execute `./client localhost:3490/d20`, `./client localhost:3490/index.html`, and any other URL that your web server implementation is capable of serving up. Don't forget to start up your web server implementation in another terminal window. Your client should print out the correct response to `stdout`, something like:
 ```
 HTTP/1.1 200 OK
 Date: Tue Oct  2 11:41:43 2018
