@@ -83,6 +83,7 @@ int send_request(int fd, char *hostname, char *port, char *path)
   const int max_request_size = 16384;
   char request[max_request_size];
   int rv;
+  // printf("send hostname")
 
   ///////////////////
   // IMPLEMENT ME! //
@@ -100,13 +101,14 @@ int main(int argc, char *argv[])
     fprintf(stderr,"usage: client HOSTNAME:PORT/PATH\n");
     exit(1);
   }
-  parse_url(argv[1]);
-  printf("int main hostname: %s \n", urlinfo_t);
-  // int get_socket(char *hostname, char *port)
-  // // get_socket(urlinfo_t)
-  // int send_request(int fd, char *hostname, char *port, char *path)
+  // parse_url(argv[1]);
+  urlinfo_t *urlinfo = parse_url(argv[1]);
+  // printf("int main path: %s\n", urlinfo->path);
 
-  // send_request()
+  // printf("int main hostname: %s \n", urlinfo_t.hostname->hostname);
+  sockfd = get_socket(urlinfo->hostname, urlinfo->port);
+
+  send_request( sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
 
   /*
     1. Parse the input URL
