@@ -7,6 +7,19 @@
 #include <sys/socket.h>
 #include "lib.h"
 
+// header: HTTP/1.1 200 OK || HTTP/1.1 200 OK
+// body: the data to send.
+// Date: Wed Dec 20 13:05:11 PST 2017
+// v     v       v        v
+//     time_t time1 = time(NULL);
+//     struct tm *localtime1 = localtime(&time1);
+//     asctime(localtime1)
+
+
+// Connection: close
+// Content-Length: 41749
+// Content-Type: text/html
+
 #define BUFSIZE 4096 // max number of bytes we can get at once
 
 /**
