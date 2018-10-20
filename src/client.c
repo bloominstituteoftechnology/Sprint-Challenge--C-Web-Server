@@ -9,15 +9,11 @@
 
 #define BUFSIZE 4096 // max number of bytes we can get at once
 
-/**
- * Struct to hold all three pieces of a URL
- */
 typedef struct urlinfo_t {
   char *hostname;
   char *port;
   char *path;
 } urlinfo_t;
-
 
 char *remove_char(char *str, char c)
 {
@@ -56,25 +52,12 @@ urlinfo_t *parse_url(char *url)
   return urlinfo;
 }
 
-/**
- * Constructs and sends an HTTP request
- *
- * fd:
- * hostname: The hostname string.
- * port:     The port string.
- * path:     The path string.
- *
- * Return the value from the send() function.
-*/
 int send_request(int fd, char *hostname, char *port, char *path)
 {
   const int max_request_size = 16384;
   char request[max_request_size];
   int rv;
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
   int request_length = sprintf(request,
     "GET /%s HTTP/1.1\n"
     "Host: %s:%s\n"
@@ -110,18 +93,6 @@ int main(int argc, char *argv[])
   }
   close(sockfd);
   free(url);
-
-  /*
-    1. Parse the input URL
-    2. Initialize a socket
-    3. Call send_request to construct the request and send it
-    4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
-    5. Clean up any allocated memory and open file descriptors.
-  */
-
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
 
   return 0;
 }
