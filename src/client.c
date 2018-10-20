@@ -83,6 +83,10 @@ urlinfo_t *parse_url(char *url)
 
 hostname = url;
 
+urlinfo->path = path;
+urlinfo->port = port;
+urlinfo->hostname = hostname;
+
   return urlinfo;
 }
 
