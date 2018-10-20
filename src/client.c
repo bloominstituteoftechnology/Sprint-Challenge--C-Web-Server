@@ -25,12 +25,25 @@ typedef struct urlinfo_t {
  *
  * Store hostname, path, and port in a urlinfo_t struct and return the struct.
 */
+char *remove_char(char *str, char c)
+{
+  for (int i = 0; i <= strlen(str); i++)
+  {
+    if (str[i] == c)
+    {
+      str[i] = '\0';
+    }
+  }
+  return str;
+}
+
 urlinfo_t *parse_url(char *url)
 {
   // copy the input URL so as not to mutate the original
   char *hostname = strdup(url);
   char *port;
   char *path;
+  char *curr;
 
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
 
@@ -44,10 +57,17 @@ urlinfo_t *parse_url(char *url)
     5. Set the port pointer to 1 character after the spot returned by strchr.
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
+  curr = strchr(hostname, '/');
+  path = curr + 1;
+  hostname = remove_char(hostname, '/');
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  curr = strchr(hostname, ':');
+  port = curr + 1;
+  hostname = remove_char(hostname, ':');
+
+  urlinfo->hostname = hostname;
+  urlinfo->port = port;
+  urlinfo->path = path;
 
   return urlinfo;
 }
@@ -71,19 +91,37 @@ int send_request(int fd, char *hostname, char *port, char *path)
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
+  int request_length = sprintf(request,
+    "GET /%s HTTP/1.1\n"
+    "Host: %s:%s\n"
+    "Connection: close",
+    path, hostname, port);
 
-  return 0;
+  rv = send(fd, request, request_length, 0);
+
+  if (rv < 0) {
+    perror("send");
+  }
+
+  return rv;
 }
 
 int main(int argc, char *argv[])
-{  
-  int sockfd, numbytes;  
+{
+  int sockfd, numbytes;
   char buf[BUFSIZE];
+  char *raw;
 
   if (argc != 2) {
     fprintf(stderr,"usage: client HOSTNAME:PORT/PATH\n");
     exit(1);
   }
+  urlinfo_t *url = parse_url(argv[1]);
+
+  printf("%s\n", url->hostname);
+  printf("%s\n", url->port);
+  printf("%s\n", url->path);
+
 
   /*
     1. Parse the input URL
