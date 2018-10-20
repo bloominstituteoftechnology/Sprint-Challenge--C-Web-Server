@@ -31,7 +31,10 @@ urlinfo_t *parse_url(char *url)
   char *hostname = strdup(url);
   char *port;
   char *path;
+  int c_index;
   char bs = '/';
+  char colon = ':';
+  char terminator = '\0'; //how could I pass up an opportunity to pass in a Terminator "I'll be back..."
 
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
 
@@ -46,12 +49,21 @@ urlinfo_t *parse_url(char *url)
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
   path = strchr(hostname, bs);
-  *path = &path+1;
-  printf("%s \n", path);
-  printf("%s \n", hostname);
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  c_index = (int) (path - hostname);
+  hostname[c_index] = terminator;
+  
+  port = strchr(hostname, colon);
+  c_index = (int) (port - hostname);
+  hostname[c_index] = terminator;
+
+  urlinfo->path = path+1;
+  urlinfo->port = port+1;
+  urlinfo->hostname = hostname;
+
+
+  printf("path: %s \n", urlinfo->path);
+  printf("hostname: %s \n", urlinfo->hostname);
+  printf("port: %s \n", urlinfo->port);
 
   return urlinfo;
 }
@@ -89,6 +101,12 @@ int main(int argc, char *argv[])
     exit(1);
   }
   parse_url(argv[1]);
+  printf("int main hostname: %s \n", urlinfo_t);
+  // int get_socket(char *hostname, char *port)
+  // // get_socket(urlinfo_t)
+  // int send_request(int fd, char *hostname, char *port, char *path)
+
+  // send_request()
 
   /*
     1. Parse the input URL
