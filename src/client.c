@@ -44,14 +44,19 @@ urlinfo_t *parse_url(char *url)
     5. Set the port pointer to 1 character after the spot returned by strchr.
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
+  hostname = strtok(hostname, ":");
+  printf("HOSTNAME: %s\n", hostname);
+
+  char *colon = strchr(url, ':');
+  // printf("COLON%s", colon);
+  port = colon++;
+  port = colon++;
+  printf("PORT%s\n", port);
+
   char *first = strchr(url, '/');
   // printf("FIRST SLASH%p", first);
-  *path = *first++;
+  path = first++;
   printf("PATH: %s\n", path);
-  char *colon = strchr(url, ':');
-  printf("COLON%s", colon);
-  *port = *colon++;
-  printf("PORT%s", port);
 
   ///////////////////
   // IMPLEMENT ME! //
@@ -98,8 +103,15 @@ int main(int argc, char *argv[])
     fprintf(stderr,"usage: client HOSTNAME:PORT/PATH\n");
     exit(1);
   }
-  parse_url(argv);
-  get_socket(*hostname, *port);
+  // parse_url(url);
+  // get_socket(*hostname, *port);
+  // send_request(fd, hostname, port, path);
+
+  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0)
+  {
+    // print the data we got back to stdout
+    fprintf(stdout, "something here\n");
+  }
   /*
     1. Parse the input URL
     2. Initialize a socket
