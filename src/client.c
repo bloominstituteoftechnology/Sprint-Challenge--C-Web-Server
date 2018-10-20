@@ -58,7 +58,30 @@ urlinfo_t *parse_url(char *url)
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
 
-  char *backslash = strchr("", '\\');
+  char *backslash;
+  char *colon;
+
+  backslash = strchr(url, '/');
+
+  backslash++;
+  path = backslash;
+
+  // printf("PATH -> %s\n", backslash);
+
+  *backslash = '\0';
+
+  colon = strchr(url, ':');
+
+  colon++;
+  port = colon;
+
+// printf("PORT -> %s\n", colon);
+
+ *colon = '\0';
+
+//  printf("%s\n", url);
+
+hostname = url;
 
   return urlinfo;
 }
@@ -79,9 +102,7 @@ int send_request(int fd, char *hostname, char *port, char *path)
   char request[max_request_size];
   int rv;
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+
 
   return 0;
 }
@@ -104,9 +125,19 @@ int main(int argc, char *argv[])
     5. Clean up any allocated memory and open file descriptors.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  parse_url(argv);
+  get_socket(*hostname, *port);
+  send_request(sockfd, *hostname, *port, *path);
+
+
+  // might be wrong
+  int num_recv = recv(sockfd, buf, BUFSIZE - 1, 0);
+
+  while (num_recv < 0) {
+    printf();
+  }
+
+  free();
 
   return 0;
 }
