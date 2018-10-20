@@ -101,10 +101,35 @@ int send_request(int fd, char *hostname, char *port, char *path)
   const int max_request_size = 16384;
   char request[max_request_size];
   int rv;
+  
+  // stringify the passed data into the request packet buffer
+  int request_length = sprintf(response,
+      "%s\n"
+      "Date: %s\n" // asctime adds its own newline
+      "Port: %s\n"
+      "Path: %s\n"
+      "Content-Length: %d\n"
+      "\n" // end
+
+      hostname,
+      asctime(ltime),
+      port,
+      path,
+      request_length
+      );
 
 
+  // send function
+  int rv = send(fd, request, request_length, 0);
 
-  return 0;
+
+  // error checking, if value returned is -1
+  if (rv < 0) {
+    perror("Send");
+  }
+
+
+  return rv;
 }
 
 int main(int argc, char *argv[])
