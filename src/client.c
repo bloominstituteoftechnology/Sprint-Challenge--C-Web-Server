@@ -44,6 +44,14 @@ urlinfo_t *parse_url(char *url)
     5. Set the port pointer to 1 character after the spot returned by strchr.
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
+  char *first = strchr(url, '/');
+  // printf("FIRST SLASH%p", first);
+  *path = *first++;
+  sprintf("PATH: %s\n", path);
+  char *colon = strchr(url, ':');
+  printf("COLON%s", colon);
+  *port = *colon++;
+  printf("PORT%s", port);
 
   ///////////////////
   // IMPLEMENT ME! //
