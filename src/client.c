@@ -18,13 +18,7 @@ typedef struct urlinfo_t {
   char *path;
 } urlinfo_t;
 
-/**
- * Tokenize the given URL into hostname, path, and port.
- *
- * url: The input URL to parse.
- *
- * Store hostname, path, and port in a urlinfo_t struct and return the struct.
-*/
+
 char *remove_char(char *str, char c)
 {
   for (int i = 0; i <= strlen(str); i++)
@@ -47,16 +41,6 @@ urlinfo_t *parse_url(char *url)
 
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
 
-  /*
-    We can parse the input URL by doing the following:
-
-    1. Use strchr to find the first backslash in the URL (this is assuming there is no http:// or https:// in the URL).
-    2. Set the path pointer to 1 character after the spot returned by strchr.
-    3. Overwrite the backslash with a '\0' so that we are no longer considering anything after the backslash.
-    4. Use strchr to find the first colon in the URL.
-    5. Set the port pointer to 1 character after the spot returned by strchr.
-    6. Overwrite the colon with a '\0' so that we are just left with the hostname.
-  */
   curr = strchr(hostname, '/');
   path = curr + 1;
   hostname = remove_char(hostname, '/');
@@ -110,18 +94,14 @@ int main(int argc, char *argv[])
 {
   int sockfd, numbytes;
   char buf[BUFSIZE];
-  char *raw;
 
   if (argc != 2) {
     fprintf(stderr,"usage: client HOSTNAME:PORT/PATH\n");
     exit(1);
   }
   urlinfo_t *url = parse_url(argv[1]);
-
-  printf("%s\n", url->hostname);
-  printf("%s\n", url->port);
-  printf("%s\n", url->path);
-
+  sockfd = get_socket(url->hostname, url->port);
+  send_request(sockfd, url->hostname, url->port, url->path);
 
   /*
     1. Parse the input URL
