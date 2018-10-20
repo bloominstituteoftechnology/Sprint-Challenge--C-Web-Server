@@ -33,8 +33,13 @@ urlinfo_t *parse_url(char *url)
   char *path;
 
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
+  path = strchr(url, '/');
+  printf(path);
 
+  urlinfo->path = path + 1;
+  printf(urlinfo);
   /*
+
     We can parse the input URL by doing the following:
 
     1. Use strchr to find the first backslash in the URL (this is assuming there is no http:// or https:// in the URL).
