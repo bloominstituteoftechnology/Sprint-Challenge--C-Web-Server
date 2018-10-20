@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
+#include <time.h>
 #include <string.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -105,18 +106,23 @@ int send_request(int fd, char *hostname, char *port, char *path)
   const int max_request_size = 16384;
   char request[max_request_size];
   int rv;
+
+  time_t time1 = time(NULL);
+  struct tm *localtime1 = localtime(&time1);
+
+
   
   // stringify the passed data into the request packet buffer
   int request_length = sprintf(response,
       "%s\n"
-      "Date: %s\n" // asctime adds its own newline
+      "Date: %s\n" // asctime
       "Port: %s\n"
       "Path: %s\n"
       "Content-Length: %d\n"
       "\n" // end
 
       hostname,
-      asctime(ltime),
+      asctime(localtime1),
       port,
       path,
       request_length
