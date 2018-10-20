@@ -61,7 +61,9 @@ urlinfo_t *parse_url(char *url)
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
-
+  urlinfo->path = path;
+  urlinfo->port = port;
+  urlinfo->hostname = hostname;
   return urlinfo;
 }
 
@@ -82,7 +84,6 @@ int send_request(int fd, char *hostname, char *port, char *path)
   int rv;
 
   int request_length = sprintf(request,
-  "%s\n"
   "Host: %s:%s"
   "Connection: close\n",
   hostname,
@@ -90,8 +91,15 @@ int send_request(int fd, char *hostname, char *port, char *path)
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
+  printf("REQUEST%s: ", request);
+  rv = send(fd, request, request_length, 0);
 
-  return 0;
+  if (rv < 0)
+  {
+    perror("send");
+  }
+
+  return rv;
 }
 
 int main(int argc, char *argv[])
@@ -103,15 +111,21 @@ int main(int argc, char *argv[])
     fprintf(stderr,"usage: client HOSTNAME:PORT/PATH\n");
     exit(1);
   }
-  // parse_url(url);
-  // get_socket(*hostname, *port);
-  // send_request(fd, hostname, port, path);
+  // parse_url(argv);
+  char *hostname = argv[0];
+  char *port = argv[1];
+  char *path = argv[2];
+  get_socket(hostname, port);
+  send_request(sockfd, hostname, port, path);
 
   while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0)
   {
     // print the data we got back to stdout
     fprintf(stdout, "something here\n");
   }
+
+  // free(urlinfo);
+  // close(fd);
   /*
     1. Parse the input URL
     2. Initialize a socket
