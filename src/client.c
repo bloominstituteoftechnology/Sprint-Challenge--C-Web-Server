@@ -35,6 +35,8 @@ urlinfo_t *parse_url(char *url)
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
   path = strchr(url, '/');
   printf(path);
+  port = strchr(url, ":");
+  printf(port);
 
   urlinfo->path = path + 1;
   printf(urlinfo);
@@ -89,6 +91,9 @@ int main(int argc, char *argv[])
     fprintf(stderr,"usage: client HOSTNAME:PORT/PATH\n");
     exit(1);
   }
+
+  
+  parse_url(argv[1]);
 
   /*
     1. Parse the input URL
