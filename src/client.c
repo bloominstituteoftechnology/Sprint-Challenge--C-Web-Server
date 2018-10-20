@@ -106,7 +106,7 @@ int main(int argc, char *argv[])
 
   while((numbytes = recv(sockfd, buf, BUFSIZ -1, 0)) > 0)
   {
-    fprintf(stdout, "response\n");
+    printf("%s\n", buf);
   }
   close(sockfd);
   free(url);
