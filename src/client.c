@@ -47,7 +47,7 @@ urlinfo_t *parse_url(char *url)
   char *first = strchr(url, '/');
   // printf("FIRST SLASH%p", first);
   *path = *first++;
-  sprintf("PATH: %s\n", path);
+  printf("PATH: %s\n", path);
   char *colon = strchr(url, ':');
   printf("COLON%s", colon);
   *port = *colon++;
@@ -76,6 +76,12 @@ int send_request(int fd, char *hostname, char *port, char *path)
   char request[max_request_size];
   int rv;
 
+  int request_length = sprintf(request,
+  "%s\n"
+  "Host: %s:%s"
+  "Connection: close\n",
+  hostname,
+  port);
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
@@ -92,7 +98,8 @@ int main(int argc, char *argv[])
     fprintf(stderr,"usage: client HOSTNAME:PORT/PATH\n");
     exit(1);
   }
-
+  parse_url(argv);
+  get_socket(*hostname, *port);
   /*
     1. Parse the input URL
     2. Initialize a socket
