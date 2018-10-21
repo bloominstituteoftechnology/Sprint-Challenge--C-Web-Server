@@ -18,6 +18,15 @@ typedef struct urlinfo_t {
   char *path;
 } urlinfo_t;
 
+char *replace_char_with_null(char *str, char c) {
+  for (int i = 0; i <= strlen(str); i++) {
+    if (str[i] == c) {
+      str[i] = '\0';
+    }
+  }
+  return str;
+}
+
 /**
  * Tokenize the given URL into hostname, path, and port.
  *
