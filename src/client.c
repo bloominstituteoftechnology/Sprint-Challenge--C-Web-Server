@@ -28,8 +28,6 @@ typedef struct urlinfo_t {
 urlinfo_t *parse_url(char *url)
 {
   char *hostname;
-  char *port;
-  char *path;
 
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
 
@@ -44,14 +42,26 @@ urlinfo_t *parse_url(char *url)
     hostname = strdup(url);
   }
 
-  path = strchr(hostname, '/');
-  hostname[(int)(path - hostname)] = '\0';
-  port = strchr(hostname, ':');
-  hostname[(int)(port - hostname)] = '\0';
+  char *path = strchr(hostname, '/');
+  char *port = strchr(hostname, ':');
+
+  if (path != NULL) {
+    hostname[(int)(path - hostname)] = '\0';
+    path = path + 1;
+  } else {
+    path = "/";
+  }
+
+  if (port != NULL) {
+    hostname[(int)(port - hostname)] = '\0';
+    port = port + 1;
+  } else {
+    port = "80";
+  }
 
   urlinfo->hostname = hostname;
-  urlinfo->path = path + 1;
-  urlinfo->port = port + 1;
+  urlinfo->path = path;
+  urlinfo->port = port;
 
   return urlinfo;
 }
@@ -70,36 +80,47 @@ int send_request(int fd, char *hostname, char *port, char *path)
 {
   const int max_request_size = 16384;
   char request[max_request_size];
-  int rv;
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  int request_length = sprintf(request,
+    "GET /%s HTTP/1.1\n"
+    "Host: %s:%s\n"
+    "Connection: close\n"
+    "\n",
+    path,
+    hostname,
+    port
+  );
 
-  return 0;
+  int rv = send(fd, request, request_length, 0);
+
+  return rv;
 }
 
 int main(int argc, char *argv[])
 {
-  int sockfd, numbytes;
-  char buf[BUFSIZE];
+  int sockfd;
+  char buf[65536];
 
   if (argc != 2) {
     fprintf(stderr,"usage: client HOSTNAME:PORT/PATH\n");
     exit(1);
   }
 
-  /*
-    1. Parse the input URL
-    2. Initialize a socket
-    3. Call send_request to construct the request and send it
-    4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
-    5. Clean up any allocated memory and open file descriptors.
-  */
+  urlinfo_t *urlinfo = parse_url(argv[1]);
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  sockfd = get_socket(urlinfo->hostname, urlinfo->port);
+  if (sockfd == -1) {
+    perror("Error getting socket");
+  }
+
+  send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
+
+  while (recv(sockfd, buf, 65535, 0) > 0) {
+    printf("%s\n", buf);
+  }
+
+  free(urlinfo->hostname);
+  free(urlinfo);
 
   return 0;
 }
