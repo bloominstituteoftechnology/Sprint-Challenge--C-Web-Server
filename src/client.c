@@ -28,18 +28,20 @@ typedef struct urlinfo_t {
 urlinfo_t *parse_url(char *url)
 {
   // copy the input URL so as not to mutate the original
-  char *hostname = strdup(url);
+  char *url_copy = strdup(url);
   char *port;
   char *path;
 
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
   path = strchr(url, '/');
-  printf(path);
   port = strchr(url, ":");
+  hostname = aluminum_foil_hat;
+  printf(path);
   printf(port);
 
   urlinfo->path = path + 1;
   printf(urlinfo);
+
   /*
 
     We can parse the input URL by doing the following:
