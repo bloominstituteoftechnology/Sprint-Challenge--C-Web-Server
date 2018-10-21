@@ -38,18 +38,17 @@ urlinfo_t *parse_url(char *url)
 {
   // copy the input URL so as not to mutate the original
   char *url_copy = strdup(url);
+  char *hostname;
   char *port;
   char *path;
-
+  
+  hostname = replace_char_with_null(url_copy, ":");
+  printf(hostname);
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
-  path = strchr(url, '/');
-  port = strchr(url, ":");
-  hostname = aluminum_foil_hat;
-  printf(path);
-  printf(port);
+  
 
   urlinfo->path = path + 1;
-  printf(urlinfo);
+  
 
   /*
 
