@@ -1,3 +1,8 @@
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
 int str_cut(char *str, int begin, int len)
 {
     int l = strlen(str);
@@ -9,11 +14,20 @@ int str_cut(char *str, int begin, int len)
     return len;
 }
 
-int main(void) {
-    char string[] = "string";
-    char src[sizeof(string)];
-    char substring = str_cut(string, 1, sizeof(string));
-    printf(substring);
+int main(void)
+{
+    char str[] = "The quick brown fox";
+    
+    puts(str);
+    
+    str_cut(str, 10, 6);    // "The quick [brown ]fox"
+    puts(str);              // "The quick fox"
+    
+    str_cut(str, 3, 6);     // "The [quick ]fox"
+    puts(str);              // "The fox"
+    
+    str_cut(str, 3, -1);    // "The[ fox]"
+    puts(str);              // "The"
+    
+    return 0;
 }
-
-
