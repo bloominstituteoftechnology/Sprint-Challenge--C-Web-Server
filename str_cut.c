@@ -15,3 +15,5 @@ int main(void) {
     char substring = str_cut(string, 1, sizeof(string));
     printf(substring);
 }
+
+
