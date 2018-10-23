@@ -99,7 +99,7 @@ int send_request(int fd, char *hostname, char *port, char *path)
 
   if (rv < 0){
     perror("send");
-    return;
+    return 0;
   }
 
   return rv;
@@ -125,7 +125,7 @@ int main(int argc, char *argv[])
 
   struct urlinfo_t *urlinfo = parse_url(argv[1]);
   
-  sockfd = get_socket(urlinfo->hostname, urlinfo->path);
+  sockfd = get_socket(urlinfo->hostname, urlinfo->port);
 
   send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
 
