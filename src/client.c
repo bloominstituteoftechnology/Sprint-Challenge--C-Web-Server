@@ -16,7 +16,7 @@ typedef struct urlinfo_t {
   char *hostname;
   char *port;
   char *path;
-} urlinfo_t;
+} urlinfo_t; // is this so we don't have to call struct everywhere??
 
 char *replace_char_with_null(char *str, char c) {
   for (int i = 0; i <= strlen(str); i++) {
@@ -25,7 +25,7 @@ char *replace_char_with_null(char *str, char c) {
     }
   }
   return str;
-}
+} 
 
 /**
  * Tokenize the given URL into hostname, path, and port.
@@ -37,19 +37,20 @@ char *replace_char_with_null(char *str, char c) {
 urlinfo_t *parse_url(char *url)
 {
   // copy the input URL so as not to mutate the original
-  char *url_copy = strdup(url);
-  char *hostname;
+  char *hostname = strdup(url);
   char *port;
   char *path;
-  
-  hostname = replace_char_with_null(url_copy, ":");
-  printf(hostname);
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
-  
-
-  urlinfo->path = path + 1;
-  
-
+  path = strchr(url, '/') ;
+  // dereference the pointer to access the value
+  *path = '\0';
+  path++;
+  port = strchr(url, ":");
+  *port = '\0';
+  port++;
+  urlinfo->hostname = hostname;
+  urlinfo->port = port;
+  urlinfo->path = path;
   /*
 
     We can parse the input URL by doing the following:
@@ -66,7 +67,7 @@ urlinfo_t *parse_url(char *url)
   // IMPLEMENT ME! //
   ///////////////////
 
-  return urlinfo;
+  return 0;
 }
 
 /**
