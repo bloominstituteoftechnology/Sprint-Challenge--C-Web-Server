@@ -61,9 +61,9 @@ urlinfo_t *parse_url(char *url)
   urlinfo->hostname = hostname;
 
 
-  printf("path: %s \n", urlinfo->path);
-  printf("hostname: %s \n", urlinfo->hostname);
-  printf("port: %s \n", urlinfo->port);
+  // printf("path: %s \n", urlinfo->path);
+  // printf("hostname: %s \n", urlinfo->hostname);
+  // printf("port: %s \n", urlinfo->port);
 
   return urlinfo;
 }
@@ -81,13 +81,15 @@ urlinfo_t *parse_url(char *url)
 int send_request(int fd, char *hostname, char *port, char *path)
 {
   const int max_request_size = 16384;
+  char send_buff[1025];
   char request[max_request_size];
   int rv;
   // printf("send hostname")
+  sprintf(request,  "GET /%s HTTP/1.1\nHost: %s:%s\r\nConnection: close\r\n\r\n", path, hostname, port);
+  
+  // printf("%s \n", request);
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  send(fd, request, strlen(request), 0);
 
   return 0;
 }
@@ -95,7 +97,7 @@ int send_request(int fd, char *hostname, char *port, char *path)
 int main(int argc, char *argv[])
 {  
   int sockfd, numbytes;  
-  char buf[BUFSIZE];
+  char buf[2056];
 
   if (argc != 2) {
     fprintf(stderr,"usage: client HOSTNAME:PORT/PATH\n");
@@ -108,8 +110,14 @@ int main(int argc, char *argv[])
   // printf("int main hostname: %s \n", urlinfo_t.hostname->hostname);
   sockfd = get_socket(urlinfo->hostname, urlinfo->port);
 
-  send_request( sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
+  send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
 
+    numbytes = recv(sockfd,buf,sizeof(buf)-1,0); // <-- -1 to leave room for a null terminator
+    buf[numbytes] = 0; // <-- add the null terminator
+    printf("recv()'d %d bytes of data in buf\n",numbytes);
+    printf("%s",buf);
+  // while ((numbytes = recv(sockfd, buf, sizeof(buf) - 1, 0)) > 0) {
+  // }
   /*
     1. Parse the input URL
     2. Initialize a socket
