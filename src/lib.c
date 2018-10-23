@@ -35,7 +35,7 @@ int get_socket(char *hostname, char *port)
   // tries to find some that match our requirements (namely either
   // IPv4 or IPv6 (AF_UNSPEC) and TCP (SOCK_STREAM) and use any IP on
   // this machine (AI_PASSIVE).
-
+  
   memset(&hints, 0, sizeof hints);
   hints.ai_family = AF_UNSPEC;
   hints.ai_socktype = SOCK_STREAM;

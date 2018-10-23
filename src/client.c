@@ -89,12 +89,10 @@ int send_request(int fd, char *hostname, char *port, char *path)
   const int max_request_size = 16384;
   char request[max_request_size];
 
-  int rv = recv(fd, request, max_request_size -1, 0);
-
-  int resquet_length = sprintf(request,
+  int resquest_length = sprintf(request,
         "GET /%s HTTP/1.1\n"
         "Host: %s:%s\n"
-        "Connection: close\n",
+        "Connection: close\n\n",
         path, hostname, port);
   
   int rv = send(fd, request, request_length, 0);
