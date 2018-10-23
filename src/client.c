@@ -131,5 +131,12 @@ int main(int argc, char *argv[])
 
   send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
 
+  while ((numbytes = recv(sockfd, buf, BUFSIZE -1,0) > 0) {
+    fwrite(buf, 1, numbytes, stdout);
+  }
+
+  free(urlinfo);
+  close(sockfd);
+
   return 0;
 }
