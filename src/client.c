@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
-#include <time.h>
 #include <string.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -59,36 +58,32 @@ urlinfo_t *parse_url(char *url)
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
 
-  char *backslash;
-  char *colon;
+  // char *backslash;
+  // char *colon;
 
-  backslash = strchr(url, '/');
+  path = strchr(hostname, '/');
 
-  backslash++;
-  path = backslash;
+  *path = '\0';
+  path++;
 
   // printf("PATH -> %s\n", backslash);
 
-  *backslash = '\0';
+  port = strchr(hostname, ':');
 
-  colon = strchr(url, ':');
-
-  colon++;
-  port = colon;
+  *port = '\0';
+  port++;
 
 // printf("PORT -> %s\n", colon);
 
- *colon = '\0';
-
 //  printf("%s\n", url);
 
-hostname = url;
+// hostname = hostname;
 
-urlinfo->path = path;
-urlinfo->port = port;
-urlinfo->hostname = hostname;
+  urlinfo->hostname = hostname;
+  urlinfo->port = port;
+  urlinfo->path = path;
 
-  return urlinfo;
+return urlinfo;
 }
 
 /**
@@ -107,30 +102,25 @@ int send_request(int fd, char *hostname, char *port, char *path)
   char request[max_request_size];
   int rv;
 
-  time_t time1 = time(NULL);
-  struct tm *localtime1 = localtime(&time1);
+  // time_t time1 = time(NULL);
+  // struct tm *localtime1 = localtime(&time1);
 
 
   
   // stringify the passed data into the request packet buffer
-  int request_length = sprintf(response,
-      "%s\n"
-      "Date: %s\n" // asctime
+  int request_length = sprintf(request,
+      "GET PATH: %s\n"
+      "Host: %s\n"
       "Port: %s\n"
-      "Path: %s\n"
-      "Content-Length: %d\n"
-      "\n" // end
-
-      hostname,
-      asctime(localtime1),
-      port,
+      "Connection Closed\n\n", // end
       path,
-      request_length
+      hostname,
+      port
       );
 
 
   // send function
-  int rv = send(fd, request, request_length, 0);
+  rv = send(fd, request, request_length, 0);
 
 
   // error checking, if value returned is -1
@@ -160,19 +150,20 @@ int main(int argc, char *argv[])
     5. Clean up any allocated memory and open file descriptors.
   */
 
-  parse_url(argv);
-  get_socket(*hostname, *port);
-  send_request(sockfd, *hostname, *port, *path);
+  urlinfo_t *urlinfo = parse_url(argv[1]);
+  sockfd = get_socket(urlinfo->hostname, urlinfo->port);
+  send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
 
 
   // might be wrong
-  int num_recv = recv(sockfd, buf, BUFSIZE - 1, 0);
+  numbytes = recv(sockfd, buf, BUFSIZE - 1, 0);
 
-  while (num_recv < 0) {
-    printf();
+  while (numbytes > 0) {
+    fwrite(buf, 1, numbytes, stdout);
   }
 
-  free();
+  free(urlinfo);
+  close(sockfd);
 
   return 0;
 }
