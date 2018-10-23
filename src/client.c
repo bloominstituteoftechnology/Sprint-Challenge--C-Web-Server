@@ -86,7 +86,7 @@ int send_request(int fd, char *hostname, char *port, char *path)
   char request[max_request_size];
   int rv;
 
-  sprintf( request,
+  int request_length = sprintf( request,
       "GET /%s HTTP/1.1\n"
       "Host: %s:%s\n"
       "Connection: close\n",
@@ -94,8 +94,9 @@ int send_request(int fd, char *hostname, char *port, char *path)
       hostname,
       port 
   );
-
-  return 0;
+  
+  rv = send(fd, request, request_length, 0);
+  return rv;
 }
 
 int main(int argc, char *argv[])
@@ -108,9 +109,16 @@ int main(int argc, char *argv[])
     exit(1);
   }
 
-  
-  parse_url(argv[1]);
+  urlinfo_t *urlinfo = parse_url(argv[1]);
+  sockfd = get_socket(urlinfo->hostname, urlinfo->port);
+  send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
 
+  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
+    fwrite(buf, 1, numbytes, stdout);
+  }
+
+  free(urlinfo);
+  close(sockfd);
   /*
     1. Parse the input URL
     2. Initialize a socket
