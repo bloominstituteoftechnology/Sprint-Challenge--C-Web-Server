@@ -45,6 +45,15 @@ urlinfo_t *parse_url(char *url)
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
 
+  char *protocol = strstr(hostname, "://");
+  if (protocol) {
+    hostname = protocol + 3;
+    *protocol = '\0';
+    printf("Protocol is: %s\n", protocol);
+  } else {
+    printf("Protocol not found, moving on...\n");
+  }
+
   path = strchr(hostname, '/');
   *path = '\0';
   path++;
