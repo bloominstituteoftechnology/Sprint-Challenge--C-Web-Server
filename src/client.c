@@ -33,9 +33,6 @@ urlinfo_t *parse_url(char *url)
   char *port;
   char *path;
 
-  const char backslash = '/';
-  const char colon = ':';
-
   char *first_backslash;
   char *first_colon;
 
@@ -44,22 +41,35 @@ urlinfo_t *parse_url(char *url)
   // We can parse the input URL by doing the following:
 
   // 1. Use strchr to find the first backslash in the URL (this is assuming there is no http:// or https:// in the URL).
-  first_backslash = strchr(hostname, backslash);
+  first_backslash = strchr(url, '/');
+
   // 2. Set the path pointer to 1 character after the spot returned by strchr.
-  path = first_backslash[1];
+  path = &first_backslash[1];
+
   // 3. Overwrite the backslash with a '\0' so that we are no longer considering anything after the backslash.
-  for (char *i = hostname; i = strchr(i, backslash); ++i)
+  for (int i = 0; i < strlen(hostname); i++)
   {
-    *i = "\0";
+    if (hostname[i] == '/')
+    {
+      hostname[i] = '\0';
+      return 0;
+    }
   }
+
   // 4. Use strchr to find the first colon in the URL.
-  first_colon = strchr(hostname, colon);
+  first_colon = strchr(url, ':');
+
   // 5. Set the port pointer to 1 character after the spot returned by strchr.
-  port = first_colon[1];
+  port = &first_colon[1];
+
   // 6. Overwrite the colon with a '\0' so that we are just left with the hostname.
-  for (char *i = hostname; i = strchr(i, colon); ++i)
+  for (int i = 0; i < strlen(hostname); i++)
   {
-    *i = "\0";
+    if (hostname[i] == ':')
+    {
+      hostname[i] = '\0';
+      return 0;
+    }
   }
 
   return urlinfo;
@@ -89,7 +99,7 @@ int send_request(int fd, char *hostname, char *port, char *path)
                                hostname,
                                port);
 
-  int rv = send(fd, request, request_length, 0);
+  rv = send(fd, request, request_length, 0);
 
   if (rv < 0)
   {
@@ -111,10 +121,14 @@ int main(int argc, char *argv[])
   }
 
   // 1. Parse the input URL
-  // parse_url();
+  urlinfo_t *urlinfo = parse_url(argv[1]);
+
   // 2. Initialize a socket
-  // get_socket();
+  sockfd = get_socket(urlinfo->hostname, urlinfo->port);
+
   // 3. Call send_request to construct the request and send it
+  send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
+
   // 4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
   // 5. Clean up any allocated memory and open file descriptors.
 
