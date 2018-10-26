@@ -45,9 +45,37 @@ urlinfo_t *parse_url(char *url)
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  char *protocol = strstr(hostname, "://");
+  if (protocol) {
+    hostname = protocol + 3;
+    *protocol = '\0';
+    printf("Protocol is: %s\n", protocol);
+  } else {
+    printf("Protocol not found, moving on...\n");
+  }
+
+  path = strchr(hostname, '/');
+  *path = '\0';
+  path++;
+  printf("Path is: %s\n", path);
+
+  port = strchr(hostname, ':');
+
+  if (port) {
+    *port = '\0';
+    port++;
+    urlinfo->port = port;
+    printf("Port is: %s\n", port);
+  } else {
+    printf("Port is null, set to default 80\n");
+    urlinfo->port = "80";
+    port = strchr(hostname, '/');
+  }
+
+  printf("Hostname is: %s\n", hostname);
+
+  urlinfo->path = path;
+  urlinfo->hostname = hostname;
 
   return urlinfo;
 }
@@ -68,9 +96,20 @@ int send_request(int fd, char *hostname, char *port, char *path)
   char request[max_request_size];
   int rv;
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  int request_length = sprintf( request,
+    "GET /%s HTTP/1.1\n"
+    "Host: %s:%s\n" 
+    "Connection: close\n\n",
+    path,
+    hostname,
+    port
+  );
+
+  rv = send(fd, request, request_length, 0);
+
+  if (rv < 0) {
+    perror("send");
+  }
 
   return 0;
 }
@@ -93,9 +132,16 @@ int main(int argc, char *argv[])
     5. Clean up any allocated memory and open file descriptors.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  urlinfo_t *urlinfo = parse_url(argv[1]);
+  sockfd = get_socket(urlinfo->hostname, urlinfo->port);
+  send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
+
+  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
+    fwrite(buf, 1, numbytes, stdout);
+  }
+
+  free(urlinfo);
+  close(sockfd);
 
   return 0;
 }
