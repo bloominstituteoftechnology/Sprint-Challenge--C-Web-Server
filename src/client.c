@@ -77,7 +77,7 @@ int send_request(int fd, char *hostname, char *port, char *path)
   char request[max_request_size];
 
   // Build HTTP reqeust and store it in request
-  int request_length = sprintf(request, "GET /%s HTTP/1.1\nHost: %s:%s\nConnection:close", path, hostname, port);
+  int request_length = sprintf(request, "GET /%s HTTP/1.1\nHost: %s:%s\nConnection:close\n\n", path, hostname, port);
 
   //Send the HTTP response via the send() sys call:
   int rv = send(fd, request, request_length, 0);
@@ -104,23 +104,21 @@ int main(int argc, char *argv[])
   urlinfo_t *urlinfo = parse_url(argv[1]);
 
   // 2. Initialize a socket
-  int fd = get_socket(urlinfo->hostname, urlinfo->port);
+  sockfd = get_socket(urlinfo->hostname, urlinfo->port);
 
   // 3. Call send_request to construct the request and send it
-  int rv = send_request(fd, urlinfo->hostname, urlinfo->port, urlinfo->path);
+  int rv = send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
   
   // 4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
-
-  while (numbytes > 0) {
-    numbytes = recv(fd, buf, BUFSIZE, 0);
-    if (numbytes > 0){
+  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) 
+  {
+    // print the data we got back to stdout
       printf("\nServer Response: \n%s\n", buf);
     }
-  }
 
   // 5. Clean up any allocated memory and open file descriptors.
   free(urlinfo);
-  close(fd);
+  close(sockfd);
 
   return 0;
 }
