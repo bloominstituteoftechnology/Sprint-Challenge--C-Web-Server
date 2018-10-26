@@ -45,9 +45,23 @@ urlinfo_t *parse_url(char *url)
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  //STEPS 1-3
+  path = strchr(hostname, '/');
+  *path = '\0';
+  path += 1;
+  printf("path: %s\n", path);
+
+  //STEPS 4-5
+  port = strchr(hostname, ':');
+  *port = '\0';
+  port += 1;
+  printf("port: %s\n", port);
+  printf("hostname: %s\n", hostname);
+
+  //STORE STRINGS IN urlinfo STRUCT
+  urlinfo->path = path;
+  urlinfo->port = port;
+  urlinfo->hostname = hostname;
 
   return urlinfo;
 }
@@ -66,13 +80,31 @@ int send_request(int fd, char *hostname, char *port, char *path)
 {
   const int max_request_size = 16384;
   char request[max_request_size];
-  int rv;
+  // int rv;
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+/*
+  GET /path HTTP/1.1
+  Host: hostname:port
+  Connection: close
+*/
 
-  return 0;
+  int request_length = sprintf(request,
+    "GET /%s HTTP/1.1\n"
+    "Host: %s:%s\n"
+    "Connection: close\n\n",
+    path,
+    hostname,
+    port
+  );
+
+  //Send it all!
+  int rv = send(fd, request, request_length, 0);
+
+  if (rv < 0) {
+    perror("send");
+  }
+
+  return rv;
 }
 
 int main(int argc, char *argv[])
@@ -93,9 +125,15 @@ int main(int argc, char *argv[])
     5. Clean up any allocated memory and open file descriptors.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
-
+  urlinfo_t *urlinfo = parse_url(argv[1]);
+  sockfd = get_socket(urlinfo->hostname, urlinfo->port);
+  send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
+  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
+  // print the data we got back to stdout
+    printf("%s\n", buf);
+  }
+  free(urlinfo);
+  close(sockfd);
+  
   return 0;
 }
