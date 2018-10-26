@@ -51,12 +51,13 @@ urlinfo_t *parse_url(char *url)
     hostname = tmp +3;
   }
 
-  tmp = strstr(hostname, '/');
+
+  tmp = strstr(hostname, "/");
   path = tmp+1;
 
   *tmp = '\0';
 
-  tmp = strstr(hostname, ':');
+  tmp = strstr(hostname, ":");
 
   if(tmp ==NULL){
     port = "80";
@@ -68,10 +69,6 @@ urlinfo_t *parse_url(char *url)
   urlinfo->hostname = hostname;
   urlinfo->port = port;
   urlinfo->path = path;
-
-  // for(int i = 0; i < strlen(url); i++){
-
-  // }
 
 
   return urlinfo;
@@ -92,19 +89,19 @@ int send_request(int fd, char *hostname, char *port, char *path)
   const int max_request_size = 16384;
   char request[max_request_size];
   int rv;
-
+  
   int request_length = sprintf(request, 
     "GET /%s HTTP/1.1\n"
     "Host: %s:%s\n"
     "Connection: close\n"
-    "/n",
+    "\n",
     path, hostname, port
   );
 
   if((rv = send(fd, request, request_length, 0) < 0)){
     perror("Error sending request");
   }
-
+printf("\n%d\n", rv);
   return rv;
 }
 
@@ -128,7 +125,8 @@ int main(int argc, char *argv[])
 
   urlinfo_t *urlinfo = parse_url(argv[1]);
 
-  sockfd = get_socket(urlinfo->hostname, urlinfo->port);
+  sockfd = get_socket(urlinfo->hostname, urlinfo->port); // client:connecting to 13.212.12.12.12
+
 
   if(sockfd < 0){
     perror("failed to get a socket");
@@ -137,8 +135,10 @@ int main(int argc, char *argv[])
 
   send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
 
-  while(numbytes = recv(sockfd, buf, BUFSIZE-1, 0) > 0){
-    printf("%s\n", buf);
+  
+  while((numbytes = recv(sockfd, buf, BUFSIZE-1, 0)) > 0){
+    fwrite(buf, 1, numbytes, stdout);
+    // printf("%s\n", buf);
   }
 
   if(numbytes < 0){
