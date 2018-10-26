@@ -51,7 +51,6 @@ urlinfo_t *parse_url(char *url)
 
   if (!(strstr(url, "http") || strstr(url, "https"))) // Case where there is no http(s) in the url
   {
-    char *url_copy = url; // copy the url for deconstruction
     // Parse the url find the path
     path = strchr(url, '/');
     path++; // Will want to double check this line to make sure it is implementing properly
@@ -67,23 +66,113 @@ urlinfo_t *parse_url(char *url)
 
     // Parse the url to find the port
 
-    port = strchr(url, ':');
-    port++;
+    if (strchr(url, ':'))
+    {
+      port = strchr(url, ':');
+      port++;
 
-    urlinfo->port = port;
+      urlinfo->port = port;
 
-    cur_position = strchr(url, ':');
+      cur_position = strchr(url, ':');
+      while (cur_position)
+      {
+        *cur_position = '\0';
+        cur_position = strchr(cur_position, ':');
+      }
+    } else
+    {
+      urlinfo->port = "80";
+    }
+    
+
+    // Wants the port has been found and stripped, only host name remains
+    urlinfo->hostname = url;
+  }
+  else if (strstr(url, "http"))
+  {
+    url = strchr(url, '/');
+    url = url + 2;
+
+    // Parse the url find the path
+    path = strchr(url, '/');
+    path++; // Will want to double check this line to make sure it is implementing properly
+
+    urlinfo->path = path;
+
+    char *cur_position = strchr(url, '/');
     while (cur_position)
     {
       *cur_position = '\0';
-      cur_position = strchr(cur_position, ':');
+      cur_position = strchr(cur_position, '/');
+    }
+
+    // Parse the url to find the port
+
+    if (strchr(url, ':'))
+    {
+      port = strchr(url, ':');
+      port++;
+
+      urlinfo->port = port;
+
+      cur_position = strchr(url, ':');
+      while (cur_position)
+      {
+        *cur_position = '\0';
+        cur_position = strchr(cur_position, ':');
+      }
+    } else
+    {
+      urlinfo->port = "80";
     }
 
     urlinfo->hostname = url;
   }
+
+  else if (strstr(url, "https"))
+  {
+    url = strchr(url, '/');
+    url = url + 2;
+
+    // Parse the url find the path
+    path = strchr(url, '/');
+    path++; // Will want to double check this line to make sure it is implementing properly
+
+    urlinfo->path = path;
+
+    char *cur_position = strchr(url, '/');
+    while (cur_position)
+    {
+      *cur_position = '\0';
+      cur_position = strchr(cur_position, '/');
+    }
+
+    // Parse the url to find the port
+
+    if (strchr(url, ':'))
+    {
+      port = strchr(url, ':');
+      port++;
+
+      urlinfo->port = port;
+
+      cur_position = strchr(url, ':');
+      while (cur_position)
+      {
+        *cur_position = '\0';
+        cur_position = strchr(cur_position, ':');
+      }
+    } else
+    {
+      urlinfo->port = "80";
+    }
+
+    urlinfo->hostname = url;
+  }
+
   else
   {
-    // Set the character pointer of the url ahead 7 or 8 spots depending on the protocol spec.
+    printf("how'd we get here?");
   }
 
   // printf("You put in %s %s %s \n", urlinfo->hostname, urlinfo->port, urlinfo->path);
