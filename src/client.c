@@ -46,18 +46,25 @@ urlinfo_t *parse_url(char *url)
   */
 
   path = strchr(hostname, '/');
-  printf("path: %s\n", path + 1);
+  // printf("path: %s\n", path + 1);
   *path = '\0';
   urlinfo->path = path + 1;
 
   // printf("url: %s\n", hostname);
 
-  port = strchr(hostname, ':');
-  printf("port: %s\n", port + 1);
-  *port = '\0';
-  urlinfo->port = port + 1;
+  if (strchr(hostname, ':') != NULL)
+  {
+    port = strchr(hostname, ':');
+    // printf("port: %s\n", port + 1);
+    *port = '\0';
+    urlinfo->port = port + 1;
+  }
+  else
+  {
+    urlinfo->port = "80";
+  }
 
-  printf("hostname: %s\n", hostname);
+  // printf("hostname: %s\n", hostname);
   urlinfo->hostname = hostname;
 
   return urlinfo;
@@ -103,8 +110,7 @@ int main(int argc, char *argv[])
     5. Clean up any allocated memory and open file descriptors.
   */
 
-  strcpy(buf, argv[1]);
-  urlinfo_t *url = parse_url(buf);
+  urlinfo_t *url = parse_url(argv[1]);
 
   sockfd = get_socket(url->hostname, url->port);  
 
@@ -117,6 +123,8 @@ int main(int argc, char *argv[])
   }
 
   close(sockfd); 
+
+  free(url);
 
   return 0;
 }
