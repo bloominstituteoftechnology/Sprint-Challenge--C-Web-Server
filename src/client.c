@@ -5,6 +5,7 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <time.h>
 #include "lib.h"
 
 #define BUFSIZE 4096 // max number of bytes we can get at once
@@ -45,9 +46,17 @@ urlinfo_t *parse_url(char *url)
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  char *tmp = strstr(hostname, "/");
+  path = tmp + 1;
+  *tmp = '\0';
+
+  tmp = strstr(hostname, ":");
+  port = tmp + 1;
+  *tmp = '\0';
+
+  urlinfo->hostname = hostname;
+  urlinfo->port = port;
+  urlinfo->path = path;
 
   return urlinfo;
 }
@@ -68,9 +77,14 @@ int send_request(int fd, char *hostname, char *port, char *path)
   char request[max_request_size];
   int rv;
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  time_t t = time(NULL);
+  struct tm *lt = localtime(&t);
+
+  unsigned long int request_length = sprintf(request,
+    "GET /%s HTTP/1.1\nHost: %s:%s\nConnection: close\n",
+    path, hostname, port);
+
+  rv = send(fd, request, request_length, 0);
 
   return 0;
 }
@@ -79,6 +93,7 @@ int main(int argc, char *argv[])
 {  
   int sockfd, numbytes;  
   char buf[BUFSIZE];
+  char hostname[18], port[8], path[20];
 
   if (argc != 2) {
     fprintf(stderr,"usage: client HOSTNAME:PORT/PATH\n");
@@ -93,9 +108,14 @@ int main(int argc, char *argv[])
     5. Clean up any allocated memory and open file descriptors.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  printf("#1%s\n", argv[0]); // ./client
+  printf("#2%s\n", argv[1]); // localhost:3490/d20
+
+  sscanf(argv[1], "%s:%s/%s", hostname, port, path); // Step 1
+
+  int listenfd = get_socket(hostname, port);
+
+  send_request(int fd, hostname, port, path) //Step 3
 
   return 0;
 }
