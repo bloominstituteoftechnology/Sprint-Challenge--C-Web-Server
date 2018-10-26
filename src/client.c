@@ -45,10 +45,6 @@ urlinfo_t *parse_url(char *url)
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
-
   return urlinfo;
 }
 
@@ -93,9 +89,16 @@ int main(int argc, char *argv[])
     5. Clean up any allocated memory and open file descriptors.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  strcpy(buf, argv[1]);
+  printf("url: %s\n", buf);
+  char *ret = strchr(buf, '/');
+  printf("path: %s\n", ret + 1);
+  *ret = '\0';
+  // printf("url: %s\n", buf);
+  ret = strchr(buf, ':');
+  printf("port: %s\n", ret + 1);
+  *ret = '\0';
+  printf("hostname: %s\n", buf);
 
   return 0;
 }
