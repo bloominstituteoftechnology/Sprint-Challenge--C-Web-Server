@@ -126,7 +126,7 @@ int main(int argc, char *argv[])
   send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);  //call send_request() to construct the request and send it
 
   while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
-    printf(buf, 1, numbytes, stdout);  //call 'recv' in a loop (see readme) and print response to stdout
+    fwrite(buf, 1, numbytes, stdout);  //call 'recv' in a loop (see readme) and print response to stdout
   }
 
   free(urlinfo);
