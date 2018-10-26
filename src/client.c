@@ -46,13 +46,24 @@ urlinfo_t *parse_url(char *url)
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
 
-  char *tmp = strstr(hostname, "/");
+  // Stretch added by solution(remove http://):
+
+  char *tmp = strstr(hostname, "://");
+  if (tmp != NULL) {
+    hostname = tmp + 3;
+  }
+
+  tmp = strstr(hostname, "/");
   path = tmp + 1;
   *tmp = '\0';
 
   tmp = strstr(hostname, ":");
-  port = tmp + 1;
-  *tmp = '\0';
+  if (tmp == NULL) {
+    port = "80";
+  } else {
+    port = tmp + 1;
+    *tmp = '\0';
+  }
 
   urlinfo->hostname = hostname;
   urlinfo->port = port;
@@ -86,7 +97,7 @@ int send_request(int fd, char *hostname, char *port, char *path)
 
   rv = send(fd, request, request_length, 0);
 
-  return 0;
+  return rv;
 }
 
 int main(int argc, char *argv[])
@@ -111,10 +122,12 @@ int main(int argc, char *argv[])
 
   // Step 4 - Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
   while ((numbytes = recv(sockfd, buf, BUFSIZE -1, 0)) > 0) {
-    fprintf(stdout, "%s\n", buf);
+    // fprintf(stdout, "%s\n", buf);
+    fwrite(buf, 1, numbytes, stdout);
   }
 
   // Step 5 - Clean up any allocated memory and open file descriptors.
+  free(urlinfo);
   close(sockfd);
 
   return 0;
