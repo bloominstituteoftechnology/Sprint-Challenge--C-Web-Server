@@ -25,12 +25,18 @@ typedef struct urlinfo_t {
  *
  * Store hostname, path, and port in a urlinfo_t struct and return the struct.
 */
+char *set_null(char* string_in, char search_char)
+{
+  char * found_char = strchr(string_in, search_char);
+  *found_char = '\0';
+}
+
 urlinfo_t *parse_url(char *url)
 {
   // copy the input URL so as not to mutate the original
   char *hostname = strdup(url);
-  char *port;
-  char *path;
+  char *port = strdup(url);
+  char *path = strdup(url);
 
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
 
@@ -45,9 +51,15 @@ urlinfo_t *parse_url(char *url)
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  set_null(hostname, ':');
+  port = strchr(port, ':') + 1;
+  set_null(port, '/');
+  path = strchr(path, '/') + 1;
+
+  urlinfo->hostname = hostname;
+  urlinfo->port = port;
+  urlinfo->path = path;
+  
 
   return urlinfo;
 }
