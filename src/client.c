@@ -46,12 +46,12 @@ urlinfo_t *parse_url(char *url)
   */
 
   path = strchr(hostname, '/');
-  path++;
   *path = '\0';
+  path++;
 
   port = strchr(hostname, ':');
-  port++;
   *port = '\0';
+  port++;
 
   printf("Path is: %s\n", path);
   printf("Port is: %s\n", port);
