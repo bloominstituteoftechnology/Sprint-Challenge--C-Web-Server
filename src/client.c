@@ -44,6 +44,25 @@ urlinfo_t *parse_url(char *url)
     5. Set the port pointer to 1 character after the spot returned by strchr.
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
+  
+
+  char *tmp = strchr(hostname, "/");
+  path = tmp + 1;
+  *tmp = '\0';
+
+  tmp = strchr(path, ":");
+  port = tmp + 1;
+  *tmp = '\0';
+
+  // urlinfo->hostname = hostname;
+  // urlinfo->port = port;
+  // urlinfo->path = path;
+
+  printf("%s\n", hostname);
+  printf("%s\n", path);
+  printf("%s\n", port);
+
+  
 
   ///////////////////
   // IMPLEMENT ME! //
@@ -62,15 +81,40 @@ urlinfo_t *parse_url(char *url)
  *
  * Return the value from the send() function.
 */
+// unsigned long int response_length = sprintf(request, "%s\n%s\n%s\n", something, something, something);
+
+// GET /path HTTP/1.1
+// Host: hostname:port
+// Connection: close
+
 int send_request(int fd, char *hostname, char *port, char *path)
 {
   const int max_request_size = 16384;
   char request[max_request_size];
   int rv;
+  
+  char get[30];
+  char connection[30];
+  char host[30];
 
+    // sprintf(hostname, "Hostname: %lu", hostname);
+    // sprintf(port, "Port: %s", port);
+    // sprintf(path, "Path: ",path);
+    sprintf(get, "GET /%s HTTP/1.1", path);
+    sprintf(host, "Host: %s:%s", hostname, port);
+    sprintf(connection, "Connection: close");
+
+    unsigned long int request_length = sprintf(request, "%s\n%s\n%s\n", get, host, connection);
+
+    rv = send(fd, request, request_length, 0 );
+    return rv;
+
+    
+    
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
+  
 
   return 0;
 }
@@ -92,7 +136,9 @@ int main(int argc, char *argv[])
     4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
     5. Clean up any allocated memory and open file descriptors.
   */
-
+  // parse_url(*argv);
+  // get_socket(hostname, port);
+  // send_request(fd, hostname, port, path);
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
