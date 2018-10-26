@@ -81,7 +81,7 @@ int send_request(int fd, char *hostname, char *port, char *path)
   struct tm *lt = localtime(&t);
 
   unsigned long int request_length = sprintf(request,
-    "GET /%s HTTP/1.1\nHost: %s:%s\nConnection: close\n",
+    "GET /%s HTTP/1.1\nHost: %s:%s\nConnection: close\n\n",
     path, hostname, port);
 
   rv = send(fd, request, request_length, 0);
@@ -101,12 +101,13 @@ int main(int argc, char *argv[])
   }
 
   // Step 1 - Parse the input URL
-  sscanf(argv[1], "%s:%s/%s", hostname, port, path);
+  struct urlinfo_t *urlinfo = parse_url(argv[1]);
+
   // Step 2 - Initialize a socket
-  sockfd = get_socket(hostname, port);
+  sockfd = get_socket(urlinfo->hostname, urlinfo->port);
 
   // Step 3 - Call send_request to construct the request and send it
-  send_request(sockfd, hostname, port, path);
+  send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
 
   // Step 4 - Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
   while ((numbytes = recv(sockfd, buf, BUFSIZE -1, 0)) > 0) {
