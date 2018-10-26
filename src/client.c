@@ -77,7 +77,7 @@ int send_request(int fd, char *hostname, char *port, char *path)
 {
   const int max_request_size = 16384;
   char request[max_request_size];
-  int rv;
+  // int rv;
 
 /*
   GET /path HTTP/1.1
@@ -85,7 +85,7 @@ int send_request(int fd, char *hostname, char *port, char *path)
   Connection: close
 */
 
-  int response_length = sprintf(response,
+  int request_length = sprintf(request,
     "GET /%s HTTP/1.1"
     "Host: %s%s"
     "Connection: close",
@@ -95,7 +95,7 @@ int send_request(int fd, char *hostname, char *port, char *path)
   );
 
   //Send it all!
-  int rv = send(fd, response, response_length, 0);
+  int rv = send(fd, request, request_length, 0);
 
   if (rv < 0) {
     perror("send");
