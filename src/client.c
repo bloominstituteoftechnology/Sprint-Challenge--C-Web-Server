@@ -45,23 +45,33 @@ urlinfo_t *parse_url(char *url)
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
 
-  // Use strchr to find the first backslash in the URL
-  path = strchr(url, '/');
+  // // Use strchr to find the first backslash in the URL
+  // path = strchr(url, '/');
+  // // Overwrite the backslash with a '\0'
+  // *path = '\0';  
+  // // Set the path pointer to 1 character after
+  // path++;
+
+  // // Use strchr to find the first colon in the URL
+  // port = strchr(url, ':');
+  // // Overwrite the colon with a '\0'
+  // *port = '\0';
+  // // Set the port pointer to 1 character after
+  // port++;
+
+  // Use temp and strstr to find the first backslash in the URL
+  char *temp = strstr(hostname, "/");
   // Overwrite the backslash with a '\0'
-  *path = '\0';  
+  *temp = '\0';
   // Set the path pointer to 1 character after
-  path++;
+  path = temp + 1;
 
-  printf("This is the path: %s\n", path);
-
-  // Use strchr to find the first colon in the URL
-  port = strchr(url, ':');
+  // Use temp and strstr to find the first colon in the URL
+  temp = strstr(hostname, ":");
   // Overwrite the colon with a '\0'
-  *port = '\0';
+  *temp = '\0';
   // Set the port pointer to 1 character after
-  port++;
-
-  printf("This is the port: %s\n", port);
+  port = temp + 1;
 
   // Store hostname, path, and port in a urlinfo_t struct (named urlinfo above) 
   urlinfo->path = path;
