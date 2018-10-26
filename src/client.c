@@ -68,9 +68,16 @@ int send_request(int fd, char *hostname, char *port, char *path)
   char request[max_request_size];
   int rv;
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  int request_length = sprintf(request,
+    "GET /%s HTTP/1.1"
+    "Host: %s:%s"
+    "Connection: close",
+    path,
+    hostname,
+    port
+  );
+
+  send(fd, request, request_length, 0);
 
   return 0;
 }
