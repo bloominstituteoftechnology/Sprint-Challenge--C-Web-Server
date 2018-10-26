@@ -2,9 +2,9 @@
 
 ## A Simple cURL-like Client
 
-[cURL](https://en.wikipedia.org/wiki/CURL), which stands for "Client URL", is a command line tool that can make requests to servers, just like browsers can. You may have been using cURL in order to test your web server implementation. 
+[cURL](https://en.wikipedia.org/wiki/CURL), which stands for "Client URL", is a command line tool that can make requests to servers, just like browsers can. You may have been using cURL in order to test your web server implementation.
 
-If you've never played around with cURL, open up a terminal window and type in `curl -D - www.google.com`. When that command gets executed, you'll see that you get back an HTTP response with a whole bunch of HTML in the body. You just requested Google's home page, but since cURL is just a command line tool, it isn't capable of taking the HTML in the response and rendering it. 
+If you've never played around with cURL, open up a terminal window and type in `curl -D - www.google.com`. When that command gets executed, you'll see that you get back an HTTP response with a whole bunch of HTML in the body. You just requested Google's home page, but since cURL is just a command line tool, it isn't capable of taking the HTML in the response and rendering it.
 
 For this sprint challenge, you'll be implementing a barebones client that will run from the command line. In other words, a stripped down version of cURL that can only make GET requests. Your MVP implementation will need to be able to accept a URL as input, make a GET request, receive the response and print it all to `stdout`.
 
@@ -29,8 +29,8 @@ For this sprint challenge, all your code should be implemented in the `client.c`
 1. Parse the input URL.
    * Your client should be able to handle URLs such as `localhost:3490/d20` and `www.google.com:80/`. Input URLs need to be broken down into `hostname`, `port`, and `path`. The `hostname` is everything before the colon (but doesn't include `http://` or `https://` if either are present), the `port` is the number after the colon ending at the backslash, and the `path` is everything after the backslash.
    * Implement the `parse_url()` function, which receives the input URL and tokenizes it into `hostname`, `port`, and `path` strings. Assign each of these to the appropriate field in the `urlinfo_t` struct and return it from the `parse_url()` function.
-   * You can use the `strchr` function to look for specific characters in a string. You can also use the `strstr` function to look for specific substrings in a string. 
-2. Construct the HTTP request. 
+   * You can use the `strchr` function to look for specific characters in a string. You can also use the `strstr` function to look for specific substrings in a string.
+2. Construct the HTTP request.
    * Just like in the web server, use `sprintf` in order to construct the request from the `hostname`, `port`, and `path`. Requests should look like the following:
    ```
    GET /path HTTP/1.1
@@ -40,7 +40,7 @@ For this sprint challenge, all your code should be implemented in the `client.c`
    ```
    The connection should be closed, otherwise some servers will simply hang and not return a response, since they're expecting more data from our client.
 3. Connect to the server.
-   * All of the networking logic that you'll need to connect to an arbitrary server is provided in the `lib.h` and `lib.c` files. All you have to do call the `get_socket()` function in order to get a socket that you can then send and receive data from using the `send` and `recv` system calls. 
+   * All of the networking logic that you'll need to connect to an arbitrary server is provided in the `lib.h` and `lib.c` files. All you have to do call the `get_socket()` function in order to get a socket that you can then send and receive data from using the `send` and `recv` system calls.
    * Make sure that your web server implementation (built during project days 1 & 2 from Web Server I) is running in another ternimal window when testing local requests.
 4. Send the request string down the socket.
    * Hopefully that's pretty self-explanatory.
@@ -52,9 +52,9 @@ For this sprint challenge, all your code should be implemented in the `client.c`
    }
    ```
 6. Clean up.
-   * Don't forget to `free` any allocated memory and `close` any open file descriptors. 
+   * Don't forget to `free` any allocated memory and `close` any open file descriptors.
 
-### Rubric
+### Rubric:
 
 Your cURL client will receive a 2 when it satisfies the following:
 
@@ -93,8 +93,8 @@ Connection: close
 In order to earn a score of 3, complete at least one of the following stretch goals:
 
 1. Make the URL parsing logic more robust.
-   * The specified URL parsing logic is really brittle. The most glaring hole is the fact that oftentimes, URLs don't actually include the port number. In such cases, clients just assume a default port number of 80. Improve the URL parsing logic such that it can handle being passed a URL without a port number, such as `www.google.com/`. 
-   * Also improve the parsing logic so that it can receive URLs prepended with `http://` or `https://`. Such URLs should not be treated any differently by the client, you'll just need to strip them off the input URL so that they don't become part of the hostname. 
+   * The specified URL parsing logic is really brittle. The most glaring hole is the fact that oftentimes, URLs don't actually include the port number. In such cases, clients just assume a default port number of 80. Improve the URL parsing logic such that it can handle being passed a URL without a port number, such as `www.google.com/`.
+   * Also improve the parsing logic so that it can receive URLs prepended with `http://` or `https://`. Such URLs should not be treated any differently by the client, you'll just need to strip them off the input URL so that they don't become part of the hostname.
 2. Implement the ability for the client to follow redirects.
    * If you execute `./client google.com:80/`, you'll get back a response with a `301 Moved Permanently` status. There's a `Location` field in the header as well as a `href` tag in the body specifying where the client needs to be redirected. Augment your client such that when it encounters a 301 status, it will automatically follow the redirect link and issue another request for the correct location.
 3. Don't have the client print out the header.
