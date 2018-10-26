@@ -110,11 +110,34 @@ int send_request(int fd, char *hostname, char *port, char *path)
   char request[max_request_size];
   int rv;
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+// Request formatted
+  int request_length = sprintf(request,
+        "GET "
+        "/%s"
+        " HTTP/1.1\r\n\r\n"
+        "Host: %s:%s\n" 
+        "Connection: close\n",
+        path,
+        hostname,  
+        port
+  );
 
-  return 0;
+// Request sent to sever
+send(fd, request, request_length, 0);
+
+int numbytes;
+char buf[BUFSIZE];
+
+// recv() called and data printed to stdout until finished
+while ((numbytes = recv(fd, buf, BUFSIZE - 1, 0)) > 0){
+    puts("Reply received\n");
+    puts(buf);
+} 
+
+close(fd);
+  
+
+return 0;
 }
 
 int main(int argc, char *argv[])
