@@ -126,5 +126,24 @@ int main(int argc, char *argv[])
     printf("%s\n", buf);
   }
 
+  char request_protocol[16];
+  char request_status[16];
+
+  sscanf(buf, "%s %s", request_protocol, request_status);
+
+  if (strcmp(request_status, "301") == 0)
+  {
+    char *body = strstr(buf, "\r\n\r\n");
+    body = strstr(body, "HREF");
+    body = strtok(body, "\"");
+    body = strtok(NULL, "\"");
+
+    char *args[2];
+    args[0] = "./client";
+    args[1] = body;
+
+    main(2, args);
+  }
+
   return 0;
 }
