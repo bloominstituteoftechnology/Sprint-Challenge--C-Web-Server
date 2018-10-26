@@ -55,8 +55,8 @@ urlinfo_t *parse_url(char *url)
   }
   else
   {
-    
-    port = ":";
+    //default port number used (80) for Stretch Goal 1.
+    port = "80";
   }
 
   urlinfo->hostname = hostname;
