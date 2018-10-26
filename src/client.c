@@ -48,17 +48,24 @@ urlinfo_t *parse_url(char *url)
   path = strchr(hostname, '/');
   *path = '\0';
   path++;
+  printf("Path is: %s\n", path);
 
   port = strchr(hostname, ':');
-  *port = '\0';
-  port++;
 
-  printf("Path is: %s\n", path);
-  printf("Port is: %s\n", port);
+  if (port) {
+    *port = '\0';
+    port++;
+    urlinfo->port = port;
+    printf("Port is: %s\n", port);
+  } else {
+    printf("Port is null, set to default 80\n");
+    urlinfo->port = "80";
+    port = strchr(hostname, '/');
+  }
+
   printf("Hostname is: %s\n", hostname);
 
   urlinfo->path = path;
-  urlinfo->port = port;
   urlinfo->hostname = hostname;
 
   return urlinfo;
