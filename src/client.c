@@ -111,7 +111,7 @@ int main(int argc, char *argv[])
 
   // Step 4 - Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
   while ((numbytes = recv(sockfd, buf, BUFSIZE -1, 0)) > 0) {
-    fprintf(stdout, "%s", buf);
+    fprintf(stdout, "%s\n", buf);
   }
 
   // Step 5 - Clean up any allocated memory and open file descriptors.
