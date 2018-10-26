@@ -28,7 +28,8 @@ typedef struct urlinfo_t {
 urlinfo_t *parse_url(char *url)
 {
   // copy the input URL so as not to mutate the original
-  char *hostname = strdup(url);
+  char *protocol= strdup(url);
+  char *hostname;
   char *port;
   char *path;
 
@@ -45,11 +46,52 @@ urlinfo_t *parse_url(char *url)
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+char str1[15];
+  strcpy(str1, "http");
 
-  return urlinfo;
+  if (strncmp(str1, protocol, 4) == 0){ 
+    
+  char *tmp = strstr(protocol, "://");
+  hostname = tmp + 3;
+  *tmp = '\0';
+
+  
+  tmp = strstr(hostname, ":");
+  port = tmp + 1;
+  *tmp = '\0';
+  tmp = strstr(port, "/");
+  path = tmp + 1;
+  *tmp = '\0';
+
+  } else {
+
+  hostname = protocol;
+  char *tmp = strstr(protocol, ":");
+  port = tmp + 1;
+  *tmp = '\0';
+  tmp = strstr(port, "/");
+  path = tmp + 1;
+  *tmp = '\0';
+  }
+ 
+
+  printf("%s\n", hostname);
+  printf("%s\n", port);
+  printf("%s\n", path);
+
+//Initialize socket
+int fd = get_socket(hostname, port);
+  
+if (fd < 0) {
+      fprintf(stderr, "client: fatal error getting socket\n");
+      exit(1);
+}
+
+// Sent request to server
+send_request(fd, hostname, port, path);
+  
+
+return urlinfo;
 }
 
 /**
@@ -68,11 +110,34 @@ int send_request(int fd, char *hostname, char *port, char *path)
   char request[max_request_size];
   int rv;
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+// Request formatted
+  int request_length = sprintf(request,
+        "GET "
+        "/%s"
+        " HTTP/1.1\r\n\r\n"
+        "Host: %s:%s\n" 
+        "Connection: close\n",
+        path,
+        hostname,  
+        port
+  );
 
-  return 0;
+// Request sent to sever
+send(fd, request, request_length, 0);
+
+int numbytes;
+char buf[BUFSIZE];
+
+// recv() called and data printed to stdout until finished
+while ((numbytes = recv(fd, buf, BUFSIZE - 1, 0)) > 0){
+    puts("Reply received\n");
+    puts(buf);
+} 
+
+close(fd);
+  
+
+return 0;
 }
 
 int main(int argc, char *argv[])
@@ -84,6 +149,10 @@ int main(int argc, char *argv[])
     fprintf(stderr,"usage: client HOSTNAME:PORT/PATH\n");
     exit(1);
   }
+
+  char *url;
+  url = argv[1];
+  parse_url(url);
 
   /*
     1. Parse the input URL
