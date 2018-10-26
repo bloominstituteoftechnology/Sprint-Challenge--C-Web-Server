@@ -16,7 +16,16 @@ typedef struct urlinfo_t {
   char *hostname;
   char *port;
   char *path;
-} urlinfo_t;
+} urlinfo_t; // is this so we don't have to call struct everywhere??
+
+char *replace_char_with_null(char *str, char c) {
+  for (int i = 0; i <= strlen(str); i++) {
+    if (str[i] == c) {
+      str[i] = '\0';
+    }
+  }
+  return str;
+} 
 
 /**
  * Tokenize the given URL into hostname, path, and port.
@@ -31,10 +40,19 @@ urlinfo_t *parse_url(char *url)
   char *hostname = strdup(url);
   char *port;
   char *path;
-
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
-
+  path = strchr(url, '/') ;
+  // dereference the pointer to access the value
+  *path = '\0';
+  path++;
+  port = strchr(url, ":");
+  *port = '\0';
+  port++;
+  urlinfo->hostname = hostname;
+  urlinfo->port = port;
+  urlinfo->path = path;
   /*
+
     We can parse the input URL by doing the following:
 
     1. Use strchr to find the first backslash in the URL (this is assuming there is no http:// or https:// in the URL).
@@ -49,7 +67,7 @@ urlinfo_t *parse_url(char *url)
   // IMPLEMENT ME! //
   ///////////////////
 
-  return urlinfo;
+  return 0;
 }
 
 /**
@@ -68,11 +86,17 @@ int send_request(int fd, char *hostname, char *port, char *path)
   char request[max_request_size];
   int rv;
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
-
-  return 0;
+  int request_length = sprintf( request,
+      "GET /%s HTTP/1.1\n"
+      "Host: %s:%s\n"
+      "Connection: close\n",
+      path,
+      hostname,
+      port 
+  );
+  
+  rv = send(fd, request, request_length, 0);
+  return rv;
 }
 
 int main(int argc, char *argv[])
@@ -85,6 +109,16 @@ int main(int argc, char *argv[])
     exit(1);
   }
 
+  urlinfo_t *urlinfo = parse_url(argv[1]);
+  sockfd = get_socket(urlinfo->hostname, urlinfo->port);
+  send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
+
+  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
+    fwrite(buf, 1, numbytes, stdout);
+  }
+
+  free(urlinfo);
+  close(sockfd);
   /*
     1. Parse the input URL
     2. Initialize a socket
