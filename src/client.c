@@ -30,9 +30,38 @@ urlinfo_t *parse_url(char *url)
   // copy the input URL so as not to mutate the original
   char *hostname = strdup(url);
   char *port;
+  char *host;
   char *path;
+  char http[10] = "http://";
+  char https[10] = "https://";
+  char www[10] = "www";
 
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
+
+  char *p;
+ 
+  //if http or https exists in url
+  if (strstr(url, http) != NULL || strstr(url, https) != NULL || strstr(url, www)) {
+
+    //get the path first
+    path = strtok(hostname, " ");
+    puts(path);
+    //  then get the port
+    // port = strtok(NULL, "/");
+    // printf("this is port- %s", port);
+
+  } else {
+    //get the hostname first
+    host = strtok(hostname, ":");
+    printf("this is hostname-%s\n", hostname);
+//  then get the port
+    port = strtok(NULL, "/");
+    printf("this is port- %s\n", port);
+    //then get the path
+    path = strchr(url, '/');
+    printf("this is path- %s\n", path);
+  }
+  
 
   /*
     We can parse the input URL by doing the following:
@@ -83,19 +112,26 @@ int main(int argc, char *argv[])
   if (argc != 2) {
     fprintf(stderr,"usage: client HOSTNAME:PORT/PATH\n");
     exit(1);
+  } else {
+    parse_url(argv[1]);
   }
 
-  /*
-    1. Parse the input URL
-    2. Initialize a socket
-    3. Call send_request to construct the request and send it
-    4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
-    5. Clean up any allocated memory and open file descriptors.
-  */
+  
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  
+    // 1. Parse the input URL
 
-  return 0;
+    // 2. Initialize a socket
+    // get_socket(char *hostname, char *port)
+
+    // 3. Call send_request to construct the request and send it
+    // 4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
+   
+    // while(1) {
+   
+    //   close(something);
+    // }
+    // 5. Clean up any allocated memory and open file descriptors.
+
+    return 0;
 }
