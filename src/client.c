@@ -81,6 +81,20 @@ int send_request(int fd, char *hostname, char *port, char *path)
   const int max_request_size = 16384;
   char request[max_request_size];
   int rv;
+ 
+  int request_length = sprintf(
+    request,
+    "GET /%s HTTP/1.1"
+    "Host: %s:%s\n"
+    "Connection: close\n\n",
+    path, hostname, port
+  );
+  
+  rv = send(fd, request, request_length, 0);
+
+  if (rv < 0) {
+    perror("send\n");
+  }
 
   ///////////////////
   // IMPLEMENT ME! //
