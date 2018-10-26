@@ -79,11 +79,29 @@ int send_request(int fd, char *hostname, char *port, char *path)
   char request[max_request_size];
   int rv;
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+/*
+  GET /path HTTP/1.1
+  Host: hostname:port
+  Connection: close
+*/
 
-  return 0;
+  int response_length = sprintf(response,
+    "GET /%s HTTP/1.1"
+    "Host: %s%s"
+    "Connection: close",
+    path,
+    hostname,
+    port
+  );
+
+  //Send it all!
+  int rv = send(fd, response, response_length, 0);
+
+  if (rv < 0) {
+    perror("send");
+  }
+
+  return rv;
 }
 
 int main(int argc, char *argv[])
