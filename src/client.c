@@ -45,9 +45,21 @@ urlinfo_t *parse_url(char *url)
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  path = strchr(hostname, '/');
+  path++;
+  *path = '\0';
+
+  port = strchr(hostname, ':');
+  port++;
+  *port = '\0';
+
+  printf("Path is: %s\n", path);
+  printf("Port is: %s\n", port);
+  printf("Hostname is: %s\n", hostname);
+
+  urlinfo->path = path;
+  urlinfo->port = port;
+  urlinfo->hostname = hostname;
 
   return urlinfo;
 }
