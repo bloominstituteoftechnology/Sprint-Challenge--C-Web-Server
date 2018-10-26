@@ -82,13 +82,23 @@ int send_request(int fd, char *hostname, char *port, char *path)
 {
   const int max_request_size = 16384;
   char request[max_request_size];
-  int rv;
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
-
-  return 0;
+  //Construct HTTP request here
+  int request_length = sprintf(request,
+      "\n"
+      "GET /%s HTTP/1.1\n"
+      "Host:%s:%s\n" //hostname:port
+      "Connection: close\n"
+      "\n",
+      hostname,
+      port,
+      path
+  );
+  //moved int rv here to be able to add request_length as param
+  int rv = send(fd, request, request_length, 0);
+  //return value
+  return rv;
+  
 }
 
 int main(int argc, char *argv[])
