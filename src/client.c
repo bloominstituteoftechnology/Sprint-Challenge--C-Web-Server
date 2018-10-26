@@ -76,7 +76,7 @@ int send_request(int fd, char *hostname, char *port, char *path)
     hostname,
     port
   );
-
+  printf("request sent");
   send(fd, request, request_length, 0);
 
   return 0;
@@ -92,6 +92,21 @@ int main(int argc, char *argv[])
     exit(1);
   }
 
+  printf("%s\n", argv[1]);
+
+  urlinfo_t *urlinfo = parse_url(argv[1]);
+  int fd = get_socket(urlinfo->hostname, urlinfo->port);
+  send_request(fd, urlinfo->hostname, urlinfo->port, urlinfo->path);
+
+  while ((numbytes = recv(fd, buf, BUFSIZE - 1, 0)) > 0) {
+    printf("%s\n", buf);
+  }
+
+  close(fd);
+
+  if (urlinfo != NULL) {
+    free(urlinfo);
+  }
   /*
     1. Parse the input URL
     2. Initialize a socket
@@ -99,10 +114,6 @@ int main(int argc, char *argv[])
     4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
     5. Clean up any allocated memory and open file descriptors.
   */
-
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
 
   return 0;
 }
