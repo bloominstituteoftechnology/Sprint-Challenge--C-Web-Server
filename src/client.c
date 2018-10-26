@@ -95,7 +95,9 @@ int main(int argc, char *argv[])
   printf("%s\n", argv[1]);
 
   urlinfo_t *urlinfo = parse_url(argv[1]);
+
   int fd = get_socket(urlinfo->hostname, urlinfo->port);
+  
   send_request(fd, urlinfo->hostname, urlinfo->port, urlinfo->path);
 
   while ((numbytes = recv(fd, buf, BUFSIZE - 1, 0)) > 0) {
