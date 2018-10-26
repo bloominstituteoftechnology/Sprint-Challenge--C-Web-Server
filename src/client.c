@@ -30,8 +30,8 @@ urlinfo_t *parse_url(char *url)
 {
   // copy the input URL so as not to mutate the original
   char *hostname = strdup(url);
-  char *port;
-  char *path;
+  char *port = port;
+  char *path = path;
 
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
 
@@ -46,9 +46,24 @@ urlinfo_t *parse_url(char *url)
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  char *http = strstr(hostname, "://");
+
+  if (http != NULL)
+  {
+    hostname = http + 3;
+  }
+
+  http = strchr(hostname, '/');
+  path = http + 1;
+  *http = '\0';
+
+  http = strchr(hostname, ':');
+  port = http + 1;
+  *http = '\0';
+
+  urlinfo->hostname = strdup(hostname);
+  urlinfo->port = strdup(port);
+  urlinfo->path = strdup(path);
 
   return urlinfo;
 }
@@ -86,6 +101,8 @@ int main(int argc, char *argv[])
     fprintf(stderr, "usage: client HOSTNAME:PORT/PATH\n");
     exit(1);
   }
+
+  parse_url(argv[1]);
 
   /*
     1. Parse the input URL
