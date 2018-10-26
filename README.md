@@ -1,4 +1,4 @@
-# Sprint Challenge: C Web Server
+# Sprint Challenge: C Web Server 
 
 ## A Simple cURL-like Client
 
