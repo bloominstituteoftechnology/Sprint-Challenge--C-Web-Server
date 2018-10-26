@@ -79,7 +79,8 @@ int send_request(int fd, char *hostname, char *port, char *path)
   char request[max_request_size];
   int rv;
 
-  sprintf(request, "%s:%s/%s", hostname, port, path);  
+  sprintf(request, "GET /%s HTTP/1.1\nHost: %s:%s", path, hostname, port);
+  send(fd, request, sizeof request, 0); 
 
   return 0;
 }
@@ -103,11 +104,19 @@ int main(int argc, char *argv[])
   */
 
   strcpy(buf, argv[1]);
-  parse_url(buf);
+  urlinfo_t *url = parse_url(buf);
 
-  // sockfd = get_socket(hostname, port);  
+  sockfd = get_socket(url->hostname, url->port);  
 
-  // send_request(sockfd, hostname, port, path);
+  send_request(sockfd, url->hostname, url->port, url->path);
+
+  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
+    for (int i = 0; i < numbytes; i++) {
+      printf("%c", buf[i]);
+    }
+  }
+
+  close(sockfd); 
 
   return 0;
 }
