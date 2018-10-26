@@ -99,3 +99,5 @@ In order to earn a score of 3, complete at least one of the following stretch go
    * If you execute `./client google.com:80/`, you'll get back a response with a `301 Moved Permanently` status. There's a `Location` field in the header as well as a `href` tag in the body specifying where the client needs to be redirected. Augment your client such that when it encounters a 301 status, it will automatically follow the redirect link and issue another request for the correct location.
 3. Don't have the client print out the header.
    * Let's make the printing of the header of the response optional. Implement functionality such that the client can accept a `-h` flag, and only when this flag is present do we print the response header as well. Otherwise, when printing a response, your client should just print the body of the response to stdout.
+
+Initial PR
