@@ -49,6 +49,8 @@ urlinfo_t *parse_url(char *url)
   // IMPLEMENT ME! //
   ///////////////////
 
+  if (strchr("/") == 0 && strchr(url, "/"))
+
   return urlinfo;
 }
 
