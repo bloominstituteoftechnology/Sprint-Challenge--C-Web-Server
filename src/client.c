@@ -30,25 +30,30 @@ urlinfo_t *parse_url(char *url)
 {
   // copy the input URL so as not to mutate the original
   char *hostname = strdup(url);
-  char *port = port;
-  char *path = path;
+  char *port = "80";
+  char *path = "/";
 
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
 
   char *http = strstr(hostname, "://");
-
   if (http != NULL)
   {
     hostname = http + 3;
   }
 
   http = strchr(hostname, '/');
-  path = http + 1;
-  *http = '\0';
+  if (http != NULL)
+  {
+    path = http + 1;
+    *http = '\0';
+  }
 
   http = strchr(hostname, ':');
-  port = http + 1;
-  *http = '\0';
+  if (http != NULL)
+  {
+    port = http + 1;
+    *http = '\0';
+  }
 
   urlinfo->hostname = strdup(hostname);
   urlinfo->port = strdup(port);
