@@ -91,7 +91,8 @@ int send_request(int fd, char *hostname, char *port, char *path)
   int response_length = sprintf(request, 
                             "GET /%s HTTP/1.1\n"
                             "Host: %s:%s\n"
-                            "Connection: close", 
+                            "Connection: close\n"
+                            "\n", 
                             path, 
                             hostname, 
                             port);
@@ -130,6 +131,7 @@ int main(int argc, char *argv[])
 
   send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
   
+  printf("About to use recv\n");
   while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
     printf("%s\n", buf);
   }
