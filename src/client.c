@@ -97,5 +97,30 @@ int main(int argc, char *argv[])
   // IMPLEMENT ME! //
   ///////////////////
 
+  urlinfo_t *urlinfo = parse_url(argv[1]);
+
+  sockfd = get_socket(urlinfo->hostname, urlinfo->port);
+
+  if (sockfd < 0) {
+    perror("Failed to get a socket\n");
+    exit(1);
+  }
+
+  send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
+
+  while ((numbytes = recv(sockfd, buf, BUFSIZE-1, 0)) > 0) {
+    fprintf(stdout, "%s\n", buf);
+  }
+
+  if (numbytes < 0) {
+    perror("Error");
+    exit(2);
+  }
+
+  printf("\n");
+
+  free(urlinfo);
+  close(sockfd);
+
   return 0;
 }
