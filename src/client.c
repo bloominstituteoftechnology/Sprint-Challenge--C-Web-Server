@@ -36,25 +36,28 @@ urlinfo_t *parse_url(char *url)
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
 
   //   We can parse the input URL by doing the following:
-
   //   1. Use strchr to find the first backslash in the URL (this is assuming there is no http:// or https:// in the URL).
-  char *p;
   if (strstr(hostname, "http://") == 0 || strstr(hostname, "https://") == 0) {
-    p = strchr(hostname, "/");
-    //   2. Set the path pointer to 1 character after the spot returned by strchr.
-    p += 1;
+    path = strchr(hostname, '/');
+    printf("PATH before: %s\n", path);
     //   3. Overwrite the backslash with a '\0' so that we are no longer considering anything after the backslash.
+    *path = '\0';
+    //   2. Set the path pointer to 1 character after the spot returned by strchr.
+    path++;
+    printf("PATH after: %s\n", path);
+    //   4. Use strchr to find the first colon in the URL.
+    port = strchr(hostname, ':');
+    printf("PORT before: %s\n", port);
+    //   6. Overwrite the colon with a '\0' so that we are just left with the hostname.
+    *port = '\0';
+    //   5. Set the port pointer to 1 character after the spot returned by strchr.
+    port++;
+    printf("PORT after: %s\n", port);
 
+    urlinfo->hostname = hostname;
+    urlinfo->port = port;
+    urlinfo->path = path;
   }
-
-  printf("POINTER: %s\n", p);
-  //   4. Use strchr to find the first colon in the URL.
-  //   5. Set the port pointer to 1 character after the spot returned by strchr.
-  //   6. Overwrite the colon with a '\0' so that we are just left with the hostname.
-
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
 
   return urlinfo;
 }
@@ -94,17 +97,13 @@ int main(int argc, char *argv[])
 
   //
   //   1. Parse the input URL
-  // printf("ARGC: %d\n", argc);
-
+  struct urlinfo_t *urlinfo = parse_url(argv[1]);
   //   2. Initialize a socket
+  sockfd = get_socket(urlinfo->hostname, urlinfo->port);
   //   3. Call send_request to construct the request and send it
   //   4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
   //   5. Clean up any allocated memory and open file descriptors.
   //
-
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
 
   return 0;
 }
