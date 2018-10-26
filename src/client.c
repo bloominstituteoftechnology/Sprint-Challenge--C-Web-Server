@@ -45,9 +45,34 @@ urlinfo_t *parse_url(char *url)
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  char *tmp = strstr(hostname, "://");
+
+  if (tmp != NULL){
+    hostname = tmp +3;
+  }
+
+  tmp = strstr(hostname, '/');
+  path = tmp+1;
+
+  *tmp = '\0';
+
+  tmp = strstr(hostname, ':');
+
+  if(tmp ==NULL){
+    port = "80";
+  }else {
+    port = tmp+1;
+    *tmp = '\0';
+  }
+
+  urlinfo->hostname = hostname;
+  urlinfo->port = port;
+  urlinfo->path = path;
+
+  // for(int i = 0; i < strlen(url); i++){
+
+  // }
+
 
   return urlinfo;
 }
@@ -68,11 +93,19 @@ int send_request(int fd, char *hostname, char *port, char *path)
   char request[max_request_size];
   int rv;
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  int request_length = sprintf(request, 
+    "GET /%s HTTP/1.1\n"
+    "Host: %s:%s\n"
+    "Connection: close\n"
+    "/n",
+    path, hostname, port
+  );
 
-  return 0;
+  if((rv = send(fd, request, request_length, 0) < 0)){
+    perror("Error sending request");
+  }
+
+  return rv;
 }
 
 int main(int argc, char *argv[])
@@ -93,9 +126,28 @@ int main(int argc, char *argv[])
     5. Clean up any allocated memory and open file descriptors.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  urlinfo_t *urlinfo = parse_url(argv[1]);
+
+  sockfd = get_socket(urlinfo->hostname, urlinfo->port);
+
+  if(sockfd < 0){
+    perror("failed to get a socket");
+    exit(1);
+  }
+
+  send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
+
+  while(numbytes = recv(sockfd, buf, BUFSIZE-1, 0) > 0){
+    printf("%s\n", buf);
+  }
+
+  if(numbytes < 0){
+    perror("error receiving response");
+    exit(2);
+  }
+
+  free(urlinfo);
+  close(sockfd);
 
   return 0;
 }
