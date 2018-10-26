@@ -49,8 +49,44 @@ urlinfo_t *parse_url(char *url)
   // IMPLEMENT ME! //
   ///////////////////
 
-  if (strchr("/") == 0 && strchr(url, "/"))
+  if (!(strstr(url, "http") || strstr(url, "https"))) // Case where there is no http(s) in the url
+  {
+    char *url_copy = url; // copy the url for deconstruction
+    // Parse the url find the path
+    path = strchr(url, '/');
+    path++; // Will want to double check this line to make sure it is implementing properly
 
+    urlinfo->path = path;
+
+    char *cur_position = strchr(url, '/');
+    while (cur_position)
+    {
+      *cur_position = '\0';
+      cur_position = strchr(cur_position, '/');
+    }
+
+    // Parse the url to find the port
+
+    port = strchr(url, ':');
+    port++;
+
+    urlinfo->port = port;
+
+    cur_position = strchr(url, ':');
+    while (cur_position)
+    {
+      *cur_position = '\0';
+      cur_position = strchr(cur_position, ':');
+    }
+
+    urlinfo->hostname = url;
+  }
+  else
+  {
+    // Set the character pointer of the url ahead 7 or 8 spots depending on the protocol spec.
+  }
+
+  printf("You put in %s %s %s \n", urlinfo->hostname, urlinfo->port, urlinfo->path);
   return urlinfo;
 }
 
@@ -98,6 +134,8 @@ int main(int argc, char *argv[])
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
+
+  parse_url(argv[1]);
 
   return 0;
 }
