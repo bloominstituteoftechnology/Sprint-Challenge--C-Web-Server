@@ -68,6 +68,14 @@ urlinfo_t *parse_url(char *url)
   return urlinfo;
 }
 
+void free_urlinfo(struct urlinfo_t *urlinfo)
+{
+  free(urlinfo->hostname);
+  free(urlinfo->port);
+  free(urlinfo->path);
+  free(urlinfo);
+}
+
 /**
  * Constructs and sends an HTTP request
  *
@@ -82,13 +90,12 @@ int send_request(int fd, char *hostname, char *port, char *path)
 {
   const int max_request_size = 16384;
   char request[max_request_size];
-  int rv;
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  int response_length = sprintf(request, "GET /%s HTTP/1.1\nHost: %s:%s\nConnection: close", path, hostname, port);
 
-  return 0;
+  int rv = send(fd, request, response_length, 0);
+
+  return rv;
 }
 
 int main(int argc, char *argv[])
@@ -102,8 +109,6 @@ int main(int argc, char *argv[])
     exit(1);
   }
 
-  parse_url(argv[1]);
-
   /*
     1. Parse the input URL
     2. Initialize a socket
@@ -112,9 +117,23 @@ int main(int argc, char *argv[])
     5. Clean up any allocated memory and open file descriptors.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  struct urlinfo_t *urlinfo = parse_url(argv[1]);
+
+  char *hostname = urlinfo->hostname;
+  char *port = urlinfo->port;
+  char *path = urlinfo->path;
+
+  sockfd = get_socket(hostname, port);
+
+  send_request(sockfd, hostname, port, path);
+
+  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0)
+  {
+    printf("%s\n", buf);
+  }
+
+  free_urlinfo(urlinfo);
+  close(sockfd);
 
   return 0;
 }
