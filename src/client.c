@@ -49,7 +49,15 @@ urlinfo_t *parse_url(char *url)
     *path = '\0';
     path++;
 
+    port = strchr(hostname, ':');
+    *port = '\0';
+    port++;
+
+    hostname = strtok(hostname, ":");
     
+    urlinfo->path = path;
+    urlinfo->port = port;
+    urlinfo->hostname = hostname;
 
   ///////////////////
   // IMPLEMENT ME! //
