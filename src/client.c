@@ -45,19 +45,29 @@ urlinfo_t *parse_url(char *url)
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
 
-  path = strchr(hostname, '/');
+  char *tmp = strstr(hostname, "://");
+
+  if (tmp != NULL)
+  {
+    hostname = tmp + 3;
+  }
+
+  tmp = strchr(hostname, '/');
   // printf("path: %s\n", path + 1);
-  *path = '\0';
-  urlinfo->path = path + 1;
+  path = tmp + 1;
+  *tmp = '\0';
+  urlinfo->path = path;
 
   // printf("url: %s\n", hostname);
 
-  if (strchr(hostname, ':') != NULL)
+  tmp = strchr(hostname, ':');
+
+  if (tmp != NULL)
   {
-    port = strchr(hostname, ':');
+    port = tmp + 1;
     // printf("port: %s\n", port + 1);
-    *port = '\0';
-    urlinfo->port = port + 1;
+    *tmp = '\0';
+    urlinfo->port = port;
   }
   else
   {
@@ -86,10 +96,18 @@ int send_request(int fd, char *hostname, char *port, char *path)
   char request[max_request_size];
   int rv;
 
-  sprintf(request, "GET /%s HTTP/1.1\nHost: %s:%s", path, hostname, port);
+  int request_length = sprintf(
+    request,
+    "GET /%s HTTP/1.1\nHost: %s:%s\nConnection: close\n\n",
+    path, hostname, port);
   send(fd, request, sizeof request, 0); 
 
-  return 0;
+  if ((rv = send(fd, request, request_length, 0) < 0))
+  {
+    perror("Error sending request"); 
+  }
+
+  return rv;
 }
 
 int main(int argc, char *argv[])
@@ -114,17 +132,28 @@ int main(int argc, char *argv[])
 
   sockfd = get_socket(url->hostname, url->port);  
 
+  if (sockfd < 0)
+  {
+    perror("Failed to get a socket");
+    exit(1);
+  }
+
   send_request(sockfd, url->hostname, url->port, url->path);
 
   while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
-    for (int i = 0; i < numbytes; i++) {
-      printf("%c", buf[i]);
-    }
+    fwrite(buf, 1, numbytes, stdout);
   }
 
-  close(sockfd); 
+  if (numbytes < 0)
+  {
+    perror("Error receiving response");
+    exit(2);
+  }
+
+  printf("\n");
 
   free(url);
+  close(sockfd); 
 
   return 0;
 }
