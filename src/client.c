@@ -36,7 +36,6 @@ urlinfo_t *parse_url(char *url)
 
   /*
     We can parse the input URL by doing the following:
-
     1. Use strchr to find the first backslash in the URL (this is assuming there is no http:// or https:// in the URL).
     2. Set the path pointer to 1 character after the spot returned by strchr.
     3. Overwrite the backslash with a '\0' so that we are no longer considering anything after the backslash.
@@ -49,13 +48,26 @@ urlinfo_t *parse_url(char *url)
   // IMPLEMENT ME! //
   ///////////////////
 
+  path = strchr(hostname, '/');  //Find first backslash in URL
+  path++;  //Set path pointer to char after the spot return by strchr
+  *path = '\0';  //Overwrite the backslash with '\0'
+
+  port = strchr(hostname, ':');  //Find first colon in URL
+  port++;  //Set port pointer to 1 character after spot return by strchr
+  *port = '\0';  //Overwrite the colon with '\0' - we are left with the hostname
+
+  urlinfo->path = path;
+  urlinfo->port = port;
+  urlinfo->hostname = hostname;
+
+
   return urlinfo;
 }
 
 /**
  * Constructs and sends an HTTP request
  *
- * fd:
+ * fd:       The file descriptor of the connection.
  * hostname: The hostname string.
  * port:     The port string.
  * path:     The path string.
@@ -76,8 +88,8 @@ int send_request(int fd, char *hostname, char *port, char *path)
 }
 
 int main(int argc, char *argv[])
-{  
-  int sockfd, numbytes;  
+{
+  int sockfd, numbytes;
   char buf[BUFSIZE];
 
   if (argc != 2) {
