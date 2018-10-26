@@ -18,6 +18,19 @@ typedef struct urlinfo_t {
   char *path;
 } urlinfo_t;
 
+void set_null(char* string_in, char search_char)
+{
+  char * found_char = strchr(string_in, search_char);
+  *found_char = '\0';
+}
+
+void free_data(urlinfo_t *urlinfo)
+{
+
+  free(urlinfo->hostname);
+
+  free(urlinfo);
+}
 /**
  * Tokenize the given URL into hostname, path, and port.
  *
@@ -25,18 +38,13 @@ typedef struct urlinfo_t {
  *
  * Store hostname, path, and port in a urlinfo_t struct and return the struct.
 */
-char *set_null(char* string_in, char search_char)
-{
-  char * found_char = strchr(string_in, search_char);
-  *found_char = '\0';
-}
 
 urlinfo_t *parse_url(char *url)
 {
   // copy the input URL so as not to mutate the original
   char *hostname = strdup(url);
-  char *port = strdup(url);
-  char *path = strdup(url);
+  char *port;
+  char *path;
 
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
 
@@ -52,9 +60,9 @@ urlinfo_t *parse_url(char *url)
   */
 
   set_null(hostname, ':');
-  port = strchr(port, ':') + 1;
+  port = strchr(hostname, '\0') + 1;
   set_null(port, '/');
-  path = strchr(path, '/') + 1;
+  path = strchr(port, '\0') + 1;
 
   urlinfo->hostname = hostname;
   urlinfo->port = port;
@@ -89,7 +97,7 @@ int send_request(int fd, char *hostname, char *port, char *path)
                             port);
 
 
-  int rv = send(fd, request, response_length, 0);
+  rv = send(fd, request, response_length, 0);
 
   if (rv < 0) {
       perror("send");
@@ -116,9 +124,16 @@ int main(int argc, char *argv[])
     5. Clean up any allocated memory and open file descriptors.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  urlinfo_t *urlinfo = parse_url(argv[1]);
 
+  sockfd = get_socket(urlinfo->hostname, urlinfo->port);
+
+  send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
+  
+  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
+    printf("%s\n", buf);
+  }
+
+  free_data(urlinfo);
   return 0;
 }
