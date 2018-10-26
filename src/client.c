@@ -85,13 +85,12 @@ int send_request(int fd, char *hostname, char *port, char *path)
 
   //Construct HTTP request here
   int request_length = sprintf(request,
-      "\n"
       "GET /%s HTTP/1.1\n"
       "Host:%s:%s\n" //hostname:port
       "Connection: close\n\n",
+      path,
       hostname,
-      port,
-      path
+      port
   );
   //moved int rv here to be able to add request_length as param
   int rv = send(fd, request, request_length, 0);
@@ -134,7 +133,7 @@ int main(int argc, char *argv[])
 
   //5. Clean up any allocated memory and open file descriptors.
 
-  free(urlinfo->hostname);
+  //free(urlinfo->hostname);
   free(urlinfo);
   close(sockfd);
 
