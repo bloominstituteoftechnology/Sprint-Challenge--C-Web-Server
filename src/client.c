@@ -45,6 +45,21 @@ urlinfo_t *parse_url(char *url)
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
 
+  path = strchr(hostname, '/');
+  printf("path: %s\n", path + 1);
+  *path = '\0';
+  urlinfo->path = path + 1;
+
+  // printf("url: %s\n", hostname);
+
+  port = strchr(hostname, ':');
+  printf("port: %s\n", port + 1);
+  *port = '\0';
+  urlinfo->port = port + 1;
+
+  printf("hostname: %s\n", hostname);
+  urlinfo->hostname = hostname;
+
   return urlinfo;
 }
 
@@ -64,9 +79,7 @@ int send_request(int fd, char *hostname, char *port, char *path)
   char request[max_request_size];
   int rv;
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  sprintf(request, "%s:%s/%s", hostname, port, path);  
 
   return 0;
 }
@@ -90,15 +103,11 @@ int main(int argc, char *argv[])
   */
 
   strcpy(buf, argv[1]);
-  printf("url: %s\n", buf);
-  char *ret = strchr(buf, '/');
-  printf("path: %s\n", ret + 1);
-  *ret = '\0';
-  // printf("url: %s\n", buf);
-  ret = strchr(buf, ':');
-  printf("port: %s\n", ret + 1);
-  *ret = '\0';
-  printf("hostname: %s\n", buf);
+  parse_url(buf);
+
+  // sockfd = get_socket(hostname, port);  
+
+  // send_request(sockfd, hostname, port, path);
 
   return 0;
 }
