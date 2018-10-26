@@ -46,20 +46,20 @@ urlinfo_t *parse_url(char *url)
   */
 
   // Use strchr to find the first backslash in the URL
-  path = strchr(hostname, '/');
-  // Set the path pointer to 1 character after
-  path++;
+  path = strchr(url, '/');
   // Overwrite the backslash with a '\0'
   *path = '\0';  
+  // Set the path pointer to 1 character after
+  path++;
 
   printf("This is the path: %s\n", path);
 
   // Use strchr to find the first colon in the URL
-  port = strchr(hostname, ':');
-  // Set the port pointer to 1 character after
-  port++;
+  port = strchr(url, ':');
   // Overwrite the colon with a '\0'
   *port = '\0';
+  // Set the port pointer to 1 character after
+  port++;
 
   printf("This is the port: %s\n", port);
 
@@ -91,7 +91,6 @@ int send_request(int fd, char *hostname, char *port, char *path)
 {
   const int max_request_size = 16384;
   char request[max_request_size];
-  int rv;
 
   // copied over response_length from server.c
   // change instances of response to request
@@ -100,20 +99,21 @@ int send_request(int fd, char *hostname, char *port, char *path)
 
   int request_length = sprintf(request,
         
-        "GET /%s HTTP/1.1"
-        "Host: %s:%s"
-        "Connection: close",
+        // added missing \n seperators
+        "GET /%s HTTP/1.1\n"
+        "Host: %s:%s\n"
+        "Connection: close\n",
 
         path,
         hostname,
         port
     );
 
-    int rv = send(fd, request, request_length, 0);
+  int rv = send(fd, request, request_length, 0); // remove int because it's already defined
 
-    if (rv < 0) {
-        perror("send");
-    }
+  if (rv < 0) {
+      perror("send");
+  }
 
   return rv;
 }
@@ -140,9 +140,20 @@ int main(int argc, char *argv[])
     6. Clean up any allocated memory and open file descriptors.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  // parse the input URL
+  urlinfo_t *urlinfo = parse_url(argv[1]);
+  // initialize a socket with `get_socket()`
+  sockfd = get_socket(urlinfo->hostname, urlinfo->port);
+  // send_request
+  send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
+  // call `recv` in a loop
+  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
+    // print the data we got back to stdout
+    printf("%s\n", buf);
+  }
+
+  close(sockfd);
+  free(urlinfo);
 
   return 0;
 }
