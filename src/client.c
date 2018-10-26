@@ -148,6 +148,22 @@ int main(int argc, char *argv[])
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
-  
+  urlinfo_t *url = parse_url(argv[1]);
+
+  sockfd = get_socket(url->hostname, url->port);
+  if (sockfd == -1)
+  {
+    perror("Error getting socket");
+  }
+
+  send_request(sockfd, url->hostname, url->port, url->path);
+
+  while (recv(sockfd, buf, 65535, 0) > 0)
+  {
+    printf("%s\n", buf);
+  }
+
+  free(url->hostname);
+  free(url);
   return 0;
 }
