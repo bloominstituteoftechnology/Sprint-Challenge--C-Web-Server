@@ -48,17 +48,36 @@ urlinfo_t *parse_url(char *url)
   // IMPLEMENT ME! //
   ///////////////////
 
-  path = strchr(hostname, '/');  //Find first backslash in URL
-  path++;  //Set path pointer to char after the spot return by strchr
-  *path = '\0';  //Overwrite the backslash with '\0'
+  // path = strchr(hostname, '/');  //Find first backslash in URL
+  // path++;  //Set path pointer to char after the spot return by strchr
+  // *path = '\0';  //Overwrite the backslash with '\0'
 
-  port = strchr(hostname, ':');  //Find first colon in URL
-  port++;  //Set port pointer to 1 character after spot return by strchr
-  *port = '\0';  //Overwrite the colon with '\0' - we are left with the hostname
+  // port = strchr(hostname, ':');  //Find first colon in URL
+  // port++;  //Set port pointer to 1 character after spot return by strchr
+  // *port = '\0';  //Overwrite the colon with '\0' - we are left with the hostname
 
-  urlinfo->path = path;
-  urlinfo->port = port;
+  char *tmp = strstr(hostname, "://");  //strip off the http:// or https:// if either are present
+  if (tmp != NULL) {
+    hostname = tmp + 3;
+  }
+
+  tmp = strstr(hostname, "/");  //look for the path
+  path = tmp + 1;
+  *tmp = '\0';  //overwrite the '/'
+
+
+
+  tmp = strstr(hostname, ":");  //look for the port number; default to 80 if not specified
+  if (tmp == NULL) {
+    port = "80";
+  } else {
+    port = tmp+ 1;
+    *tmp = '\0';
+  }
+
   urlinfo->hostname = hostname;
+  urlinfo->port = port;
+  urlinfo->path = path;
 
 
   return urlinfo;
@@ -88,12 +107,8 @@ int send_request(int fd, char *hostname, char *port, char *path)
     hostname,
     port
   );
-
-
-  rv = send(fd, request, request_length, 0);
-
-  if (rv < 0) {
-    perror("send");
+  if ((rv = send(fd, request, request_length, 0) < 0)) {
+    perror("Error sending request");
   }
 
   return 0;
@@ -123,11 +138,25 @@ int main(int argc, char *argv[])
 
   urlinfo_t *urlinfo = parse_url(argv[1]);  //Parse input URL
   sockfd = get_socket(urlinfo->hostname, urlinfo->port);  //Initialize socket (see lib.c for get_socket())
+
+  if (sockfd < 0) {
+    perror("Failed to get socket");
+    exit(1);
+  }
+
+
   send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);  //call send_request() to construct the request and send it
 
   while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
     fwrite(buf, 1, numbytes, stdout);  //call 'recv' in a loop (see readme) and print response to stdout
   }
+
+  if (numbytes > 0) {
+    perror("Error receiving response");
+    exit(2);
+  }
+
+  printf("\n");
 
   free(urlinfo);
   close(sockfd);  //close socket
