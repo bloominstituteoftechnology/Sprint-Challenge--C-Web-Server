@@ -88,8 +88,7 @@ int send_request(int fd, char *hostname, char *port, char *path)
       "\n"
       "GET /%s HTTP/1.1\n"
       "Host:%s:%s\n" //hostname:port
-      "Connection: close\n"
-      "\n",
+      "Connection: close\n\n",
       hostname,
       port,
       path
@@ -130,11 +129,12 @@ int main(int argc, char *argv[])
   //4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
   while ((numbytes = recv(sockfd, buf, 65535, 0)) > 0)
   {
-    printf("%s\n", buf);
+    fprintf(stdout,"%s", buf);
   }
 
   //5. Clean up any allocated memory and open file descriptors.
-  
+
+  free(urlinfo->hostname);
   free(urlinfo);
   close(sockfd);
 
