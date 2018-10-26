@@ -18,13 +18,6 @@ typedef struct urlinfo_t {
   char *path;
 } urlinfo_t;
 
-/**
- * Tokenize the given URL into hostname, path, and port.
- *
- * url: The input URL to parse.
- *
- * Store hostname, path, and port in a urlinfo_t struct and return the struct.
-*/
 urlinfo_t *parse_url(char *url)
 {
   // copy the input URL so as not to mutate the original
@@ -48,7 +41,7 @@ urlinfo_t *parse_url(char *url)
     puts(host);
     urlinfo->hostname = host;
     *urlinfo->port = 80;  //hardcoded for now
-    urlinfo->path = "/";
+    *urlinfo->path = "/";
 
 
   } else {
@@ -98,7 +91,8 @@ int send_request(int fd, char *hostname, char *port, char *path)
 
 int main(int argc, char *argv[])
 {  
-  int sockfd, numbytes;  
+  
+  int numbytes;  
   char buf[BUFSIZE];
 
   if (argc != 2) {
@@ -108,12 +102,13 @@ int main(int argc, char *argv[])
     
 
     // 1. Parse the input URL
-    urlinfo_t *parsed_url = parse_url(argv[1]);
+    urlinfo_t *urlinfo = parse_url(argv[1]);
     // 2. Initialize a socket
-    sockfd = get_socket(parsed_url->hostname, parsed_url->port);
+    int sockfd;
+    sockfd = get_socket(urlinfo->hostname, urlinfo->port);
 
     // 3. Call send_request to construct the request and send it
-    send_request(sockfd, parsed_url->hostname, parsed_url->port, parsed_url->path);
+    send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
     // 4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
 
     while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0)
