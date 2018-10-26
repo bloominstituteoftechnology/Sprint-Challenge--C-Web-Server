@@ -110,18 +110,33 @@ int main(int argc, char *argv[])
     fprintf(stderr,"usage: client HOSTNAME:PORT/PATH\n");
     exit(1);
   }
-
-  /*
-    1. Parse the input URL
-    2. Initialize a socket
-    3. Call send_request to construct the request and send it
-    4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
-    5. Clean up any allocated memory and open file descriptors.
-  */
-
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
+
+  // 1. Parse the input URL
+  urlinfo_t *urlinfo = parse_url(argv[1]);
+
+  //2. Initialize a socket (if no socket get error)
+  sockfd = get_socket(urlinfo->hostname, urlinfo->port);
+  if (sockfd == -1)
+  {
+    perror("Unable to retrieve the socket");
+  }
+
+  //3. Call send_request to construct the request and send it
+  send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
+
+  //4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
+  while ((numbytes = recv(sockfd, buf, 65535, 0)) > 0)
+  {
+    printf("%s\n", buf);
+  }
+
+  //5. Clean up any allocated memory and open file descriptors.
+  
+  free(urlinfo);
+  close(sockfd);
 
   return 0;
 }
