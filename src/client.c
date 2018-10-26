@@ -50,7 +50,7 @@ urlinfo_t *parse_url(char *url)
   path = tmp + 1;
   *tmp = '\0';
 
-  tmp = strstr(path, ":");
+  tmp = strstr(hostname, ":");
   port = tmp + 1;
   *tmp = '\0';
 
@@ -99,21 +99,15 @@ int send_request(int fd, char *hostname, char *port, char *path)
     sprintf(host, "Host: %s:%s", hostname, port);
     sprintf(connection, "Connection: close");
 
-    unsigned long int request_length = sprintf(request, "%s\n%s\n%s\n", get, host, connection);
+    unsigned long int request_length = sprintf(request, "%s\n%s\n%s\n\n", get, host, connection);
 
-    // rv = 
-    send(fd, request, request_length, 0 );
+    rv = send(fd, request, request_length, 0);
     // return rv;
 
     
-    
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
-  
-
   return 0;
 }
+
 
 int main(int argc, char *argv[])
 {  
@@ -130,22 +124,27 @@ int main(int argc, char *argv[])
     1. Parse the input URL
     2. Initialize a socket
     3. Call send_request to construct the request and send it
-    4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
+    4. Call `recv` in a loop until there is no more data to receive 
+    from the server. Print the received response to stdout.
     5. Clean up any allocated memory and open file descriptors.
   */
   struct urlinfo_t *url = parse_url(argv[1]);
-  printf("%s",argv);
+  
+  printf("%s",argv[1]);
   // get_in_addr(argv);
+  
   sockfd = get_socket(url->hostname, url->port);
-  printf("%s",sockfd);
+  
+  printf("%d",sockfd);
   // send_request( fd,argv[0], argv[1], argv[2]);
+  
   send_request(sockfd, url->hostname, url->port, url->path);
+  
   while((numbytes = recv(sockfd, buf, BUFSIZE-1, 0)) > 0){
-    fprintf 
+    
+    fprintf(stdout,"%s\n", buf);
   };
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  
 
   return 0;
 }
