@@ -39,14 +39,14 @@ urlinfo_t *parse_url(char *url)
   path = strdup(strstr(hostname, "/")+1);
 
   //3. Overwrite the backslash with a '\0' so that we are no longer considering anything after the backslash.
-  hostname[strlen(hostname) - strlen(path) - 1] = "\0";
+  hostname[strlen(hostname) - strlen(path) - 1] = '\0';
   
   //4. Use strchr to find the first colon in the URL.
   //5. Set the port pointer to 1 character after the spot returned by strchr.
   port = strdup(strstr(hostname, ":")+1);
 
   //6. Overwrite the colon with a '\0' so that we are just left with the hostname.
-  hostname[strlen(hostname) - strlen(port) - 1] = "\0";
+  hostname[strlen(hostname) - strlen(port) - 1] = '\0';
 
   urlinfo->path = path;
   urlinfo->port = port;
@@ -102,7 +102,7 @@ int main(int argc, char *argv[])
     send_request(sockfd, parsed->hostname, parsed->port, parsed->path);
     //4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
     while((numbytes = recv(sockfd, buf, BUFSIZE -1, 0))>0){
-      printf(stdout, "%s\n", buf);
+      printf("%s\n", buf);
     }
     //5. Clean up any allocated memory and open file descriptors.
     free(parsed);
