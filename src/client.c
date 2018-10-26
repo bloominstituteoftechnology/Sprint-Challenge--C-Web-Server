@@ -79,7 +79,19 @@ char str1[15];
   printf("%s\n", port);
   printf("%s\n", path);
 
-  return urlinfo;
+//Initialize socket
+int fd = get_socket(hostname, port);
+  
+if (fd < 0) {
+      fprintf(stderr, "client: fatal error getting socket\n");
+      exit(1);
+}
+
+// Sent request to server
+send_request(fd, hostname, port, path);
+  
+
+return urlinfo;
 }
 
 /**
