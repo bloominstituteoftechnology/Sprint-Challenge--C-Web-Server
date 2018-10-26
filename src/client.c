@@ -29,8 +29,7 @@ urlinfo_t *parse_url(char *url)
 {
   // copy the input URL so as not to mutate the original
   char *hostname = strdup(url);
-  char *port;
-  char *path;
+ 
 
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
 
@@ -48,6 +47,48 @@ urlinfo_t *parse_url(char *url)
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
+  char *http_url = strstr(url, "http://");
+  char *https_url = strstr(url, "https://");
+
+  if (http_url != NULL)
+  {
+    hostname = strdup(http_url + 7);
+  }
+  else if (https_url != NULL)
+  {
+    hostname = strdup(https_url + 8);
+  }
+  else
+  {
+    hostname = strdup(url);
+  }
+
+  char *path = strchr(hostname, '/');
+  char *port = strchr(hostname, ':');
+
+  if (path != NULL)
+  {
+    hostname[(int)(path - hostname)] = '\0';
+    path = path + 1;
+  }
+  else
+  {
+    path = "/";
+  }
+
+  if (port != NULL)
+  {
+    hostname[(int)(port - hostname)] = '\0';
+    port = port + 1;
+  }
+  else
+  {
+    port = "80";
+  }
+
+  urlinfo->hostname = hostname;
+  urlinfo->path = path;
+  urlinfo->port = port;
 
   return urlinfo;
 }
@@ -66,13 +107,24 @@ int send_request(int fd, char *hostname, char *port, char *path)
 {
   const int max_request_size = 16384;
   char request[max_request_size];
-  int rv;
 
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
 
-  return 0;
+  int request_length = sprintf(request,
+                               "GET /%s HTTP/1.1\n"
+                               "Host: %s:%s\n"
+                               "Connection: close\n"
+                               "\n",
+                               path,
+                               hostname,
+                               port);
+
+  int rv = send(fd, request, request_length, 0);
+
+  return rv;
+
 }
 
 int main(int argc, char *argv[])
@@ -96,6 +148,6 @@ int main(int argc, char *argv[])
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
-
+  
   return 0;
 }
