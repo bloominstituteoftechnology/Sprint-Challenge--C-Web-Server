@@ -46,27 +46,22 @@ urlinfo_t *parse_url(char *url)
   */
   
 
-  char *tmp = strchr(hostname, "/");
+  char *tmp = strstr(hostname, "/");
   path = tmp + 1;
   *tmp = '\0';
 
-  tmp = strchr(path, ":");
+  tmp = strstr(path, ":");
   port = tmp + 1;
   *tmp = '\0';
 
-  // urlinfo->hostname = hostname;
-  // urlinfo->port = port;
-  // urlinfo->path = path;
+  urlinfo->hostname = hostname;
+  urlinfo->port = port;
+  urlinfo->path = path;
 
   printf("%s\n", hostname);
   printf("%s\n", path);
   printf("%s\n", port);
 
-  
-
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
 
   return urlinfo;
 }
@@ -106,8 +101,9 @@ int send_request(int fd, char *hostname, char *port, char *path)
 
     unsigned long int request_length = sprintf(request, "%s\n%s\n%s\n", get, host, connection);
 
-    rv = send(fd, request, request_length, 0 );
-    return rv;
+    // rv = 
+    send(fd, request, request_length, 0 );
+    // return rv;
 
     
     
@@ -125,6 +121,7 @@ int main(int argc, char *argv[])
   char buf[BUFSIZE];
 
   if (argc != 2) {
+    printf("%s\n",argv);
     fprintf(stderr,"usage: client HOSTNAME:PORT/PATH\n");
     exit(1);
   }
@@ -136,9 +133,16 @@ int main(int argc, char *argv[])
     4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
     5. Clean up any allocated memory and open file descriptors.
   */
-  // parse_url(*argv);
-  // get_socket(hostname, port);
-  // send_request(fd, hostname, port, path);
+  struct urlinfo_t *url = parse_url(argv[1]);
+  printf("%s",argv);
+  // get_in_addr(argv);
+  sockfd = get_socket(url->hostname, url->port);
+  printf("%s",sockfd);
+  // send_request( fd,argv[0], argv[1], argv[2]);
+  send_request(sockfd, url->hostname, url->port, url->path);
+  while((numbytes = recv(sockfd, buf, BUFSIZE-1, 0)) > 0){
+    fprintf 
+  };
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
