@@ -39,20 +39,16 @@ urlinfo_t *parse_url(char *url)
   //   1. Use strchr to find the first backslash in the URL (this is assuming there is no http:// or https:// in the URL).
   if (strstr(hostname, "http://") == 0 || strstr(hostname, "https://") == 0) {
     path = strchr(hostname, '/');
-    printf("PATH before: %s\n", path);
     //   3. Overwrite the backslash with a '\0' so that we are no longer considering anything after the backslash.
     *path = '\0';
     //   2. Set the path pointer to 1 character after the spot returned by strchr.
     path++;
-    printf("PATH after: %s\n", path);
     //   4. Use strchr to find the first colon in the URL.
     port = strchr(hostname, ':');
-    printf("PORT before: %s\n", port);
     //   6. Overwrite the colon with a '\0' so that we are just left with the hostname.
     *port = '\0';
     //   5. Set the port pointer to 1 character after the spot returned by strchr.
     port++;
-    printf("PORT after: %s\n", port);
 
     urlinfo->hostname = hostname;
     urlinfo->port = port;
@@ -78,12 +74,14 @@ int send_request(int fd, char *hostname, char *port, char *path)
   char request[max_request_size];
   int rv;
 
-  int request_length = sprintf(request, "fd: %s \nhostname: %s \nport: %s \npath: %s\n", fd, hostname, port, path);
+  int request_length = sprintf(request, 
+    "\nGET /%s HTTP/1.1\nHost: %s:%s\nConnection: close\n\n",
+    path, hostname, port);
   printf("Request: %s\n", request);
 
   rv = send(fd, request, request_length, 0);
     if (rv < 0) {
-        perror("send");
+        perror("Error sending request");
     }
 
   return rv;
@@ -106,7 +104,7 @@ int main(int argc, char *argv[])
   sockfd = get_socket(urlinfo->hostname, urlinfo->port);
   if (sockfd < 0) {
     perror("No socket");
-    exit(1)
+    exit(1);
   }
   //   3. Call send_request to construct the request and send it
   send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
@@ -120,7 +118,7 @@ int main(int argc, char *argv[])
     exit(2);
   }
 
-  printf("\n") 
+  printf("\n");
   //   5. Clean up any allocated memory and open file descriptors.
   free(urlinfo);
   close(sockfd);
