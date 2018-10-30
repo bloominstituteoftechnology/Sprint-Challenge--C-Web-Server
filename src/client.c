@@ -9,6 +9,19 @@
 
 #define BUFSIZE 4096 // max number of bytes we can get at once
 
+char* split(char *s, const char *delim) {
+  char *p = strstr(s, delim);
+  
+  if (p == NULL) return NULL;
+  if (p == s + strlen(s) - 1) {
+      *p = '\0';
+      return NULL;
+  }
+  *p = '\0';
+  
+  return p + strlen(delim);
+}
+
 /**
  * Struct to hold all three pieces of a URL
  */
@@ -26,28 +39,73 @@ typedef struct urlinfo_t {
  * Store hostname, path, and port in a urlinfo_t struct and return the struct.
 */
 urlinfo_t *parse_url(char *url)
-{
-  // copy the input URL so as not to mutate the original
-  char *hostname = strdup(url);
-  char *port;
-  char *path;
+{  
+  char *uri, *tempuri1, *tempuri2, *tempuri3, *cpy_path;
+  char *http = strdup(url);
+  tempuri1 = split(http, "https://");
+
+  if (tempuri1 == NULL) { 
+    tempuri1 = strdup(url);
+  }
+
+  tempuri2 = split(tempuri1, "http://");
+
+  if (tempuri2 == NULL) { 
+    tempuri2 = strdup(tempuri1);
+  }
+  
+  tempuri3 = split(tempuri2, "www.");
+
+  if (tempuri3 == NULL) { 
+    uri = strdup(tempuri2);
+  } else {
+    uri = strdup(tempuri3);
+  }
+
+  char *host, *port, *path;
+
+  if (strchr(uri, ':')) {
+    host = strdup(uri);
+    port = split(host, ":");
+    if (strchr(port, '/')) {
+      path = split(port, "/");
+      if(path == NULL) {
+        path = strdup("/");
+      } else {
+        cpy_path = strdup(path);
+        sprintf(path, "/%s", cpy_path);
+      }
+    } else {
+      path = strdup("/");
+    }
+  } else {
+    host = strdup(uri);
+    port = strdup("80");
+    if (strchr(host, '/')) {
+      path = split(host, "/");
+      if(path == NULL) {
+        path = strdup("/");
+      } else {
+        cpy_path = strdup(path);
+        sprintf(path, "/%s", cpy_path);
+      }
+    } else {
+      path = strdup("/");
+    }
+  }
+
+    puts(host);
+    puts(port);
+    puts(path);
 
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
+  urlinfo->hostname = malloc(sizeof(host));
+  urlinfo->port = malloc(sizeof(port));
+  urlinfo->path = malloc(sizeof(path));
 
-  /*
-    We can parse the input URL by doing the following:
-
-    1. Use strchr to find the first backslash in the URL (this is assuming there is no http:// or https:// in the URL).
-    2. Set the path pointer to 1 character after the spot returned by strchr.
-    3. Overwrite the backslash with a '\0' so that we are no longer considering anything after the backslash.
-    4. Use strchr to find the first colon in the URL.
-    5. Set the port pointer to 1 character after the spot returned by strchr.
-    6. Overwrite the colon with a '\0' so that we are just left with the hostname.
-  */
-
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  strcpy(urlinfo->hostname, host);
+  strcpy(urlinfo->port, port);
+  strcpy(urlinfo->path, path);  
 
   return urlinfo;
 }
@@ -68,10 +126,12 @@ int send_request(int fd, char *hostname, char *port, char *path)
   char request[max_request_size];
   int rv;
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  sprintf(request, "GET %s HTTP1.1\nHost: %s:%s\nConnection:close\n\n", path,
+                    hostname, port);
 
+  rv = send(fd, request, strlen(request), 0);
+//   puts(rv);
+  if (rv < 0) return -1;
   return 0;
 }
 
@@ -86,16 +146,36 @@ int main(int argc, char *argv[])
   }
 
   /*
-    1. Parse the input URL
+    1. Parse the input URL   
     2. Initialize a socket
     3. Call send_request to construct the request and send it
     4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
     5. Clean up any allocated memory and open file descriptors.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  char *url = strdup(argv[1]);
+
+  urlinfo_t *url_info = parse_url(url);
+
+  sockfd = get_socket(url_info->hostname, url_info->port);
+
+  int rv = send_request(sockfd, url_info->hostname, url_info->port, url_info->path);  
+  
+  if (rv == -1) {
+      puts("Send failed");
+      return -1;
+  }
+
+  while ((numbytes = recv(sockfd, buf, BUFSIZ - 1, 0)) > 0) {
+      printf("%.*s", numbytes, buf);
+  }
+
+  free(url_info->hostname);
+  free(url_info->path);
+  free(url_info->port);
+  free(url_info);
+
+  close(sockfd); 
 
   return 0;
 }
