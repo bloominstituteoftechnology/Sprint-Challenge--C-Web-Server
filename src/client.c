@@ -173,6 +173,8 @@ int main(int argc, char *argv[])
     }
   }
 
+  char *leftover;
+
   if (strcmp(url_info->hostname, "localhost") == 0) {
     while ((numbytes = recv(sockfd, buf, BUFSIZ - 1, 0)) > 0) {
         printf("%.*s", numbytes, buf);
@@ -180,13 +182,17 @@ int main(int argc, char *argv[])
   } else {
     while ((numbytes = recv(sockfd, buf, BUFSIZ - 1, 0)) > 0) {
         if (strstr(buf, "<!doctype")) {
-            char *leftover = split(buf, "<!doctype");
+            leftover = split(buf, "<!doctype");
             printf("%.*s", (int)strlen(buf), buf);
-            break;    
+            break;
+        } else if (strstr(buf, "<!DOCTYPE")) {
+            leftover = split(buf, "<!DOCTYPE");
+            printf("%.*s", (int)strlen(buf), buf);
+            break;
         } else {
             printf("%.*s", numbytes, buf);
         }
-    }  
+    }
   }
 
   puts("\n"); 
