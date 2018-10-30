@@ -94,10 +94,6 @@ urlinfo_t *parse_url(char *url)
     }
   }
 
-    puts(host);
-    puts(port);
-    puts(path);
-
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
   urlinfo->hostname = malloc(sizeof(host));
   urlinfo->port = malloc(sizeof(port));
@@ -126,11 +122,11 @@ int send_request(int fd, char *hostname, char *port, char *path)
   char request[max_request_size];
   int rv;
 
-  sprintf(request, "GET %s HTTP1.1\nHost: %s:%s\nConnection:close\n\n", path,
-                    hostname, port);
+  sprintf(request, "GET %s HTTP/1.1\nHost: %s\nConnection:close\n\n", path,
+                    hostname);
+  puts(request);
 
   rv = send(fd, request, strlen(request), 0);
-//   puts(rv);
   if (rv < 0) return -1;
   return 0;
 }
@@ -157,18 +153,43 @@ int main(int argc, char *argv[])
 
   urlinfo_t *url_info = parse_url(url);
 
-  sockfd = get_socket(url_info->hostname, url_info->port);
-
-  int rv = send_request(sockfd, url_info->hostname, url_info->port, url_info->path);  
+  if (strcmp(url_info->hostname, "localhost") == 0) {
+    sockfd = get_socket(url_info->hostname, url_info->port);
+    int rv = send_request(sockfd, url_info->hostname, url_info->port, url_info->path);  
   
-  if (rv == -1) {
-      puts("Send failed");
-      return -1;
+    if (rv == -1) {
+        puts("Send failed");
+        return -1;
+    }
+  } else {
+    char new_hostname[100];
+    sprintf(new_hostname, "www.%s", url_info->hostname);
+    sockfd = get_socket(new_hostname, url_info->port);
+    int rv = send_request(sockfd, new_hostname, url_info->port, url_info->path);  
+  
+    if (rv == -1) {
+        puts("Send failed");
+        return -1;
+    }
   }
 
-  while ((numbytes = recv(sockfd, buf, BUFSIZ - 1, 0)) > 0) {
-      printf("%.*s", numbytes, buf);
+  if (strcmp(url_info->hostname, "localhost") == 0) {
+    while ((numbytes = recv(sockfd, buf, BUFSIZ - 1, 0)) > 0) {
+        printf("%.*s", numbytes, buf);
+    }
+  } else {
+    while ((numbytes = recv(sockfd, buf, BUFSIZ - 1, 0)) > 0) {
+        if (strstr(buf, "<!doctype")) {
+            char *leftover = split(buf, "<!doctype");
+            printf("%.*s", (int)strlen(buf), buf);
+            break;    
+        } else {
+            printf("%.*s", numbytes, buf);
+        }
+    }  
   }
+
+  puts("\n"); 
 
   free(url_info->hostname);
   free(url_info->path);
