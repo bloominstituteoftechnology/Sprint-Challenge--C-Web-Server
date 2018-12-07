@@ -146,10 +146,7 @@ int main(int argc, char *argv[])
 
   while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
        // print the data we got back to stdout
-       int *temp = 0;
-       printf("%s   ---%i\n", buf, temp);
-       temp++;
-       break;
+       printf("%s\n", buf);
      }
 
      char *hey;
