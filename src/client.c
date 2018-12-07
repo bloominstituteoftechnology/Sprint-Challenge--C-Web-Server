@@ -18,14 +18,6 @@ typedef struct urlinfo_t {
   char *path;
 } urlinfo_t;
 
-char *replace_w_space(char *needs_space){
-  for (int i=0; i<strlen(needs_space); i++){
-    if(needs_space[i] == "/" || needs_space[i] == ":" ){
-      needs_space[i] = " ";
-    } 
-  }
-  return needs_space;
-}
 
 /**
  * Tokenize the given URL into hostname, path, and port.
@@ -40,42 +32,35 @@ urlinfo_t *parse_url(char *url)
   char *hostname = strdup(url);
   char *port;
   char *path;
-  char temp_url[128];
-  char *point_break;
 
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
 
   /*
-    We can parse the input URL by doing the following:
-
-    1. Use strchr to find the first backslash in the URL (this is assuming there is no http:// or https:// in the URL).
-    2. Set the path pointer to 1 character after the spot returned by strchr.
-    3. Overwrite the backslash with a '\0' so that we are no longer considering anything after the backslash.
-    4. Use strchr to find the first colon in the URL.
-    5. Set the port pointer to 1 character after the spot returned by strchr.
-    6. Overwrite the colon with a '\0' so that we are just left with the hostname.
+    The following is to isolate path and port strings and assign the values to their respective variables.
   */
+  // returning pointer to index of first occurance of '/'
+  path = strchr(hostname, '/');
 
-  if(strstr(hostname, "http://") == 0){
-    strncpy(temp_url, hostname+7, sizeof(temp_url));
-    point_break = replace_w_space(temp_url);
-    sscanf(point_break, "%s %s %s", hostname, port, path);
-    // printf("hostname >> %s, port >>> %s, path >> %s\n", hostname, port, path);
-  } else if (strstr(hostname, "https://") == 0) {
-    strncpy(temp_url, hostname+8, sizeof(temp_url));
-    // printf("tEMPURL >>>> %s", temp_url);
-    point_break = replace_w_space(temp_url);
-    sscanf(point_break, "%s %s %s", hostname, port, path);
-    // printf("hostname >> %s, port >>> %s, path >> %s\n", hostname, port, path);
+  // assigning '\0' to index of path
+  *path = '\0';
+  // inrc the index of path pointer
+  path++;
+
+  // reassigning index of ':' to port
+  port = strchr(hostname, ':');
+  if( port == NULL ){
+    // if nothing exists at port, port is assigned '80'
+    port = '80';
   } else {
-    point_break = replace_w_space(temp_url);
-    sscanf(point_break, "%s %s %s", hostname, port, path);
-    // printf("hostname >> %s, port >>> %s, path >> %s\n", hostname, port, path);
+    // is value of port is not ':', '\0' is assigned to port index
+    *port = '\0';
+    // port index is incr.
+    port++;
   }
 
-  urlinfo->hostname = strdup(hostname);
-  urlinfo->path = strdup(path);
-  urlinfo->port = strdup(port);
+  urlinfo->port = port;
+  urlinfo->hostname = hostname;
+  urlinfo->path = path;
 
   return urlinfo;
 }
@@ -95,10 +80,6 @@ int send_request(int fd, char *hostname, char *port, char *path)
   const int max_request_size = 16384;
   char request[max_request_size];
   int rv;
-  // time_t curr_time;
-  // char* frmt_curr_time;
-  // curr_time = time(NULL);
-  // frmt_curr_time = ctime(&curr_time);
 
 /*
 GET /path HTTP/1.1
@@ -127,6 +108,7 @@ int main(int argc, char *argv[])
   int sockfd, numbytes;  
   char buf[BUFSIZE];
   char *URL = argv[1];
+  printf("URL >>>> %s\n", URL);
 
   // 1. Parse the input URL
   struct urlinfo_t *urlinfo = parse_url(URL);
@@ -140,6 +122,7 @@ int main(int argc, char *argv[])
   // 4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
   while((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
     printf("Response:\n %s", buf);
+    // fwrite()
   }
 
   if (argc != 2) {
@@ -148,7 +131,6 @@ int main(int argc, char *argv[])
   }
 
   // 5. Clean up any allocated memory and open file descriptors.
-  free(&sockfd);
   free(urlinfo);
 
   return 0;
