@@ -33,7 +33,6 @@ urlinfo_t *parse_url(char *url)
   char *path;
 
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
-
   /*
     We can parse the input URL by doing the following:
 
@@ -45,9 +44,6 @@ urlinfo_t *parse_url(char *url)
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
   //find the first backslash, and add one so that it is one character over.
   path = strchr(hostname, '/') + 1; 
   //overwrite the backslash, so that anything after the backslash will be considered.
@@ -80,6 +76,18 @@ int send_request(int fd, char *hostname, char *port, char *path)
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
+  int response_length = sprintf(request, 
+  "%s\n"
+  "Host: %s\n"
+  "Connection: close\n"
+  "Port: %d\n"
+  "Path: %s\n"
+  "\n",
+
+  hostname,
+  port,
+  path, 
+  );
 
   return 0;
 }
