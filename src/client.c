@@ -12,7 +12,8 @@
 /**
  * Struct to hold all three pieces of a URL
  */
-typedef struct urlinfo_t {
+typedef struct urlinfo_t
+{
   char *hostname;
   char *port;
   char *path;
@@ -44,15 +45,22 @@ urlinfo_t *parse_url(char *url)
     5. Set the port pointer to 1 character after the spot returned by strchr.
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
-
+  // if (strstr(hostname, "https://") != NULL) {
+  //     hostname += 8;
+  //   } else if (strstr(hostname, "http://")) {
+  //     hostname +=7;
+  //   }
   path = strchr(hostname, '/');
   *path = '\0';
   path++;
 
   port = strchr(hostname, ':');
-  if (port == NULL) {
+  if (port == NULL)
+  {
     port = "80";
-  } else {
+  }
+  else
+  {
     *port = '\0';
     port++;
   }
@@ -81,13 +89,11 @@ int send_request(int fd, char *hostname, char *port, char *path)
   int rv;
 
   int response = sprintf(
-  request, 
-  "GET /%s HHTP/1.1\n"
-  "Host: %s:%s\n"
-  "Connection:close\n\n",
-  path,
-  hostname,
-  port);
+      request,
+      "GET /%s HTTP/1.1\nHost: %s:%s\nConnection:close\n\n",
+      path,
+      hostname,
+      port);
 
   rv = send(fd, request, response, 0);
 
@@ -95,12 +101,13 @@ int send_request(int fd, char *hostname, char *port, char *path)
 }
 
 int main(int argc, char *argv[])
-{  
-  int sockfd, numbytes;  
+{
+  int sockfd, numbytes;
   char buf[BUFSIZE];
 
-  if (argc != 2) {
-    fprintf(stderr,"usage: client HOSTNAME:PORT/PATH\n");
+  if (argc != 2)
+  {
+    fprintf(stderr, "usage: client HOSTNAME:PORT/PATH\n");
     exit(1);
   }
 
@@ -112,24 +119,28 @@ int main(int argc, char *argv[])
     5. Clean up any allocated memory and open file descriptors.
   */
   urlinfo_t *parsed = parse_url(argv[1]);
-  int sock = get_socket(parsed->hostname, parsed->port);
-  
-  if (sock == -1) {
+  sockfd = get_socket(parsed->hostname, parsed->port);
+
+  if (sockfd == -1)
+  {
     perror("get_socket");
     exit(2);
   }
 
-  send_request(sock, parsed->hostname, parsed->port, parsed->path);
+  send_request(sockfd, parsed->hostname, parsed->port, parsed->path);
 
-  while((numbytes = recv(sock, buf, BUFSIZE, 0)) > 0) {
-    fwrite(buf, sizeof(char), numbytes, stdout);
+  while ((numbytes = recv(sockfd, buf, BUFSIZE, 0)) > 0)
+  {
+    // fwrite(buf, sizeof(char), numbytes, stdout);
+    printf("buf: %s\n", buf);
   }
 
-  if (numbytes < 0) {
+  if (numbytes < 0)
+  {
     perror("recv");
   }
 
-  close(sock);
+  close(sockfd);
   free(parsed->hostname);
   free(parsed);
 
