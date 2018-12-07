@@ -90,10 +90,13 @@ int send_request(int fd, char *hostname, char *port, char *path)
   int rv;
 
   printf("\n--inside send_request--\n\n");
+  printf("fd: %d\n", fd);
 
-  rv = sprintf(request, "GET %s HTTP/1.1\nHost: %s:%s\nConnection: close\n\n", path, hostname, port);//may or many not need the extra new line at the end 
-  printf("rv: %i\n", rv);
+  int *request_length = sprintf(request, "GET %s HTTP/1.1\nHost: %s:%s\nConnection: close\n\n", path, hostname, port);//may or many not need the extra new line at the end 
+  printf("request_length: %i\n", request_length);
   printf("request:\n'%s'\n", request);
+
+  rv = send(fd, request, request_length, 0);
 
   ///////////////////
   // IMPLEMENT ME! //
@@ -122,10 +125,11 @@ int main(int argc, char *argv[])
   printf("port: %s\n", parsedUrl->port);
   //2. Initialize a socket
   sockfd = get_socket(parsedUrl->hostname, parsedUrl->port);
-  
+  printf("sockfd: %i\n", sockfd);
 
   //3. Call send_request to construct the request and send it
   numbytes = send_request(sockfd, parsedUrl->hostname, parsedUrl->port, parsedUrl->path);
+  printf("numbytes: %i\n", numbytes);
 
   //4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
 
