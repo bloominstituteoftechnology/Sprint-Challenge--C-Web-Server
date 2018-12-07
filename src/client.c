@@ -31,6 +31,7 @@ urlinfo_t *parse_url(char *url)
   char *hostname = strdup(url);
   char *port;
   char *path;
+  char *to_null;
 
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
 
@@ -44,10 +45,13 @@ urlinfo_t *parse_url(char *url)
     5. Set the port pointer to 1 character after the spot returned by strchr.
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
- *path = strchr(url, '/') + 1;
- *port = strchr(url, ':') + 1;
- strchr(url, ':') = "\0";
-
+ urlinfo->hostname = hostname;
+ urlinfo->path = strchr(hostname, '/') + 1;
+ to_null = strchr(hostname, '/');
+ to_null = '\0';
+ urlinfo->port = strchr(hostname, ':') + 1;
+ to_null = strchr(hostname, ':');
+ to_null = '\0';
   return urlinfo;
 }
 
@@ -65,20 +69,19 @@ int send_request(int fd, char *hostname, char *port, char *path)
 {
   const int max_request_size = 16384;
   char request[max_request_size];
+  int request_size;
   int rv;
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  request_size = sprintf(request, "GET %s HTTP/1.1\nHost: %s:%s\n", path, hostname, port);
 
-  return 0;
+  rv = send(fd, request, request_size, 0);
+  return rv;
 }
 
 int main(int argc, char *argv[])
 {  
   int sockfd, numbytes;  
   char buf[BUFSIZE];
-
   if (argc != 2) {
     fprintf(stderr,"usage: client HOSTNAME:PORT/PATH\n");
     exit(1);
@@ -92,9 +95,24 @@ int main(int argc, char *argv[])
     5. Clean up any allocated memory and open file descriptors.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
-
+  urlinfo_t *purl = parse_url(argv[1]);
+  printf("hostname:%s\n port:%s\n path:%s\n", purl->hostname, purl->port, purl->path );
+  get_socket(purl->hostname, purl->port);
+  send_request(sockfd, purl->hostname, purl->port, purl->path);
+  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
+       // print the data we got back to stdout
+       printf("%s", buf);
+     }
+/*   msg_length = recv(fd, buf, BUFSIZE, MSG_WAITALL); 
+  if (msg_length == 0) {
+    printf("No message retrieved");
+  }
+  if (msg_length >= 1) {
+    printf("%s", buf);
+  }
+  if (msg_length < 0) {
+    printf("recv error");
+  } */
+  
   return 0;
 }
