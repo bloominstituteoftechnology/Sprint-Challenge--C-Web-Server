@@ -45,9 +45,12 @@ urlinfo_t *parse_url(char *url)
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
 
-// if(strncmp(url,"http://",7) == 0 || strncmp(url,"https://",8) == 0 ){
-//   //handle that
-// }
+if(strncmp(url,"http://",7) == 0  ){
+  hostname = hostname+7;
+}
+if(strncmp(url,"https://",8) == 0  ){
+  hostname = hostname+8;
+}
 path = strchr(hostname,'/');
   *path = '\0';
 path++;
@@ -81,9 +84,7 @@ int send_request(int fd, char *hostname, char *port, char *path)
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
-  printf("%s\n",request);
    rv = send(fd, request, response_length, 0);
-printf("%i\n",rv);
     if (rv < 0) {
         perror("send");
     }
