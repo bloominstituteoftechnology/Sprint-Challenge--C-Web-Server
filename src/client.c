@@ -29,16 +29,17 @@ urlinfo_t *parse_url(char *url)
 
     char portStr = strchr(url, '/');
     *port = '\0';
-    char *port = strdup(port);
+    char *portMem = strdup(portStr);
     port++;
 
     char pathStr = strchr(url, ':');
     *path = "\0";
-    pathStr++;
+    char *pathMem = strdup(pathStr);
+    path++;
 
 printf("Hostname: %s\n", hostname);
-printf("Port: %s\n", portStr);
-printf("Path: %s\n", pathStr);
+printf("Port: %s\n", port);
+printf("Path: %s\n", path);
 
   return urlinfo;
 }
@@ -77,9 +78,6 @@ int send_request(int fd, char *hostname, char *port, char *path)
 
 
 
-
-
-
 int main(int argc, char *argv[])
 {  
   int sockfd, numbytes;  
@@ -89,6 +87,47 @@ int main(int argc, char *argv[])
     fprintf(stderr,"usage: client HOSTNAME:PORT/PATH\n");
     exit(1);
   }
+
+
+  struct urlinfo_t *parseURL = malloc(sizeof *parseURL);
+  
+  // parseURL = parse_url(argv);
+
+  sockfd = socket(AF_INET, SOCK_STREAM, 0);
+  if(sockfd == -1){
+    printf("socket error\n");
+    exit(1);
+  }
+
+  int sendRequest = send_request(sockfd, parseURL->hostname, parseURL->port, parseURL->path);
+
+  numbytes = recv(sockfd, buf, BUFSIZ - 1, 0);
+
+
+  if(numbytes < 0 ){
+    perror("recv");
+    return;
+  }
+
+  char hostname[256];
+  char port[256];
+  char path[256];
+
+  while(numbytes > 0){
+    fprintf(stdout, "%s\n", hostname);
+    fprintf(stdout, "%s\n", port);
+    fprintf(stdout, "%s\n", path);
+
+  }
+
+  free(parseURL);
+
+  return 0;
+}
+
+
+
+
 
   /*
     1. Parse the input URL
@@ -103,35 +142,6 @@ int main(int argc, char *argv[])
   ///////////////////
 
 // int send_request(int fd, char *hostname, char *port, char *path)
-
-
-  struct urlinfo_t *parseURL = malloc(sizeof *parseURL);
-  
-  // parseURL = parse_url(argv);
-
-  int sendRequest = send_request(parseURL->fd, parseURL->hostname, parseURL->port, parseURL->path);
-
-  int bytes_recvd = recv(parseURL->fd, parseURL->request, buf, 0);
-
-  if(bytes_recvd < 0 ){
-    perror("recv");
-    return;
-  }
-
-  char hostname[256];
-  char port[256];
-  char path[256];
-
-  fprintf(stdout, "%s\n", hostname);
-  fprintf(stdout, "%s\n", port);
-  fprintf(stdout, "%s\n", path);
-
-  return 0;
-}
-
-
-
-
 
 
 
