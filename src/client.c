@@ -125,10 +125,14 @@ int main(int argc, char *argv[])
     // 4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
     while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
        // print the data we got back to stdout
-      //  printf("%s\n", )
+       printf("%s\n", buf);
      }
     // 5. Clean up any allocated memory and open file descriptors.
-
+    free(urlinfo->hostname);
+    free(urlinfo->port);
+    free(urlinfo->path);
+    free(urlinfo);
+    close(sockfd);
 
   ///////////////////
   // IMPLEMENT ME! //
