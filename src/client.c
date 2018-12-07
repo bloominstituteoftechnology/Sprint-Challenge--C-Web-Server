@@ -48,8 +48,11 @@ urlinfo_t *parse_url(char *url)
   if(strstr(hostname, "https://") != NULL) hostname += 8;
   else if(strstr(hostname, "http://") != NULL) hostname += 7;
   path = strchr(hostname, '/');
-  path[0] = '\0';
-  path++;
+  if (path == NULL) path = "";
+  else {
+    path[0] = '\0';
+    path++;
+  }
   port = strchr(hostname, ':');
   if(port == NULL) port = "80";
   else {
