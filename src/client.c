@@ -52,13 +52,23 @@ if(strncmp(url,"https://",8) == 0  ){
   hostname = hostname+8;
 }
 path = strchr(hostname,'/');
+if(path == NULL){
+path ="/";
+}else{
   *path = '\0';
 path++;
+}
+
 urlinfo->path = path;
 
 port = strchr(hostname,':');
+if(port == NULL){
+  port="80";
+}else{
   *port = '\0';
 port++;
+}
+
 urlinfo->port = port;
 
 urlinfo->hostname = hostname;
