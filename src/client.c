@@ -52,13 +52,13 @@ urlinfo_t *parse_url(char *url)
   *port = '\0';
   port++;
 
-  urlinfo->hostname = malloc(strlen(hostname) + 1);
+  // urlinfo->hostname = malloc(strlen(hostname) + 1);
   strcpy(urlinfo->hostname, hostname);
 
-  urlinfo->path = malloc(strlen(path) + 1);
+  // urlinfo->path = malloc(strlen(path) + 1);
   strcpy(urlinfo->path, path);
 
-  urlinfo->port = malloc(strlen(port) + 1);
+  // urlinfo->port = malloc(strlen(port) + 1);
   strcpy(urlinfo->port, port);
 
   return urlinfo;
@@ -80,11 +80,25 @@ int send_request(int fd, char *hostname, char *port, char *path)
   char request[max_request_size];
   int rv;
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  int request_length = sprintf(request,
+      "GET /%s HTTP/1.1\n"
+      "Host: %s:%s\n"
+      "Connection: close\n"
+      "\n",
+      path,
+      hostname,
+      port
+      );
 
-  return 0;
+  rv = send(fd, request, request_length, 0);
+
+  if (rv < 0) {
+      perror("send");
+  }
+
+  return rv;
+
+  // return 0;
 }
 
 int main(int argc, char *argv[])
