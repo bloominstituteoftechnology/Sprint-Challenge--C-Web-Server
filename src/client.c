@@ -147,11 +147,35 @@ int main(int argc, char *argv[])
   while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
        // print the data we got back to stdout
        printf("%s\n", buf);
+        char *firstLine;
+        char *secondLine;
+        char *everythingElse;
+        firstLine = buf;
+        secondLine = strchr(firstLine, '\n');
+        *secondLine = '\0';
+        secondLine++;
+        printf("firstLine: %s\n", firstLine);
+        everythingElse = strchr(secondLine, '\n');
+        *everythingElse = '\0';
+        everythingElse++;
+        printf("secondLine: %s\n", secondLine);
+        // printf("everythingElse: %s\n", everythingElse);
+        char *is301;
+        char *redirectURL;
+        is301 = strstr(firstLine, "301");
+        printf("is301 %s", is301);
+        if(is301 != NULL){
+          printf("301 is not null");
+          redirectURL = strstr(secondLine, "http");
+          printf("%s", redirectURL);
+          char *newArgv;
+          sprintf(newArgv, "./client %s", redirectURL);
+          main(2, newArgv);
+        } else {
+          break;
+        }
      }
 
-     char *hey;
-     hey = strstr(buf, "301 Moved Permently");
-     printf("%s", hey);
 
   //5. Clean up any allocated memory and open file descriptors.
 
