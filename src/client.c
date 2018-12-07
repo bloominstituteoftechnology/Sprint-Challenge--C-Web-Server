@@ -6,7 +6,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include "lib.h"
-// test comment
+
 #define BUFSIZE 4096 // max number of bytes we can get at once
 
 /**
@@ -28,7 +28,8 @@ typedef struct urlinfo_t {
 urlinfo_t *parse_url(char *url)
 {
   // copy the input URL so as not to mutate the original
-  char *hostname = strdup(url);
+  char *url_copy = strdup(url); 
+  char *hostname;
   char *port;
   char *path;
 
@@ -45,9 +46,19 @@ urlinfo_t *parse_url(char *url)
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  hostname = url_copy;
+  path = strchr(url_copy, '/');
+  *path = '\0';
+  path++;
+  port = strchr(url_copy, ':');
+  *port = '\0';
+  port++;
+
+  urlinfo->hostname = hostname;
+  urlinfo->port = port;
+  urlinfo->path = path;
+
+  printf("hostname: %s, port: %s, path: %s\n", urlinfo->hostname, urlinfo->port, urlinfo->path);
 
   return urlinfo;
 }
