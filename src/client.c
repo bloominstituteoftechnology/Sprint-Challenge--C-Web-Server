@@ -146,7 +146,12 @@ int main(int argc, char *argv[])
 
   while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
        // print the data we got back to stdout
+       buf[numbytes] = '\0';
        printf("%s\n", buf);
+       //beej----- fwrite(buf, sizeof(char), numbytes, stdout)
+
+       //vause that makes it null terminate 
+
         char *firstLine;
         char *secondLine;
         char *everythingElse;
