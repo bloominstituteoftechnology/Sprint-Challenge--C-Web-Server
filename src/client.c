@@ -34,11 +34,18 @@ urlinfo_t *parse_url(char *url)
 
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
 
+  printf("\n--in parse_url--\n\n");
   
   // We can parse the input URL by doing the following:
 
   // 1. Use strchr to find the first backslash in the URL (this is assuming there is no http:// or https:// in the URL).
-  printf("\n--in parse_url--\n\n");
+  char *clean;
+  clean = strstr(url, "://");
+  printf("clean: %s\n", clean);
+
+  url = clean +3;
+  printf("url: %s\n", url);
+  
   path = strchr(url, '/');
   printf("path: %s\n", path);
 
@@ -125,12 +132,12 @@ int main(int argc, char *argv[])
   printf("port: %s\n", parsedUrl->port);
   //2. Initialize a socket
   sockfd = get_socket(parsedUrl->hostname, parsedUrl->port);
-  printf("sockfd: %i\n", sockfd);
+  // printf("sockfd: %i\n", sockfd);
 
   //3. Call send_request to construct the request and send it
   numbytes = send_request(sockfd, parsedUrl->hostname, parsedUrl->port, parsedUrl->path);
-  printf("numbytes: %i\n", numbytes);
-  printf("BUFSIZE: %i\n", BUFSIZE);
+  // printf("numbytes: %i\n", numbytes);
+  // printf("BUFSIZE: %i\n", BUFSIZE);
 
   //4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
 
