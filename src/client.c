@@ -38,12 +38,9 @@ urlinfo_t *parse_url(char *url)
   // We can parse the input URL by doing the following:
 
   // 1. Use strchr to find the first backslash in the URL (this is assuming there is no http:// or https:// in the URL).
-  printf("in parse_url\n");
+  printf("\n--in parse_url--\n\n");
   path = strchr(url, '/');
   printf("path: %s\n", path);
-
-  // char *hostname = url;
-  // printf("port: %s", port);
 
   // 2. Set the path pointer to 1 character after the spot returned by strchr.
 
@@ -92,11 +89,17 @@ int send_request(int fd, char *hostname, char *port, char *path)
   char request[max_request_size];
   int rv;
 
+  printf("\n--inside send_request--\n\n");
+
+  rv = sprintf(request, "GET %s HTTP/1.1\nHost: %s:%s\nConnection: close\n\n", path, hostname, port);//may or many not need the extra new line at the end 
+  printf("rv: %i\n", rv);
+  printf("request:\n'%s'\n", request);
+
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
 
-  return 0;
+  return rv;//changed from 0 to rv
 }
 
 int main(int argc, char *argv[])
@@ -113,12 +116,21 @@ int main(int argc, char *argv[])
   char *hostname = strdup(argv[1]);
   printf("%s\n", hostname);
   struct urlinfo_t *parsedUrl = parse_url(hostname);
+  printf("\n--after parse_url--\n\n");
   printf("hostname: %s\n", parsedUrl->hostname);
   printf("path: %s\n", parsedUrl->path);
   printf("port: %s\n", parsedUrl->port);
   //2. Initialize a socket
+  sockfd = get_socket(parsedUrl->hostname, parsedUrl->port);
+  
+
   //3. Call send_request to construct the request and send it
+  numbytes = send_request(sockfd, parsedUrl->hostname, parsedUrl->port, parsedUrl->path);
+
   //4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
+
+
+
   //5. Clean up any allocated memory and open file descriptors.
 
   ///////////////////
