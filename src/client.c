@@ -79,7 +79,7 @@ int send_request(int fd, char *hostname, char *port, char *path)
     "GET /%s HTTP/1.1"
     "Host: %s:%s\n"
     "Connection: close\n"
-  )
+  );
 
   rv = send(fd, request, request_length, 0);
 
