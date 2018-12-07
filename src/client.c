@@ -92,10 +92,6 @@ int send_request(int fd, char *hostname, char *port, char *path)
 
   send(fd, request, rv, 0);
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
-
   return 0;
 }
 
@@ -124,5 +120,8 @@ int main(int argc, char *argv[])
   while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
     printf("%s\n", buf);
   }
+
+  free(urlinfo->hostname);
+  free(urlinfo);
   return 0;
 }
