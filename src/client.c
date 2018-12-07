@@ -48,7 +48,15 @@ urlinfo_t *parse_url(char *url)
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
+  path = strdup(strstr(hostname, "/") + 1);
+  hostname[strlen(hostname) - strlen(path) - 1] = '\0';
+  port = strdup(strstr(hostname, ":") + 1);
+  hostname[strlen(hostname) - strlen(port) - 1] = '\0';
 
+  urlinfo->path = path;
+  urlinfo->port = port;
+  urlinfo->hostname = hostname;
+  
   return urlinfo;
 }
 
@@ -76,8 +84,8 @@ int send_request(int fd, char *hostname, char *port, char *path)
 }
 
 int main(int argc, char *argv[])
-{  
-  int sockfd, numbytes;  
+{
+  int sockfd, numbytes;
   char buf[BUFSIZE];
 
   if (argc != 2) {
