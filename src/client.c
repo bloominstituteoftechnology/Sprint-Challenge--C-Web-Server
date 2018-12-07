@@ -121,6 +121,7 @@ int main(int argc, char *argv[])
   urlinfo_t *parsedinput = parse_url(argv[1]);
   sockfd = get_socket(parsedinput->hostname, parsedinput->port);
   send_request(sockfd, parsedinput->hostname, parsedinput->port, parsedinput->path);
+  
   while ((numbytes = recv(sockfd, buf, BUFSIZ - 1, 0)) > 0)
   {
     printf("%s", buf);
