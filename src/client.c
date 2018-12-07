@@ -132,6 +132,7 @@ int main(int argc, char *argv[])
     // 5. Clean up any allocated memory and open file descriptors.
     // if(urlinfo) //need to only do this if there is data here
     if(sizeof(urlinfo) != 0) {
+    free(urlinfo->hostname);
     free(urlinfo);
     }
     
