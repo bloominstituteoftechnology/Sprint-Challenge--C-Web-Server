@@ -45,10 +45,33 @@ urlinfo_t *parse_url(char *url)
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+if(strncmp(url,"http://",7) == 0  ){
+  hostname = hostname+7;
+}
+if(strncmp(url,"https://",8) == 0  ){
+  hostname = hostname+8;
+}
+path = strchr(hostname,'/');
+if(path == NULL){
+path ="/";
+}else{
+  *path = '\0';
+path++;
+}
 
+urlinfo->path = path;
+
+port = strchr(hostname,':');
+if(port == NULL){
+  port="80";
+}else{
+  *port = '\0';
+port++;
+}
+
+urlinfo->port = port;
+
+urlinfo->hostname = hostname;
   return urlinfo;
 }
 
@@ -67,35 +90,41 @@ int send_request(int fd, char *hostname, char *port, char *path)
   const int max_request_size = 16384;
   char request[max_request_size];
   int rv;
-
+ int response_length=sprintf(request,"GET /%s HTTP/1.1\r\nHost: %s:%s\r\nConnection: close\r\n\r\n",path,hostname,port); 
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
-
-  return 0;
+   rv = send(fd, request, response_length, 0);
+    if (rv < 0) {
+        perror("send");
+    }
+  return rv;
 }
 
 int main(int argc, char *argv[])
 {  
   int sockfd, numbytes;  
   char buf[BUFSIZE];
-
+  // char *testurl = "google.com:44/aa";
   if (argc != 2) {
     fprintf(stderr,"usage: client HOSTNAME:PORT/PATH\n");
     exit(1);
   }
-
   /*
     1. Parse the input URL
+
     2. Initialize a socket
     3. Call send_request to construct the request and send it
     4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
     5. Clean up any allocated memory and open file descriptors.
   */
+      urlinfo_t *tosend = parse_url(argv[1]);
+      sockfd = get_socket(tosend->hostname,tosend->port);
+      int request = send_request(sockfd,tosend->hostname,tosend->port,tosend->path);
+      while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
+      fprintf(stdout, buf);
+      };
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
-
+  free(tosend);
   return 0;
 }
