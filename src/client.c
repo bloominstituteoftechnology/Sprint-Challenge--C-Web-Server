@@ -93,9 +93,7 @@ int send_request(int fd, char *hostname, char *port, char *path)
     "Connection: close\n\n",
      path, hostname, port);
 
-  send(fd, request, rv, 0);
-
-  return 0;
+  return send(fd, request, rv, 0);
 }
 
 int main(int argc, char *argv[])
@@ -121,7 +119,7 @@ int main(int argc, char *argv[])
 
 
   while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
-    printf("%s\n", buf);
+    fwrite(buf, sizeof(char), numbytes, stdout);
   }
 
   free(urlinfo->hostname);
