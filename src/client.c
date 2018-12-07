@@ -88,10 +88,10 @@ int send_request(int fd, char *hostname, char *port, char *path)
   hostname,
   port);
 
-
-
-
-
+  rv = send(fd, request, request_length, 0);
+   if (rv < 0) {
+    perror("Could not process request");
+  }
 
   return rv;
 }
