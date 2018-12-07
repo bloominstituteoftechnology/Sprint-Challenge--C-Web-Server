@@ -9,7 +9,7 @@ performs web requests and prints the results on `stdout`.
 ## Instructions
 
 **Read these instructions carefully. Understand exactly what is expected
-_before_ starting this Sprint Challenge.**
+_before_ starting this Sprint Challenge.** 
 
 This is an individual assessment. All work must be your own. Your challenge
 score is a measure of your ability to work independently using the material
