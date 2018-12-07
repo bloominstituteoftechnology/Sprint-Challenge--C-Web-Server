@@ -28,7 +28,7 @@ typedef struct urlinfo_t {
 urlinfo_t *parse_url(char *url)
 {
   // copy the input URL so as not to mutate the original
-  char *hostname = strdup(url);
+  char *hostname;
   char *port;
   char *path;
 
@@ -45,13 +45,30 @@ urlinfo_t *parse_url(char *url)
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
 
+  if (strstr(url, "https://")) {
+    hostname = strdup(url + 8);
+  } else if (strstr(url, "http://")) {
+    hostname = strdup(url + 7);
+  } else {
+    hostname = strdup(url);
+  }
+
   char *backslash = strchr(hostname, '/');
-  path = backslash + 1;
-  *backslash = '\0';
+  if (backslash) {
+    path = backslash + 1;
+    *backslash = '\0';
+  } else {
+    path = "/";
+  }
 
   char *colon = strchr(hostname, ':');
-  port = colon + 1;
-  *colon = '\0';
+  if (colon) {
+    port = colon + 1;
+    *colon = '\0';
+  } else {
+    port = "80";
+  }
+
 
   urlinfo->hostname = hostname;
   urlinfo->port = port;
