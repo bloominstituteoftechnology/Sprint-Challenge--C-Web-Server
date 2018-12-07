@@ -141,7 +141,7 @@ int main(int argc, char *argv[])
 
   //5. Clean up any allocated memory and open file descriptors.
 
-  // free(urlinfo);
+  free(parsedUrl);
 
   ///////////////////
   // IMPLEMENT ME! //
