@@ -60,7 +60,7 @@ urlinfo_t *actual_parse_logic (char *url)
     
     strncpy(test, url+i, j-i); // begining to colon. 
     test[j] = '\0'; 
-    printf("should be the host name:    %s\n", test);
+    // printf("should be the host name:    %s\n", test);
     //AT this position localhost is the hostname  however  by the time it gets down the main function it changes. 
 
     j++;// to remove the colon. 
@@ -76,7 +76,7 @@ urlinfo_t *actual_parse_logic (char *url)
     // printf("should be the path :  %s\n", test2); 
     
     urlinfo->hostname = strdup(test); 
-    printf("should be the host name:    %s\n", test);
+    // printf("should be the host name:    %s\n", test);
     urlinfo->port = strdup(test1); 
     urlinfo->path = strdup(test2); 
 
@@ -118,11 +118,11 @@ urlinfo_t *parse_url(char *url)
   char *temp; 
 
   temp = strstr(url, "//"); 
-  printf("%s  temp\n", temp); 
+  // printf("%s  temp\n", temp); 
   if (temp != NULL){
     temp++;//removes the back slash
     temp++;//removes the back slash
-    printf("%s  temp\n", temp);
+    // printf("%s  temp\n", temp);
   }
   if(temp == NULL){//if there is not // in the url 
    return  actual_parse_logic(url);
@@ -190,7 +190,8 @@ int main(int argc, char *argv[])
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
-  urlinfo_t *urlinfo = parse_url(argv[2]);
+  urlinfo_t *urlinfo = parse_url(argv[1]);
+  // printf("%s %s %s\n", urlinfo->hostname, urlinfo->port, urlinfo->path);
   sockfd = get_socket(urlinfo->hostname, urlinfo->port); 
   int rv = send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path); 
 
