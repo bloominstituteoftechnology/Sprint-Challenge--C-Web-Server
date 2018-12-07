@@ -66,12 +66,16 @@ urlinfo_t *parse_url(char *url)
 
   // 5. Set the port pointer to 1 character after the spot returned by strchr.
   
-  urlinfo->port = port +1;
+  if(port == NULL){
+    urlinfo->port = "80";
+  } else {
+    urlinfo->port = port +1;
+    *port = '\0';
+  }
   printf("urlinfo->port: %s\n", urlinfo->port);
 
   // 6. Overwrite the colon with a '\0' so that we are just left with the hostname.
 
-  *port = '\0';
   printf("url: %s\n", url);
 
   urlinfo->hostname = url;
