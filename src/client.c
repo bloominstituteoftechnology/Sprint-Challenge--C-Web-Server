@@ -27,7 +27,16 @@ typedef struct urlinfo_t {
 urlinfo_t *parse_url(char *url)
 {
   // copy the input URL so as not to mutate the original
-  char *hostname = strdup(url);
+  char *hostname;
+  if (strstr(url,"http://")) {
+    hostname=strdup(url+7);
+    printf("%s",hostname);
+  } else if (strstr(url,"https://")){
+    hostname=strdup(url+8);
+    printf("%s",hostname);
+  } else {
+    hostname=strdup(url);
+  }
   char *port;
   char *path;
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
@@ -44,10 +53,20 @@ urlinfo_t *parse_url(char *url)
   ///////////////////
   // IMPLEMENT ME! //
   //////////////////
-  path=strchr(hostname,'/')+1;
-  *(path-1)=NULL;
-  port=strchr(hostname,':')+1;
-  *(port-1)=NULL;
+  if (strchr(hostname,'/')) {
+    path=strchr(hostname,'/')+1;
+    *(path-1)=NULL;
+  } else {
+    path="/";
+  }
+  if (strchr(hostname,':')) {
+    port=strchr(hostname,':')+1;
+    *(port-1)=NULL;
+  } else {
+    char buffer[3];
+    sprintf(buffer,"%i",80);
+    port=buffer;
+  }
   urlinfo->port=strdup(port);
   urlinfo->path=strdup(path);
   urlinfo->hostname=hostname;
