@@ -45,12 +45,24 @@ urlinfo_t *parse_url(char *url)
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
 
+  char *robust;
+  robust = strstr(hostname, "//");
+  if (robust != NULL) {
+    hostname = robust;
+    hostname +=2;
+  }
+
   path = strchr(hostname, '/');
   *path = '\0';
   path++;
   port = strchr(hostname, ':');
-  *port = '\0';
-  port++;
+  if (port == NULL) {
+    port = "80";
+  } else {
+      *port = '\0';
+      port++;
+  }
+
 
   // urlinfo->hostname = malloc(strlen(hostname) + 1);
   // strcpy(urlinfo->hostname, hostname);
@@ -101,7 +113,6 @@ int send_request(int fd, char *hostname, char *port, char *path)
 
   return rv;
 
-  // return 0;
 }
 
 int main(int argc, char *argv[])
@@ -124,7 +135,7 @@ int main(int argc, char *argv[])
 
   urlinfo_t *urlinfo = parse_url(argv[1]);
   sockfd = get_socket(urlinfo->hostname, urlinfo->port);
-  int sr = send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
+  send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
 
   while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
     printf("Response: %s\n", buf);
