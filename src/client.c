@@ -47,10 +47,10 @@ urlinfo_t *parse_url(char *url)
   //find the first backslash, and add one so that it is one character over.
   path = strchr(hostname, '/') + 1; 
   //overwrite the backslash, so that anything after the backslash will be considered.
-  *path = "\0";  
+  *(path - 1) = NULL;  
   //repeat what you did for path but instead of / it will be : . 
   port = strchr(hostname, ":") + 1;
-  *port = "\0"; 
+  *(port - 1) = NULL;
   urlinfo->path = path; 
   urlinfo->port = port; 
   urlinfo->hostname = hostname; 
@@ -89,6 +89,12 @@ int send_request(int fd, char *hostname, char *port, char *path)
   // path, 
   // );
   sprintf(get, "GET /%s HTTP/1.1", path); 
+  sprintf(connection, "Connection: close\n"); 
+  sprintf(host, "Host: %s:%s", hostname, port); 
+ 
+  unsigned long int request_length = sprintf(request, "%s\n%s\n%s\n\n", get, host, connection); 
+
+  rv = send(fd, request, request_length, 0); 
 
   return 0;
 }
@@ -110,7 +116,19 @@ int main(int argc, char *argv[])
     4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
     5. Clean up any allocated memory and open file descriptors.
   */
+    struct urlinfo_t *url = parse_url(argv[1]);
 
+    printf("%s", argv[1]); 
+
+    sockfd = get_socket(url->hostname, url->port); 
+
+    printf("%d", sockfd); 
+
+    send_request(sockfd, url->hostname, url->port, url->path); 
+
+    while((numbytes = recv(sockfd, buf, BUFSIZ-1, 0)) > 0){
+      fprintf(stdout, "%s\n", buf);
+    };
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
