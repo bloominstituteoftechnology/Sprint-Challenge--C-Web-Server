@@ -18,6 +18,7 @@ typedef struct urlinfo_t {
   char *path;
 } urlinfo_t;
 
+
 /**
  * Tokenize the given URL into hostname, path, and port.
  *
@@ -96,8 +97,8 @@ int send_request(int fd, char *hostname, char *port, char *path)
   // path, 
   // );
   sprintf(get, "GET /%s HTTP/1.1", path); 
-  sprintf(connection, "Connection: close\n"); 
-  sprintf(host, "Host: %s:%s", hostname, port); 
+  sprintf(host, "Host: %s:%s", hostname, port);
+  sprintf(connection, "Connection: close"); 
  
   unsigned long int request_length = sprintf(request, "%s\n%s\n%s\n\n", get, host, connection); 
 
@@ -133,7 +134,7 @@ int main(int argc, char *argv[])
 
     send_request(sockfd, url->hostname, url->port, url->path); 
 
-    while((numbytes = recv(sockfd, buf, BUFSIZ-1, 0)) > 0){
+    while((numbytes = recv(sockfd, buf, BUFSIZE-1, 0)) > 0){
       fprintf(stdout, "%s\n", buf);
     };
   ///////////////////
