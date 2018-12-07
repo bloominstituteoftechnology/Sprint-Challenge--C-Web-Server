@@ -85,7 +85,7 @@ int send_request(int fd, char *hostname, char *port, char *path)
   char request[max_request_size];
   int rv;
 
-  int request_length = sprintf(request, "GET /%s HTTP/1.1\n Host: %s:%s\nConnection: close", path, hostname, port);
+  int request_length = sprintf(request, "GET /%s HTTP/1.1\nHost: %s:%s\nConnection: close\n\n", path, hostname, port);
 
   rv = send(fd, request, request_length, 0);
 
@@ -116,9 +116,17 @@ int main(int argc, char *argv[])
     5. Clean up any allocated memory and open file descriptors.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  urlinfo_t *urlinfo = parse_url(argv[1]);
 
+  sockfd = get_socket(urlinfo->hostname, urlinfo->port);
+
+  send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
+
+  while ((numbytes = recv(sockfd, buf, BUFSIZ - 1, 0)) > 0)
+  {
+    printf("%s", buf);
+  }
+  free(urlinfo);
+  close(sockfd);
   return 0;
 }
