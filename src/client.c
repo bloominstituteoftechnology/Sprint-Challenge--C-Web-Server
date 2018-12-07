@@ -49,7 +49,18 @@ urlinfo_t *parse_url(char *url)
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
+  char *backslash = strchr(hostname, '/');
+  path = backslash + 1;
+  *backslash = '\0';
 
+  char *colon = strchr(hostname, ':');
+  port = colon + 1;
+  *colon = '\0';
+
+  urlinfo->hostname = hostname;
+  urlinfo->port = port;
+  urlinfo->path = path;
+  
   return urlinfo;
 }
 
