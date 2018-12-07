@@ -1,4 +1,4 @@
-# Sprint Challenge: TOPIC - CHALLENGE TITLE
+# Sprint Challenge: C Web Server Sprint
 
 This challenge allows you to practice the concepts and techniques learned over
 the past week and apply them in a concrete project. This Sprint explored
@@ -53,9 +53,7 @@ in the response and rendering it.
 Your program for the Sprint Challenge will be a stripped down version of cURL
 that can only make GET requests. Your MVP implementation will need to be able to
 accept a URL as input, make a GET request, receive the response and print it all
-to `stdout`. In this challenge, you build/design/create... [Describe the _end
-result_ (code) or the _tasks_ (UX, etc) the student will perform in this
-project. Do not include any project specs]
+to `stdout`.
 
 ### HTTP Requests
 
