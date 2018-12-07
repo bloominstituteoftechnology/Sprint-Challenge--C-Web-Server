@@ -92,7 +92,7 @@ int send_request(int fd, char *hostname, char *port, char *path)
   printf("\n--inside send_request--\n\n");
   printf("fd: %d\n", fd);
 
-  int *request_length = sprintf(request, "GET %s HTTP/1.1\nHost: %s:%s\nConnection: close\n\n", path, hostname, port);//may or many not need the extra new line at the end 
+  int *request_length = sprintf(request, "GET /%s HTTP/1.1\nHost: %s:%s\nConnection: close\n", path, hostname, port);//may or many not need the extra new line at the end 
   printf("request_length: %i\n", request_length);
   printf("request:\n'%s'\n", request);
 
@@ -140,6 +140,8 @@ int main(int argc, char *argv[])
      }
 
   //5. Clean up any allocated memory and open file descriptors.
+
+  // free(urlinfo);
 
   ///////////////////
   // IMPLEMENT ME! //
