@@ -55,6 +55,15 @@ urlinfo_t *parse_url(char *url)
 
   tmp = strstr(port, "/");
 
+  path = tmp + 1;
+
+  urlinfo->path = path;
+
+  *tmp = '\0';
+
+
+  urlinfo->hostname = hostname;
+
   return urlinfo;
 }
 
