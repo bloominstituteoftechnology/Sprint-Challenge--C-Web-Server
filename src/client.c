@@ -8,10 +8,12 @@
 #include "lib.h"
 
 #define BUFSIZE 4096 // max number of bytes we can get at once
+#define DEBUG 0
 
 /**
  * Struct to hold all three pieces of a URL
  */
+
 
 typedef struct urlinfo_t {
   char *hostname;
@@ -24,28 +26,30 @@ urlinfo_t *parse_url(char *url)
   char *hostname = strdup(url);
   char *port;
   char *path;
+  // int i = 0;
 
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
 
-    char portStr = strchr(url, '/');
-    *port = '\0';
-    char *portMem = strdup(portStr);
-    port++;
-
-    char pathStr = strchr(url, ':');
-    *path = "\0";
-    char *pathMem = strdup(pathStr);
+  
+    path = strchr(hostname, '/');
+    *path = '\0';
     path++;
+    urlinfo->path = strdup(path);
+    
+    port = strchr(hostname, ':');
+    *port = '\0';
+    port++;
+    urlinfo->port = strdup(port);
 
-printf("Hostname: %s\n", hostname);
-printf("Port: %s\n", port);
-printf("Path: %s\n", path);
+    
+    printf("Hostname: %s\n", hostname);
+    printf("Port: %s\n", port);
+    printf("Path: %s\n", path);
 
+    urlinfo->hostname = strdup(hostname);  
+  
   return urlinfo;
 }
-
-
-
 
 
 /**
@@ -66,8 +70,17 @@ int send_request(int fd, char *hostname, char *port, char *path)
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
-  int request_length = sprintf(request, "File Descriptor: %d\nHostname: %s\nPort: %s\nPath:%s\n", fd, hostname, port, path);
 
+  /*
+       GET /path HTTP/1.1
+     Host: hostname:port
+     Connection: close
+  */
+      
+  int request_length = sprintf(request, "GET /%s HTTP/1.1\nHost: %s:%s\nConnection: close\n\n", path, hostname, port);
+
+  printf("\nRequest:\n%s\n", request);
+  
   rv = send(fd, request, request_length, 0);
   if(rv < 0){
     perror("send");
@@ -75,7 +88,6 @@ int send_request(int fd, char *hostname, char *port, char *path)
 
   return 0;
 }
-
 
 
 int main(int argc, char *argv[])
@@ -88,36 +100,37 @@ int main(int argc, char *argv[])
     exit(1);
   }
 
+  // struct urlinfo_t *parseURL = malloc(sizeof *parseURL); // you're allocating memory here, but the memory is empty
+  struct urlinfo_t *parseURL = malloc(sizeof(urlinfo_t));
+  parseURL = parse_url(argv[1]);
+  // printf("%d\n", ++i);
+  #if DEBUG
+  printf("argv[1]:\t\t%s\n", argv[1]);
+  printf("parseURL->hostname:\t%s\n", parseURL->hostname);
+  printf("parseURL->port:\t\t%s\n", parseURL->port);
+  printf("parseURL->path:\t\t%s\n", parseURL->path);
+  #endif
 
-  struct urlinfo_t *parseURL = malloc(sizeof *parseURL);
-  
-  // parseURL = parse_url(argv);
+  sockfd = get_socket(parseURL->hostname, parseURL->port);
 
-  sockfd = socket(AF_INET, SOCK_STREAM, 0);
+  int sendRequest = send_request(sockfd, parseURL->hostname, parseURL->port, parseURL->path);
+
+
   if(sockfd == -1){
     printf("socket error\n");
     exit(1);
   }
-
-  int sendRequest = send_request(sockfd, parseURL->hostname, parseURL->port, parseURL->path);
-
-  numbytes = recv(sockfd, buf, BUFSIZ - 1, 0);
-
 
   if(numbytes < 0 ){
     perror("recv");
     return;
   }
 
-  char hostname[256];
-  char port[256];
-  char path[256];
-
-  while(numbytes > 0){
-    fprintf(stdout, "%s\n", hostname);
-    fprintf(stdout, "%s\n", port);
-    fprintf(stdout, "%s\n", path);
-
+  while(numbytes = recv(sockfd, buf, BUFSIZ - 1, 0) > 0){
+    // fprintf(stdout, "%s\n", parseURL->hostname);
+    // fprintf(stdout, "%s\n", parseURL->port);
+    // fprintf(stdout, "%s\n", parseURL->path);
+    printf("%s\n", buf);
   }
 
   free(parseURL);
