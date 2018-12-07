@@ -51,7 +51,7 @@ urlinfo_t *parse_url(char *url)
   char *backslash, *colon;
 
   backslash = strchr(hostname, '/');
-
+  //todo check if backslash is null
   path = backslash + 1;
 
   *backslash = '\0';
@@ -124,7 +124,9 @@ int main(int argc, char *argv[])
 
   while ((numbytes = recv(sockfd, buf, BUFSIZ - 1, 0)) > 0)
   {
+    buf[numbytes] = '\0';
     printf("%s", buf);
+    //change to fwrite(buf,sizeof(char),numbytes, fileno(stdout));
   }
   free(urlinfo);
   close(sockfd);
