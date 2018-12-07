@@ -12,7 +12,8 @@
 /**
  * Struct to hold all three pieces of a URL
  */
-typedef struct urlinfo_t {
+typedef struct urlinfo_t
+{
   char *hostname;
   char *port;
   char *path;
@@ -29,8 +30,10 @@ urlinfo_t *parse_url(char *url)
 {
   // copy the input URL so as not to mutate the original
   char *hostname = strdup(url);
-  char *port;
-  char *path;
+  // set default values
+  char *port = "80";
+  char *path = "/";
+  char *tmp_pointer;
 
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
 
@@ -45,9 +48,32 @@ urlinfo_t *parse_url(char *url)
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  // check to see if http(s)
+  tmp_pointer = strstr(hostname, "://");
+  if (tmp_pointer != NULL)
+  {
+    hostname = tmp_pointer + 3;
+  }
+
+  // look for first /
+  tmp_pointer = strstr(hostname, "/");
+  if (tmp_pointer != NULL)
+  {
+    path = tmp_pointer + 1;
+    *tmp_pointer = '\0';
+  }
+
+  // look for first :
+  tmp_pointer = strstr(hostname, ":");
+  if (tmp_pointer != NULL)
+  {
+    port = tmp_pointer + 1;
+    *tmp_pointer = '\0';
+  }
+
+  urlinfo->hostname = hostname;
+  urlinfo->port = port;
+  urlinfo->path = path;
 
   return urlinfo;
 }
@@ -55,7 +81,7 @@ urlinfo_t *parse_url(char *url)
 /**
  * Constructs and sends an HTTP request
  *
- * fd:       The file descriptor of the connection.
+ * fd:
  * hostname: The hostname string.
  * port:     The port string.
  * path:     The path string.
@@ -68,20 +94,32 @@ int send_request(int fd, char *hostname, char *port, char *path)
   char request[max_request_size];
   int rv;
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  int request_length = sprintf(request,
+                               "GET /%s HTTP/1.1\n"
+                               "Host: %s:%s\n"
+                               "Connection: close\n"
+                               "\n", // end marker for header
+                               path, hostname, port);
 
-  return 0;
+  // Send it all!
+  rv = send(fd, request, request_length, 0);
+
+  if (rv < 0)
+  {
+    perror("send");
+  }
+
+  return rv;
 }
 
 int main(int argc, char *argv[])
-{  
-  int sockfd, numbytes;  
+{
+  int sockfd, numbytes;
   char buf[BUFSIZE];
 
-  if (argc != 2) {
-    fprintf(stderr,"usage: client HOSTNAME:PORT/PATH\n");
+  if (argc != 2)
+  {
+    fprintf(stderr, "usage: client HOSTNAME:PORT/PATH\n");
     exit(1);
   }
 
@@ -93,9 +131,31 @@ int main(int argc, char *argv[])
     5. Clean up any allocated memory and open file descriptors.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  // parse URL
+  urlinfo_t *parsed_url = parse_url(argv[1]);
+  printf("\nparsed hostname %s\nport %s\npath %s\n", parsed_url->hostname, parsed_url->port, parsed_url->path);
+
+  // initialize socket
+  sockfd = get_socket(parsed_url->hostname, parsed_url->port);
+
+  if (sockfd < 0)
+  {
+    fprintf(stderr, "curl: fatal error getting listening socket\n");
+    exit(1);
+  }
+
+  // Call send_request to construct the request and send it
+  int rv = send_request(sockfd, parsed_url->hostname, parsed_url->port, parsed_url->path);
+
+  // Call `recv` in a loop until there is no more data to receive from the server.
+  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0)
+  {
+    // print the data we got back to stdout
+    printf("%s\n", buf);
+  }
+
+  free(parsed_url);
+  close(sockfd);
 
   return 0;
 }
