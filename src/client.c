@@ -81,7 +81,8 @@ int send_request(int fd, char *hostname, char *port, char *path)
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
-  int request_length = sprintf(request,"GET /%s HTTP/1.1\nHost: %s:%s\nConnection: close\n\n", 
+  int request_length = sprintf(request,
+  "GET /%s HTTP/1.1\nHost: %s:%s\nConnection: close\n\n", 
   path, 
   hostname, 
   port);
@@ -117,6 +118,15 @@ int main(int argc, char *argv[])
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
+  urlinfo_t *parsedinput = parse_url(argv[1]);
+  sockfd = get_socket(parsedinput->hostname, parsedinput->port);
+  send_request(sockfd, parsedinput->hostname, parsedinput->port, parsedinput->path);
+  while ((numbytes = recv(sockfd, buf, BUFSIZ - 1, 0)) > 0)
+  {
+    printf("%s", buf);
+  }
+  free(parsedinput);
+  close(sockfd);
 
   return 0;
 }
