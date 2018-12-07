@@ -126,11 +126,13 @@ int main(int argc, char *argv[])
     return;
   }
 
-  while(numbytes = recv(sockfd, buf, BUFSIZ - 1, 0) > 0){
+  while((numbytes = recv(sockfd, buf, BUFSIZE, 0)) > 0){
+    // buf[numbytes] = '\0';
     // fprintf(stdout, "%s\n", parseURL->hostname);
     // fprintf(stdout, "%s\n", parseURL->port);
     // fprintf(stdout, "%s\n", parseURL->path);
-    printf("%s\n", buf);
+    // printf("%s\n", buf);
+    fwrite(buf, sizeof(char), numbytes, stdout);
   }
 
   free(parseURL);
