@@ -163,34 +163,39 @@ int send_request(int fd, char *hostname, char *port, char *path)
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
-  if(strlen(path) < 2)
-    printf("path is null\n"); 
-    make_request_differently--; 
-  if (strlen(port) < 2)
-    printf("port is null\n");
-    make_request_differently-=2; 
-  
-  if(make_request_differently == 0){
-    request_length = sprintf(request, "GET /%s HTTP/1.1\n"
+
+  request_length = sprintf(request, "GET /%s HTTP/1.1\n"
     "Host: %s: %s\n"
-    "Connection: close",  path, hostname, port 
+    "Connection: close\n\n",  path, hostname, port 
     );
-  } else if (make_request_differently == -1){
-      request_length = sprintf(request, "GET HTTP/1.1\n"
-      "Host: %s: %s\n"
-      "Connection: close", hostname, port 
-      );
-  } else if (make_request_differently == -3){
-    request_length = sprintf(request, "GET HTTP/1.1\n"
-      "Host: %s: %s\n"
-      "Connection: close", hostname, "80"
-      );
-  } else if (make_request_differently == -2){
-    request_length = sprintf(request, "GET /%s HTTP/1.1\n"
-      "Host: %s: %s\n"
-      "Connection: close",  path, hostname, "80"
-      );
-  }
+  // if(strlen(path) < 2)
+  //   printf("path is null\n"); 
+  //   make_request_differently--; 
+  // if (strlen(port) < 2)
+  //   printf("port is null\n");
+  //   make_request_differently-=2; 
+  
+  // if(make_request_differently == 0){
+  //   request_length = sprintf(request, "GET /%s HTTP/1.1\n"
+  //   "Host: %s: %s\n"
+  //   "Connection: close",  path, hostname, port 
+  //   );
+  // } else if (make_request_differently == -1){
+  //     request_length = sprintf(request, "GET HTTP/1.1\n"
+  //     "Host: %s: %s\n"
+  //     "Connection: close", hostname, port 
+  //     );
+  // } else if (make_request_differently == -3){
+  //   request_length = sprintf(request, "GET HTTP/1.1\n"
+  //     "Host: %s: %s\n"
+  //     "Connection: close", hostname, "80"
+  //     );
+  // } else if (make_request_differently == -2){
+  //   request_length = sprintf(request, "GET /%s HTTP/1.1\n"
+  //     "Host: %s: %s\n"
+  //     "Connection: close",  path, hostname, "80"
+  //     );
+  // }
 
 
   rv = send(fd, request,request_length, 0);
