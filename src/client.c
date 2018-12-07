@@ -41,13 +41,13 @@ urlinfo_t *parse_url(char *url)
     // 2. Set the path pointer to 1 character after the spot returned by strchr.
     path = a + 1; 
     // 3. Overwrite the backslash with a '\0' so that we are no longer considering anything after the backslash.
-    a = '\0';
+    *a = '\0';
     // 4. Use strchr to find the first colon in the URL.
     char *b = strchr(url, ':');
     // 5. Set the port pointer to 1 character after the spot returned by strchr.
     port = b + 1;
     // 6. Overwrite the colon with a '\0' so that we are just left with the hostname.
-    b = '\0';
+    *b = '\0';
 
     urlinfo->hostname = malloc(strlen(hostname));
     strcpy(urlinfo->hostname, hostname);
@@ -108,10 +108,14 @@ int main(int argc, char *argv[])
     4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
     5. Clean up any allocated memory and open file descriptors.
   */
+  struct urlinfo_t *url = parse_url(*argv);
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  get_socket(url->hostname, url->port);
+  send_request(argc, url->hostname, url->port, url->path);
+  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
+  // print the data we got back to stdout
+
+  }
 
   return 0;
 }
