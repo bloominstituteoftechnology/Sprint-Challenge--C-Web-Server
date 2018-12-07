@@ -52,12 +52,16 @@ urlinfo_t *parse_url(char *url)
   char *backslash = strchr(hostname, "/");
   path = backslash + 1;
   *backslash = "\0";
-  printf("%s\n", backslash);
+  printf("%s\n", path);
 
   char *colon = strchr(hostname, ":");
   port = colon + 1;
   *colon = "\0";
-  printf("%s\n", colon);
+  printf("%s\n", port);
+
+  urlinfo->hostname = hostname;
+  urlinfo->port = port;
+  urlinfo->path = path;
 
   return urlinfo;
 }
@@ -84,10 +88,9 @@ int send_request(int fd, char *hostname, char *port, char *path)
   ///////////////////
 
   request_length = sprintf(request, 
-                    "%s\n"
                     "GET /%s HTTP/1.1\n"
                     "Host: %s:%s\n"
-                    "Connection: close",
+                    "Connection: close\n\n",
                     path, hostname, port);
 
   rv = send(fd, request, request_length, 0);
