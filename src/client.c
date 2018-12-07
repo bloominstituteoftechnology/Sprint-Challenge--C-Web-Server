@@ -22,6 +22,12 @@ the recv() function takes in a socket, buffer, and length
 
 The recv() function shall return the length of the message written 
 to the buffer pointed to by the buffer argument.
+
+https://www.geeksforgeeks.org/strdup-strdndup-functions-c/
+This function returns a pointer to a null-terminated byte string, 
+which is a duplicate of the string pointed to by s. The memory 
+obtained is done dynamically using malloc and hence it can be freed 
+using free(). It returns a pointer to the duplicated string s.
 */
 
 
@@ -98,6 +104,7 @@ urlinfo_t *parse_url(char *url)
 }
 
 //create a function to free allocated memory
+// use free() for each field because we used strdup create them, which allocates memory in the process
 void free_data(struct urlinfo_t *urlinfo){
   free(urlinfo->hostname);
   free(urlinfo->port);
@@ -135,7 +142,7 @@ int send_request(int fd, char *hostname, char *port, char *path)
   request_length = sprintf(
     request,
     //set up formatting for subsequent arguments
-    "GET /%s HTTP/1.1\n Host: %s:%s\nConnection: close\n",
+    "GET /%s HTTP/1.1\n Host: %s:%s\nConnection: close\n", //????
     path, hostname, port
     );
 
@@ -166,29 +173,30 @@ int main(int argc, char *argv[])
   // IMPLEMENT ME! //
   ///////////////////
 
-  // Parse the input URL using parse_url() function 
-  // parse_url() accepts a url and returns the parsed url info
-  // ?????
+    // Parse the input URL using parse_url() function 
+    // parse_url() accepts a url and returns the parsed url info
+    // ?????
+    struct urlinfo_t *urlinfo = parse_url(argv[1]);
+    // Initialize a socket as sockfd, input url->hostname and url->port
+    sockfd = get_socket(urlinfo->hostname, urlinfo->port);
 
-  // Initialize a socket as sockfd, input url->hostname and url->port
-  sockfd = get_socket(urlinfo->hostname, urlinfo->port);
+    // Call send_request to construct the request and send it
+    send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
 
-  // Call send_request to construct the request and send it
-  send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
+    /* Call `recv` in a loop until there is no more data to receive 
+    from the server. Print the received response to stdout.  
+    
+    Taken from Readme 
+    ||                                                           */
+    while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) 
+    {
+    // print the data we got back to stdout
 
-  /* Call `recv` in a loop until there is no more data to receive 
-  from the server. Print the received response to stdout.  
-  
-  Taken from Readme 
-   ||                                                           */
-  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
-  // print the data we got back to stdout ????
+    printf("%s", buf); 
+    }
 
-  printf("%d", numbytes); //?????
-  }
-
-  // Clean up any allocated memory and open file descriptors.
-  free_data(urlinfo);
+    // Clean up any allocated memory and open file descriptors.
+    free_data(urlinfo);
 
   return 0;
 }
