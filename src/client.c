@@ -9,6 +9,22 @@
 
 #define BUFSIZE 4096 // max number of bytes we can get at once
 
+/*  Things I looked up
+https://www.tutorialspoint.com/cprogramming/c_input_output.htm
+stdout is just the output of a normal printf
+http://pubs.opengroup.org/onlinepubs/000095399/functions/recv.html
+The recv() function shall receive a message from a connection-mode 
+or connectionless-mode socket. It is normally used with connected 
+sockets because it does not permit the application to retrieve the 
+source address of received data.
+
+the recv() function takes in a socket, buffer, and length
+
+The recv() function shall return the length of the message written 
+to the buffer pointed to by the buffer argument.
+*/
+
+
 /**
  * Struct to hold all three pieces of a URL
  */
@@ -81,6 +97,14 @@ urlinfo_t *parse_url(char *url)
   return urlinfo;
 }
 
+//create a function to free allocated memory
+void free_data(struct urlinfo_t *urlinfo){
+  free(urlinfo->hostname);
+  free(urlinfo->port);
+  free(urlinfo->path);
+  free(urlinfo);
+}
+
 /**
  * Constructs and sends an HTTP request
  *
@@ -111,11 +135,9 @@ int send_request(int fd, char *hostname, char *port, char *path)
   request_length = sprintf(
     request,
     //set up formatting for subsequent arguments
-    "GET /%s\n Host: %s:%s\nConnection: close\n",
-    
+    "GET /%s HTTP/1.1\n Host: %s:%s\nConnection: close\n",
     path, hostname, port
-  );
-
+    );
 
     rv = send(fd, request, request_length, 0);
 
@@ -143,6 +165,30 @@ int main(int argc, char *argv[])
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
+
+  // Parse the input URL using parse_url() function 
+  // parse_url() accepts a url and returns the parsed url info
+  // ?????
+
+  // Initialize a socket as sockfd, input url->hostname and url->port
+  sockfd = get_socket(urlinfo->hostname, urlinfo->port);
+
+  // Call send_request to construct the request and send it
+  send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
+
+  /* Call `recv` in a loop until there is no more data to receive 
+  from the server. Print the received response to stdout.  
+  
+  Taken from Readme 
+   ||                                                           */
+  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
+  // print the data we got back to stdout ????
+
+  printf("%d", numbytes); //?????
+  }
+
+  // Clean up any allocated memory and open file descriptors.
+  free_data(urlinfo);
 
   return 0;
 }
