@@ -119,6 +119,7 @@ int main(int argc, char *argv[])
   }
 
   free(url);
+  fclose(stdout);
 
   return 0;
 }
