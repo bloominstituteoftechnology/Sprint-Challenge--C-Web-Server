@@ -77,12 +77,13 @@ int send_request(int fd, char *hostname, char *port, char *path)
   const int max_request_size = 16384;
   char request[max_request_size];
   int rv;
- int response_length=sprintf(request,"GET /%s HTTP/1.1\nHost: %s:%s\nConnection: close",path,hostname,port); 
+ int response_length=sprintf(request,"GET /%s HTTP/1.1\r\nHost: %s:%s\r\nConnection: close\r\n\r\n",path,hostname,port); 
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
-   rv = send(fd, request, max_request_size, 0);
-
+  printf("%s\n",request);
+   rv = send(fd, request, response_length, 0);
+printf("%i\n",rv);
     if (rv < 0) {
         perror("send");
     }
