@@ -85,13 +85,17 @@ int main(int argc, char *argv[])
     exit(1);
   }
 
-  /*
-    1. Parse the input URL
-    2. Initialize a socket
-    3. Call send_request to construct the request and send it
-    4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
-    5. Clean up any allocated memory and open file descriptors.
-  */
+  //1. Parse the input URL
+  char *hostname = strdup(argv[1]);
+  printf("%s", hostname);
+  struct urlinfo_t *parsedUrl = parse_url(hostname);
+  printf("hostname: %s", parsedUrl->hostname);
+  printf("path: %s", parsedUrl->path);
+  printf("port: %s", parsedUrl->port);
+  //2. Initialize a socket
+  //3. Call send_request to construct the request and send it
+  //4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
+  //5. Clean up any allocated memory and open file descriptors.
 
   ///////////////////
   // IMPLEMENT ME! //
