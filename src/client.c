@@ -44,19 +44,22 @@ urlinfo_t *parse_url(char *url)
     5. Set the port pointer to 1 character after the spot returned by strchr.
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
-  printf("hostname: %s\n", hostname);
-  printf("port: %s\n", port);
-  printf("path: %s\n", path);
-  printf("urlinfo: %s\n", urlinfo);
 
+  path = strchr(hostname, '/');
+  *path = '\0';
+  path++;
 
-  char *bslash = strchr(hostname, "/");
-  urlinfo->path = bslash + 1;
-  bslash = "\0";
+  port = strchr(hostname, ':');
+  if (port == NULL) {
+    port = "80";
+  } else {
+    *port = '\0';
+    port++;
+  }
 
-  char *colon =strchr(hostname, ":");
-  urlinfo->port = colon + 1;
-  colon = "\0";
+  urlinfo->hostname = hostname;
+  urlinfo->port = port;
+  urlinfo->path = path;
 
   return urlinfo;
 }
@@ -108,14 +111,27 @@ int main(int argc, char *argv[])
     4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
     5. Clean up any allocated memory and open file descriptors.
   */
-  urlinfo_t *parsed = parse_url(argv);
+  urlinfo_t *parsed = parse_url(argv[1]);
   int sock = get_socket(parsed->hostname, parsed->port);
   
+  if (sock == -1) {
+    perror("get_socket");
+    exit(2);
+  }
+
   send_request(sock, parsed->hostname, parsed->port, parsed->path);
 
-  while(recv(sock, buf, BUFSIZE, 0) > 0) {
-    fprintf( stdout, "???\n" );
+  while((numbytes = recv(sock, buf, BUFSIZE, 0)) > 0) {
+    fwrite(buf, sizeof(char), numbytes, stdout);
   }
+
+  if (numbytes < 0) {
+    perror("recv");
+  }
+
+  close(sock);
+  free(parsed->hostname);
+  free(parsed);
 
   return 0;
 }
