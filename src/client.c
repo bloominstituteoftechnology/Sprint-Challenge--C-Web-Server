@@ -45,7 +45,11 @@ urlinfo_t *parse_url(char *url)
     5. Set the port pointer to 1 character after the spot returned by strchr.
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
-
+if (strstr(hostname, "https://") != NULL) {
+    hostname += 8;
+  } else if (strstr(hostname, "http://")) {
+    hostname +=7;
+  }
  urlinfo->hostname = hostname;
  urlinfo->path = strchr(hostname, '/');
  *urlinfo->path = '\0';
@@ -73,7 +77,7 @@ int send_request(int fd, char *hostname, char *port, char *path)
   int request_size;
   int rv;
 
-  request_size = sprintf(request, "GET %s HTTP/1.1\nHost: %s:%s\n", path, hostname, port);
+  request_size = snprintf(request, max_request_size, "GET %s HTTP/1.1\nHost: %s:%s\nConnection: close\n\n", path, hostname, port);
 
   rv = send(fd, request, request_size, 0);
   return rv;
@@ -98,12 +102,20 @@ int main(int argc, char *argv[])
 
   urlinfo_t *purl = parse_url(argv[1]);
   printf("hostname:%s\n port:%s\n path:%s\n", purl->hostname, purl->port, purl->path );
-  get_socket(purl->hostname, purl->port);
-  send_request(sockfd, purl->hostname, purl->port, purl->path);
-  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
+  int fd = get_socket(purl->hostname, purl->port);
+  if (fd == -1) {
+    perror("get_socket");
+    exit(2);
+  }
+  send_request(fd, purl->hostname, purl->port, purl->path);
+  while ((numbytes = recv(fd, buf, BUFSIZE, 0)) > 0) {
        // print the data we got back to stdout
-       printf("%s .", buf);
+       fwrite(buf, sizeof(char), numbytes, stdout);
      }
+    if (numbytes < 0) {
+      perror("recv");
+    }
+
   free(purl);
   
   return 0;
