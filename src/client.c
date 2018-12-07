@@ -163,6 +163,7 @@ int send_request(int fd, char *hostname, char *port, char *path)
 
   if (rv < 0){
     perror("send");
+    exit(1);
   }
 
   return rv; 
@@ -197,7 +198,7 @@ int main(int argc, char *argv[])
 
   while ((numbytes = recv(sockfd, buf, BUFSIZ -1, 0) > 0 )) {
     //print the data we got back to stdout 
-    printf("\n"); 
+    printf("%s\n", buf); 
   } 
 
   /*Performing tests for parse url */
