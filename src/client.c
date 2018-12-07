@@ -55,6 +55,10 @@ urlinfo_t *parse_url(char *url)
   port = first_colon + 1;
   *first_colon = '\0';
 
+  urlinfo->hostname = hostname;
+  urlinfo->port = port;
+  urlinfo->path = path;
+
   return urlinfo;
 }
 
@@ -106,13 +110,12 @@ int main(int argc, char *argv[])
     exit(1);
   }
 
-  /*
-    1. Parse the input URL
-    2. Initialize a socket
-    3. Call send_request to construct the request and send it
-    4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
-    5. Clean up any allocated memory and open file descriptors.
-  */
+  // 1. Parse the input URL
+  struct urlinfo_t *urlinfo = parse_url(argv[1]);
+  // 2. Initialize a socket
+  // 3. Call send_request to construct the request and send it
+  // 4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
+  // 5. Clean up any allocated memory and open file descriptors.
 
   ///////////////////
   // IMPLEMENT ME! //
