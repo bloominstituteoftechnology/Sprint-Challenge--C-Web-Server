@@ -46,6 +46,11 @@ urlinfo_t *parse_url(char *url)
   */
 
   path = strchr(hostname, '/');
+  *path = '\0';
+  path++;
+  port = strchr(hostname, ':');
+  *port = '\0';
+  port++;
 
   return urlinfo;
 }
