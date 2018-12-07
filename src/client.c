@@ -130,10 +130,14 @@ int main(int argc, char *argv[])
   //3. Call send_request to construct the request and send it
   numbytes = send_request(sockfd, parsedUrl->hostname, parsedUrl->port, parsedUrl->path);
   printf("numbytes: %i\n", numbytes);
+  printf("BUFSIZE: %i\n", BUFSIZE);
 
   //4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
 
-
+  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
+       // print the data we got back to stdout
+       printf("%s\n", buf);
+     }
 
   //5. Clean up any allocated memory and open file descriptors.
 
