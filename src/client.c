@@ -48,6 +48,15 @@ urlinfo_t *parse_url(char *url)
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
+  const char str[] = "www.google.com/";
+   const char ch = '.';
+   char *ret;
+
+   ret = strchr(str, ch);
+
+   printf("String after |%c| is - |%s|\n", ch, ret);
+   
+   return(0);
 
   return urlinfo;
 }
@@ -71,8 +80,22 @@ int send_request(int fd, char *hostname, char *port, char *path)
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
+  int request_length = sprintf(
+    request,
+    "%s\nfd: %s\nhostname: %s\nport: %s\npath: %s\n",
+    hostname,
+    port,
+    path
+  );
+ int rv = send(fd, request, request_length, 0);
 
-  return 0;
+    if (rv < 0)
+    {
+        perror("send");
+    }
+
+    return rv;
+  //return 0;
 }
 
 int main(int argc, char *argv[])
@@ -96,6 +119,7 @@ int main(int argc, char *argv[])
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
+get_socket()
 
   return 0;
 }
