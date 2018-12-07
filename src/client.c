@@ -45,10 +45,20 @@ urlinfo_t *parse_url(char *url)
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+// if(strncmp(url,"http://",7) == 0 || strncmp(url,"https://",8) == 0 ){
+//   //handle that
+// }
+path = strchr(hostname,'/');
+  *path = '\0';
+path++;
+urlinfo->path = path;
 
+port = strchr(hostname,':');
+  *port = '\0';
+port++;
+urlinfo->port = port;
+
+urlinfo->hostname = hostname;
   return urlinfo;
 }
 
@@ -79,12 +89,12 @@ int main(int argc, char *argv[])
 {  
   int sockfd, numbytes;  
   char buf[BUFSIZE];
-
-  if (argc != 2) {
-    fprintf(stderr,"usage: client HOSTNAME:PORT/PATH\n");
-    exit(1);
-  }
-
+  char *testurl = "google.com:44/aa";
+  // if (argc != 2) {
+  //   fprintf(stderr,"usage: client HOSTNAME:PORT/PATH\n");
+  //   exit(1);
+  // }
+  parse_url(testurl);
   /*
     1. Parse the input URL
     2. Initialize a socket
