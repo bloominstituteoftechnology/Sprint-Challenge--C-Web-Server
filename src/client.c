@@ -54,7 +54,7 @@ urlinfo_t *parse_url(char *url)
   port = colon +1;
   //6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   *colon = '\0';
-  // need to store the strings inside urlinfo, don't think I need to allocate memory for these strings
+  // need to store the strings inside urlinfo to access for the socket, don't think I need to allocate memory for these strings
   // since urlinfo already takes the size of urlinfo_t
   urlinfo->hostname = hostname;
   urlinfo->path = path;
@@ -109,11 +109,20 @@ int main(int argc, char *argv[])
   // 1. Parse the input URL, using parse_url I assume:
   struct urlinfo_t *urlinfo = parse_url(agrv[1]);
   // 2. Initialize a socket
-  sockfd = get_socket
+  sockfd = get_socket(urlinfo->hostname, urlinfo->port);
   // 3. Call send_request to construct the request and send it
-  // 4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
+  send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
+  // 4. Call `recv` in a loop *until there is no more data* to receive from the server. Print the received response to stdout.
+  //Upon successful completion, recv() shall return the length of the message in bytes. If no messages are available to be received and the peer has performed an orderly shutdown, recv() shall return 0. Otherwise, -1 shall be returned and errno set to indicate the error.
+  while((numbytes = recv(sockfd, buf, BUFSIZE -1, 0)) > 0){
+  // print the data we got back to stdout
+    printf("%s\n", buf);
+  }
   // 5. Clean up any allocated memory and open file descriptors.
-
+  //Don't forget to `free` any allocated memory
+  free(urlinfo);
+  //`close` any open file descriptors.
+  close(sockfd);
 
   ///////////////////
   // IMPLEMENT ME! //
