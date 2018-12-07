@@ -129,7 +129,7 @@ int main(int argc, char *argv[])
 {  
   int sockfd, numbytes;  
   char buf[BUFSIZE] = argv[1];
-  // char *URL = argv[1];
+  char *URL = argv[1];
 
   // 1. Parse the input URL
   struct urlinfo_t *urlinfo = parse_url(URL);
@@ -143,9 +143,8 @@ int main(int argc, char *argv[])
   // 4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
 
   while((numbytes = recv(sockfd, buf, BUFSIZE - numbytes, 0))) {
-      
+    printf("Response:\n %s", buf);
   }
-
 
   if (argc != 2) {
     fprintf(stderr,"usage: client HOSTNAME:PORT/PATH\n");
@@ -154,7 +153,8 @@ int main(int argc, char *argv[])
 
 
     // 5. Clean up any allocated memory and open file descriptors.
-  
+  free(sockfd);
+  free(urlinfo);
 
   return 0;
 }
