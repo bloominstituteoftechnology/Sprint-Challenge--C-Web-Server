@@ -98,16 +98,38 @@ int send_request(int fd, char *hostname, char *port, char *path)
   const int max_request_size = 16384;
   char request[max_request_size];
   int rv;
-  
+  // time_t curr_time;
+  // char* frmt_curr_time;
+  // curr_time = time(NULL);
+  // frmt_curr_time = ctime(&curr_time);
 
+/*
+GET /path HTTP/1.1
+Host: hostname:port
+Connection: close
+*/
+  // Build HTTP response and store it in response
+  int req_len = sprintf(request, 
+  "GET /%s HTTP/1.1\n"
+  "Host: %s:%s\n"
+  "Connection: close",
+  path, hostname, port
+  );
+
+  int rv = send(fd, request, req_len, 0);
+
+  if (rv < 0) {
+      perror("send");
+  }
+  
   return 0;
 }
 
 int main(int argc, char *argv[])
 {  
   int sockfd, numbytes;  
-  char buf[BUFSIZE];
-  char *URL = argv[1];
+  char buf[BUFSIZE] = argv[1];
+  // char *URL = argv[1];
 
   // 1. Parse the input URL
   struct urlinfo_t *urlinfo = parse_url(URL);
@@ -121,7 +143,7 @@ int main(int argc, char *argv[])
   // 4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
 
   while((numbytes = recv(sockfd, buf, BUFSIZE - numbytes, 0))) {
-    //  
+      
   }
 
 
