@@ -76,7 +76,7 @@ int send_request(int fd, char *hostname, char *port, char *path)
   // IMPLEMENT ME! //
   ///////////////////
 
-  int request_length = sprintf(request, "%s\nHost: %s%s\nConnection: close", path, hostname, port);
+  int request_length = sprintf(request, "GET /%s HTTP:1.1\nHost: %s:%s\nConnection: close", path, hostname, port);
   send(fd, request, request_length, 0);
 
   if (rv < 0) {
