@@ -48,10 +48,19 @@ urlinfo_t *parse_url(char *url)
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
+  //find the first backslash, and add one so that it is one character over.
   path = strchr(hostname, '/') + 1; 
+  //overwrite the backslash, so that anything after the backslash will be considered.
+  *path = "\0";  
+  //repeat what you did for path but instead of / it will be : . 
+  port = strchr(hostname, ":") + 1;
+  *port = "\0"; 
+  urlinfo->path = path; 
+  urlinfo->port = port; 
+  urlinfo->hostname = hostname; 
+
   return urlinfo;
 }
-
 /**
  * Constructs and sends an HTTP request
  *
