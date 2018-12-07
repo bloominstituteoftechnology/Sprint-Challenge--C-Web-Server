@@ -49,15 +49,16 @@ urlinfo_t *parse_url(char *url)
   // IMPLEMENT ME! //
   ///////////////////
 
-  char *backslash = strchr(hostname, "/");
-  path = backslash + 1;
-  *backslash = "\0";
-  printf("%s\n", path);
-
-  char *colon = strchr(hostname, ":");
+  char *colon = strstr(hostname, ":");
   port = colon + 1;
   *colon = "\0";
-  printf("%s\n", port);
+  printf("port: %s\n", port);
+
+  char *backslash = strstr(port, "/");
+  path = backslash + 1;
+  *backslash = "\0";
+  printf("path: %s\n", path);
+
 
   urlinfo->hostname = hostname;
   urlinfo->port = port;
