@@ -49,6 +49,28 @@ urlinfo_t *parse_url(char *url)
   // IMPLEMENT ME! //
   ///////////////////
 
+  // checking for http:// and https://
+  char *placeholder = strstr(hostname, "://");
+
+  // if http:// etc. present, move hostname pointer just after
+  if (placeholder != NULL) {
+    placeholder++;
+    hostname = placeholder;
+  }
+
+  // set path and port
+  path = strchr(hostname, '/');
+  *path = '\0';
+  path++;
+  port = strchr(hostname, ':');
+  *port = '\0';
+  port++;
+
+  // set path, port, and hostname in urlinfo
+  urlinfo->hostname = strdup(hostname);
+  urlinfo->path = strdup(path);
+  urlinfo->port = strdup(port);
+
   return urlinfo;
 }
 
@@ -72,12 +94,25 @@ int send_request(int fd, char *hostname, char *port, char *path)
   // IMPLEMENT ME! //
   ///////////////////
 
-  return 0;
+  // print the formatted request to the request buffer
+  int request_length = sprintf(request,
+                              "GET /%s HTTP/1.1\n"
+                              "Host: %s:%s\n"
+                              "Connection: close",
+                               path, hostname, port);
+
+  rv = send(fd, request, request_length, 0);
+
+  if (rv < 0) {
+      perror("send");
+  }
+
+  return rv;
 }
 
 int main(int argc, char *argv[])
-{  
-  int sockfd, numbytes;  
+{
+  int sockfd, numbytes;
   char buf[BUFSIZE];
 
   if (argc != 2) {
