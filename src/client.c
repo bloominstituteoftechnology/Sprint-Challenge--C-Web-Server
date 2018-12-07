@@ -39,18 +39,48 @@ urlinfo_t *parse_url(char *url)
     2. Set the path pointer to 1 character after the spot returned by strchr.
     3. Overwrite the backslash with a '\0' so that we are no longer considering anything after the backslash.
   */
-  path = strchr(hostname, '/');
+  /* path = strchr(hostname, '/');
   *path = '\0';
-  path += 1;
+  path += 1; */
 
 /*
     4. Use strchr to find the first colon in the URL.
     5. Set the port pointer to 1 character after the spot returned by strchr.
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
 */
-  port = strchr(hostname, ':');
+  /* port = strchr(hostname, ':');
   *port = '\0';
-  port += 1;
+  port += 1; */
+
+  // Working on stretch #1.
+
+  // Getting rid of the http:// or https://
+  char *strip = strstr(hostname, "://");
+  
+  if (strip != NULL)
+    {
+      hostname = strip + 3;
+    }
+  // Searching for the path
+  strip = strstr(hostname, "/");
+  path = strip + 1;
+  // Overriting '/'
+  *strip = '\0';
+
+  // Searching for the port and define default port 80
+
+  strip = strstr(hostname, ":");
+
+  if (strip == NULL)
+  {
+    port = "80";
+  }
+  else
+  {
+    port = strip + 1;
+    *strip = '\0';
+  }
+  
 
 // Next three lines of code storing strings in urlinfo structure
   urlinfo -> hostname = hostname;
@@ -120,7 +150,14 @@ int main(int argc, char *argv[])
     while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0)
     {
       // print the data we got back to stdout
-      printf("%s", buf);
+      //printf("%s", buf);
+      fwrite(buf, 1, numbytes, stdout);
+    }
+
+    if (numbytes > 0)
+    {
+      perror("No response...");
+      exit(1);
     }
     // 5. Clean up any allocated memory and open file descriptors.
     free(urlinfo);
