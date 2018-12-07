@@ -59,28 +59,31 @@ urlinfo_t *parse_url(char *url)
     *backslash3 = '\0';
 
     colon = strchr(backslash2, ':');
-    colon++;
-    urlinfo->port = colon; 
-    colon--; 
-    *colon = '\0';
-
+    if(colon == NULL) {
+      urlinfo->port = "80"; 
+    } else{
+        colon++;
+        urlinfo->port = colon; 
+        colon--; 
+        *colon = '\0';
+      }
     urlinfo->hostname = backslash2; 
-
-    printf("this is hostname %s\n\n", urlinfo->hostname);
   } else {
-  
-  backslash++;
-  urlinfo->path = backslash;
-  backslash--;
-  *backslash = '\0';
+      backslash++;
+      urlinfo->path = backslash;
+      backslash--;
+      *backslash = '\0';
 
-  colon = strchr(url, ':');
-  colon++;
-  urlinfo->port = colon; 
-  colon--; 
-  *colon = '\0';
-
-  urlinfo->hostname = url; 
+      colon = strchr(url, ':');
+      if(colon == NULL) {
+        urlinfo->port = "80";
+      } else {
+          colon++;
+          urlinfo->port = colon; 
+          colon--; 
+          *colon = '\0';
+        }
+      urlinfo->hostname = url; 
   }
 
   ///////////////////
