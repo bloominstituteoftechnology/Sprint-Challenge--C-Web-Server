@@ -107,7 +107,7 @@ int main(int argc, char *argv[])
   }
 
   // 1. Parse the input URL, using parse_url I assume:
-  struct urlinfo_t *urlinfo = parse_url(agrv[1]);
+  struct urlinfo_t *urlinfo = parse_url(argv[1]);
   // 2. Initialize a socket
   sockfd = get_socket(urlinfo->hostname, urlinfo->port);
   // 3. Call send_request to construct the request and send it
