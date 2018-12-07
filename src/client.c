@@ -30,10 +30,8 @@ urlinfo_t *parse_url(char *url)
   char *hostname;
   if (strstr(url,"http://")) {
     hostname=strdup(url+7);
-    printf("%s",hostname);
   } else if (strstr(url,"https://")){
     hostname=strdup(url+8);
-    printf("%s",hostname);
   } else {
     hostname=strdup(url);
   }
