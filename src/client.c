@@ -105,9 +105,13 @@ int main(int argc, char *argv[])
     5. Clean up any allocated memory and open file descriptors.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  urlinfo_t *parse = parse_url(argv[1]); 
+  socket = get_socket(parse->hostname, parse->port); 
+  send_request(socket, parse->hostname, parse->port, parse->path); 
+
+  while ((numbytes = recv(socket, buf, BUFSIZE - 1, 0)) > 0) {
+    // print the data we got back to stdout
+}
 
   return 0;
 }
