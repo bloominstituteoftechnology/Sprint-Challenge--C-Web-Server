@@ -19,12 +19,10 @@ typedef struct urlinfo_t {
 } urlinfo_t;
 
 char *replace_w_space(char *needs_space){
-  int cnt = 0;
-  while(needs_space[cnt] != "\0"){
-    if(needs_space[cnt] == "/" || needs_space[cnt] == "/" ){
-      needs_space[cnt] = " ";
+  for (int i=0; i<strlen(needs_space); i++){
+    if(needs_space[i] == "/" || needs_space[i] == "/" ){
+      needs_space[i] = " ";
     } 
-    cnt++;
   }
   return needs_space;
 }
@@ -116,7 +114,7 @@ Connection: close
   path, hostname, port
   );
 
-  int rv = send(fd, request, req_len, 0);
+  rv = send(fd, request, req_len, 0);
 
   if (rv < 0) {
       perror("send");
@@ -128,7 +126,7 @@ Connection: close
 int main(int argc, char *argv[])
 {  
   int sockfd, numbytes;  
-  char buf[BUFSIZE] = argv[1];
+  char buf[BUFSIZE];
   char *URL = argv[1];
 
   // 1. Parse the input URL
@@ -138,11 +136,11 @@ int main(int argc, char *argv[])
   sockfd = get_socket(urlinfo->hostname, urlinfo->port);
 
   // 3. Call send_request to construct the request and send it
-  send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
+  // send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
 
   // 4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
 
-  while((numbytes = recv(sockfd, buf, BUFSIZE - numbytes, 0))) {
+  while((numbytes = recv(sockfd, buf, BUFSIZE - numbytes, 0)) > 0) {
     printf("Response:\n %s", buf);
   }
 
@@ -151,8 +149,7 @@ int main(int argc, char *argv[])
     exit(1);
   }
 
-
-    // 5. Clean up any allocated memory and open file descriptors.
+  // 5. Clean up any allocated memory and open file descriptors.
   free(sockfd);
   free(urlinfo);
 
