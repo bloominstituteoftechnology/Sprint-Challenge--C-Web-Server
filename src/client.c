@@ -110,12 +110,13 @@ int main(int argc, char *argv[])
   */
   struct urlinfo_t *url = parse_url(*argv);
 
-  get_socket(url->hostname, url->port);
-  send_request(argc, url->hostname, url->port, url->path);
+  sockfd = get_socket(url->hostname, url->port);
+  send_request(sockfd, url->hostname, url->port, url->path);
   while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
   // print the data we got back to stdout
-
+    printf("%s", buf);
   }
+  free(url);
 
   return 0;
 }
