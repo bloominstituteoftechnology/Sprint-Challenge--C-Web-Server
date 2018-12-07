@@ -72,7 +72,24 @@ int send_request(int fd, char *hostname, char *port, char *path)
   // IMPLEMENT ME! //
   ///////////////////
 
-  return 0;
+  int request_length = sprintf(
+  request,
+  "GET /%s HTTP/1.1\n"
+  "Host: %s:%s\n"
+  "Connection: close\n"
+  "\n", 
+  path,
+  hostname,
+  port
+  );
+
+  int rv = send(fd, request, request_length, 0);
+
+  if (rv < 0) {
+      perror("cannot send request");
+  }
+
+  return rv;
 }
 
 int main(int argc, char *argv[])
