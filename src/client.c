@@ -46,12 +46,25 @@ urlinfo_t *parse_url(char *url)
   */
   char *httpCheck = strstr(url, "//");
   if(httpCheck != NULL) {
-    
+    httpCheck += 2;
+    path = strchr(httpCheck, '/');
+    *path = '\0';
+    path++;
+    port = strchr(httpCheck, ':');
+    *port = '\0';
+    *port++;
+    *hostname = httpCheck;
+  }else {
+    path = strchr(hostname, '/');  
+    *path = '\0';
+    path++;
+    port = strchr(hostname, ':');
+    *port = '\0';
+    *port++;
   }
-
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  urlinfo->hostname = hostname;
+  urlinfo->port = port;
+  urlinfo->path = path;
 
   return urlinfo;
 }
@@ -72,10 +85,13 @@ int send_request(int fd, char *hostname, char *port, char *path)
   char request[max_request_size];
   int rv;
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
-
+  rv = sprintf(request,
+              "GET /path HTTP/1.1\n"
+              "Host: %s:%s%s\n"
+              "Connection: close",
+              hostname,
+              port,
+              path)
   return 0;
 }
 
