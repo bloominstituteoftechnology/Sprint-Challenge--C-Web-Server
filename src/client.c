@@ -247,7 +247,7 @@ int main(int argc, char *argv[])
   /*NEEED THIS BELOW */
   while ((numbytes = recv(sockfd, buf, BUFSIZ -1, 0) > 0 )) {
     //print the data we got back to stdout 
-    printf("%s\n", buf); 
+    printf("%s\n\n", buf); 
   } 
 
   //free  struct because of strdup 
