@@ -99,17 +99,21 @@ int main(int argc, char *argv[])
   char buf[BUFSIZE];
 
   if (argc != 2) {
+    printf("argc =========> %d\n", argc);
+    printf("argv =========> %s\n", argv);
     fprintf(stderr,"usage: client HOSTNAME:PORT/PATH\n");
     exit(1);
   }
 
-  /*
-    1. Parse the input URL
-    2. Initialize a socket
-    3. Call send_request to construct the request and send it
-    4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
-    5. Clean up any allocated memory and open file descriptors.
-  */
+    printf("argc =========> %d\n", argc);
+    printf("argv =========> %s\n", argv);
+    // 1. Parse the input URL
+    // 2. Initialize a socket
+    // get_socket("localhost", "3490");
+    // 3. Call send_request to construct the request and send it
+    // 4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
+    // 5. Clean up any allocated memory and open file descriptors.
+
 
   ///////////////////
   // IMPLEMENT ME! //
