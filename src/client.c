@@ -48,6 +48,12 @@ urlinfo_t *parse_url(char *url)
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
+  char *tmp = strstr(hostname, ":");
+  port = tmp + 1;
+  urlinfo->port = port;
+  *tmp = '\0';
+
+  tmp = strstr(port, "/");
 
   return urlinfo;
 }
