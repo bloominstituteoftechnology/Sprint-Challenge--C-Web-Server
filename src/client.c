@@ -31,6 +31,7 @@ urlinfo_t *parse_url(char *url)
   char *hostname = strdup(url);
   char *port;
   char *path;
+  char *colon;
 
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
 
@@ -47,18 +48,40 @@ urlinfo_t *parse_url(char *url)
  
   char *backslash = strchr(url, '/');
   backslash++;
+  char *backslash2 = backslash; 
+  backslash--;
+  if(*backslash == '/' && *backslash2 == '/'){
+    backslash2++;
+    char *backslash3 = strchr(backslash2,'/');
+    backslash3++;
+    urlinfo->path = backslash3;
+    backslash3--;
+    *backslash3 = '\0';
+
+    colon = strchr(backslash2, ':');
+    colon++;
+    urlinfo->port = colon; 
+    colon--; 
+    *colon = '\0';
+
+    urlinfo->hostname = backslash2; 
+
+    printf("this is hostname %s\n\n", urlinfo->hostname);
+  } else {
+  
+  backslash++;
   urlinfo->path = backslash;
   backslash--;
   *backslash = '\0';
 
-  char *colon = strchr(url, ':');
+  colon = strchr(url, ':');
   colon++;
   urlinfo->port = colon; 
   colon--; 
   *colon = '\0';
 
   urlinfo->hostname = url; 
-  printf("this is port %s\n\n", urlinfo->port); 
+  }
 
   ///////////////////
   // IMPLEMENT ME! //
