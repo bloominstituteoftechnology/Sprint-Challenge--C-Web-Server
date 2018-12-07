@@ -83,12 +83,12 @@ int send_request(int fd, char *hostname, char *port, char *path)
 
   int request_length = sprintf(
     request,
-    "GET /%s HTTP/1.1"
+    "\nGET /%s HTTP/1.1\n"
     "Host: %s:%s\n"
     "Connection: close\n\n",
-    hostname, port, path);
+    path, hostname, port);
 
-  printf("before send ===> %s\n",request_length);
+ 
 
   rv = send(fd, request, request_length, 0);
 
