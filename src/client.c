@@ -12,7 +12,8 @@
 /**
  * Struct to hold all three pieces of a URL
  */
-typedef struct urlinfo_t {
+typedef struct urlinfo_t
+{
   char *hostname;
   char *port;
   char *path;
@@ -25,81 +26,78 @@ typedef struct urlinfo_t {
  *
  * Store hostname, path, and port in a urlinfo_t struct and return the struct.
 */
-urlinfo_t *actual_parse_logic (char *url)
+urlinfo_t *actual_parse_logic(char *url)
 {
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
   // printf("no http or https:// \n");
 
-    int i, j, k, length; 
-    // i = begining  j = :    k = /
-    i = 0, j = 0, k = 0, length = 0; 
-    char colon = ':';
-    char backslash = '/';
-    // const char * default_port = ":80"; 
-    // char *temp; 
+  int i, j, k, length;
+  // i = begining  j = :    k = /
+  i = 0, j = 0, k = 0, length = 0;
+  char colon = ':';
+  char backslash = '/';
+  // const char * default_port = ":80";
+  // char *temp;
 
-    // temp = strchr(url, ':');
-    // if(temp == NULL){
-    //   printf("no port concat the port to the string\n");
-    //   strcat(url, default_port); 
-    //   printf("%s \n", url); 
-    // }
+  // temp = strchr(url, ':');
+  // if(temp == NULL){
+  //   printf("no port concat the port to the string\n");
+  //   strcat(url, default_port);
+  //   printf("%s \n", url);
+  // }
 
-    while (url[length] != '\0'){
-      // printf("%c\n", full_site[length]);
-      if(colon == url[length]){
-        // printf("equal 0\n");
-        j = length; 
-      } else if (url[length] == '/'){
-        // printf("equal 0\n");
-        k = length; 
-      }
+  while (url[length] != '\0')
+  {
+    // printf("%c\n", full_site[length]);
+    if (colon == url[length])
+    {
+      // printf("equal 0\n");
+      j = length;
+    }
+    else if (url[length] == '/')
+    {
+      // printf("equal 0\n");
+      k = length;
+    }
 
-      length++; 
-
-    }  
-
-    // printf("the numbers i j k length %d |  %d |  %d | %d \n", i, j, k, length); 
-
-    //if there is no colon then  j will equal 0 still. set the port to default 80 
-
-    char test[j-i+1]; //hostname
-    char test1[k-j]; //port 
-    char test2[length -j+1]; //path  
-    
-    
-    strncpy(test, url+i, j-i); // begining to colon. 
-    test[j] = '\0'; 
-    // printf("should be the host name:    %s\n", test);
-    //AT this position localhost is the hostname  however  by the time it gets down the main function it changes. 
-
-    j++;// to remove the colon. 
-    strncpy(test1, url+j, k-j); //colon to slash 
-    test1[k-j] = '\0'; 
-    k++; // remove the back slash. 
-
-    strncpy(test2, url+k, length-j);
-    test2[length-j] = '\0'; 
-
-    // printf("should be the host name:    %s\n", test); 
-    // printf("should be the port : %s\n", test1);
-    // printf("should be the path :  %s\n", test2); 
-    
-    urlinfo->hostname = strdup(test); 
-    // printf("should be the host name:    %s\n", test);
-    urlinfo->port = strdup(test1); 
-    urlinfo->path = strdup(test2); 
-
-    // printf("%s, %s, %s", urlinfo->hostname, urlinfo->port, urlinfo->path);
-    //may have to malloc space for this 
-    // using strdup  allowed me to get the full hostname  instead of a cut off version. 
-    return urlinfo;
-
+    length++;
   }
 
-  
+  // printf("the numbers i j k length %d |  %d |  %d | %d \n", i, j, k, length);
 
+  //if there is no colon then  j will equal 0 still. set the port to default 80
 
+  char test[j - i + 1];       //hostname
+  char test1[k - j];          //port
+  char test2[length - j + 1]; //path
+
+  strncpy(test, url + i, j - i); // begining to colon.
+  test[j] = '\0';
+  // printf("should be the host name:    %s\n", test);
+  //AT this position localhost is the hostname  however  by the time it gets down the main function it changes.
+
+  j++;                            // to remove the colon.
+  strncpy(test1, url + j, k - j); //colon to slash
+  test1[k - j] = '\0';
+  k++; // remove the back slash.
+
+  strncpy(test2, url + k, length - j);
+  test2[length - j] = '\0';
+
+  // printf("should be the host name:    %s\n", test);
+  // printf("should be the port : %s\n", test1);
+  // printf("should be the path :  %s\n", test2);
+
+  urlinfo->hostname = strdup(test);
+  // printf("should be the host name:    %s\n", test);
+  urlinfo->port = strdup(test1);
+  urlinfo->path = strdup(test2);
+
+  // printf("%s, %s, %s", urlinfo->hostname, urlinfo->port, urlinfo->path);
+  //may have to malloc space for this
+  // using strdup  allowed me to get the full hostname  instead of a cut off version.
+  return urlinfo;
+}
 
 urlinfo_t *parse_url(char *url)
 {
@@ -107,8 +105,6 @@ urlinfo_t *parse_url(char *url)
   // char *hostname = strdup(url);
   // char *port;
   // char *path;
-
-  
 
   /*
     We can parse the input URL by doing the following:
@@ -125,23 +121,25 @@ urlinfo_t *parse_url(char *url)
   // IMPLEMENT ME! //
   ///////////////////
 
-  char *temp; 
+  char *temp;
 
-  temp = strstr(url, "//"); 
-  // printf("%s  temp\n", temp); 
-  if (temp != NULL){
-    temp++;//removes the back slash
-    temp++;//removes the back slash
+  temp = strstr(url, "//");
+  // printf("%s  temp\n", temp);
+  if (temp != NULL)
+  {
+    temp++; //removes the back slash
+    temp++; //removes the back slash
     // printf("%s  temp\n", temp);
   }
-  if(temp == NULL){//if there is not // in the url 
-   return  actual_parse_logic(url);
-} else {//if there is a // in the url use temp. 
-  return actual_parse_logic(temp); 
+  if (temp == NULL)
+  { //if there is not // in the url
+    return actual_parse_logic(url);
   }
-
+  else
+  { //if there is a // in the url use temp.
+    return actual_parse_logic(temp);
+  }
 }
-
 
 /**
  * Constructs and sends an HTTP request
@@ -158,27 +156,26 @@ int send_request(int fd, char *hostname, char *port, char *path)
   const int max_request_size = 16384;
   char request[max_request_size];
   int rv;
-  int make_request_differently = 0; 
-  int request_length; 
+  int make_request_differently = 0;
+  int request_length;
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
 
   request_length = sprintf(request, "GET /%s HTTP/1.1\n"
-    "Host:%s:%s\n"
-    "Connection: close\n\n",  path, hostname, port 
-    );
-  
+                                    "Host:%s:%s\n"
+                                    "Connection: close\n\n",
+                           path, hostname, port);
 
+  rv = send(fd, request, request_length, 0);
 
-  rv = send(fd, request,request_length, 0);
-
-  if (rv < 0){
+  if (rv < 0)
+  {
     perror("send");
     exit(1);
   }
 
-  return rv; 
+  return rv;
 }
 
 void free_struct(urlinfo_t *urlinfo)
@@ -190,13 +187,14 @@ void free_struct(urlinfo_t *urlinfo)
 }
 
 int main(int argc, char *argv[])
-{  
+{
   /*NEEED THIS BELOW */
-  int sockfd, numbytes;  
+  int sockfd, numbytes;
   char buf[BUFSIZE];
   /*NEEED THIS BELOW */
-  if (argc != 2) {
-    fprintf(stderr,"usage: client HOSTNAME:PORT/PATH\n");
+  if (argc != 2)
+  {
+    fprintf(stderr, "usage: client HOSTNAME:PORT/PATH\n");
     exit(1);
   }
 
@@ -213,28 +211,28 @@ int main(int argc, char *argv[])
   ///////////////////
   urlinfo_t *urlinfo = parse_url(argv[1]);
   // printf("%s %s %s\n", urlinfo->hostname, urlinfo->port, urlinfo->path);
-  sockfd = get_socket(urlinfo->hostname, urlinfo->port); 
-  int rv = send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path); 
+  sockfd = get_socket(urlinfo->hostname, urlinfo->port);
+  int rv = send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
 
-  //recv 
+  //recv
   /*NEEED THIS BELOW */
-  while ((numbytes = recv(sockfd, buf, BUFSIZ -1, 0) > 0 )) {
-    //print the data we got back to stdout 
-    printf("%s\n\n\n", buf); 
-  } 
+  while ((numbytes = recv(sockfd, buf, BUFSIZ - 1, 0) > 0))
+  {
+    //print the data we got back to stdout
+    printf("%s\n\n\n", buf);
+  }
 
-  //free  struct because of strdup 
+  //free  struct because of strdup
 
   /*NEEED THIS BELOW */
-  free_struct(urlinfo); 
+  free_struct(urlinfo);
   close(sockfd);
 
   /*Performing tests for parse url */
-  // urlinfo_t *urlinfo = parse_url("http://localhost:3490/d20");   tested and works 
-  // urlinfo_t *urlinfo = parse_url("localhost:3490/d20");  tested and works. 
+  // urlinfo_t *urlinfo = parse_url("http://localhost:3490/d20");   tested and works
+  // urlinfo_t *urlinfo = parse_url("localhost:3490/d20");  tested and works.
   // urlinfo_t *urlinfo = parse_url("www.google.com");
 
   // printf("%s %s %s\n", urlinfo->hostname, urlinfo->port, urlinfo->path);  //only for testing
   return 0;
-
 }
