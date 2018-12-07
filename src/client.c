@@ -73,6 +73,11 @@ urlinfo_t *parse_url(char *url)
   //overwrite the colon with a '\0' so that we are just left with the hostname
   *temp = '/0';
 
+  //Assign each of these to the appropriate field in the urlinfo_t struct
+  urlinfo->hostname = strdup(hostname);
+  urlinfo->port = strdup(port);
+  urlinfo->path = strdup(path);
+
   return urlinfo;
 }
 
@@ -84,19 +89,37 @@ urlinfo_t *parse_url(char *url)
  * port:     The port string.
  * path:     The path string.
  *
+ * Requests should look like the following:
+
+  GET /path HTTP/1.1
+  Host: hostname:port
+  Connection: close
+ 
  * Return the value from the send() function.
 */
 int send_request(int fd, char *hostname, char *port, char *path)
 {
   const int max_request_size = 16384;
   char request[max_request_size];
+  int request_length = 0; //following pattern in server.c, this gives total length of header and body
   int rv;
 
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
 
-  return 0;
+  request_length = sprintf(
+    request,
+    //set up formatting for subsequent arguments
+    "GET /%s\n Host: %s:%s\nConnection: close\n",
+    
+    path, hostname, port
+  );
+
+
+    rv = send(fd, request, request_length, 0);
+
+  return rv;
 }
 
 int main(int argc, char *argv[])
