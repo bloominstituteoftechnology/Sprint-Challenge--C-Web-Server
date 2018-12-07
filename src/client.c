@@ -52,6 +52,15 @@ urlinfo_t *parse_url(char *url)
   *port = '\0';
   port++;
 
+  urlinfo->hostname = malloc(strlen(hostname) + 1);
+  strcpy(urlinfo->hostname, hostname);
+
+  urlinfo->path = malloc(strlen(path) + 1);
+  strcpy(urlinfo->path, path);
+
+  urlinfo->port = malloc(strlen(port) + 1);
+  strcpy(urlinfo->port, port);
+
   return urlinfo;
 }
 
