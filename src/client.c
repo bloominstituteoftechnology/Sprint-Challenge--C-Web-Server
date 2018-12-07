@@ -44,10 +44,16 @@ urlinfo_t *parse_url(char *url)
     5. Set the port pointer to 1 character after the spot returned by strchr.
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
+  port = strchr(hostname, ':');
+  *port = '\0';
+  port++;
+  path = strchr(port, '/');
+  *path = '\0';
+  path++;
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  urlinfo->port = strdup(port);
+  urlinfo->path = strdup(path);
+  urlinfo->hostname = strdup(hostname);
 
   return urlinfo;
 }
@@ -68,9 +74,7 @@ int send_request(int fd, char *hostname, char *port, char *path)
   char request[max_request_size];
   int rv;
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  sprintf(request, "GET %s HTTP/1.1\nHost: %s%s\nConnection: close\n", path, hostname, port);
 
   return 0;
 }
@@ -93,9 +97,19 @@ int main(int argc, char *argv[])
     5. Clean up any allocated memory and open file descriptors.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  urlinfo_t *parsed_struct = malloc(sizeof(struct urlinfo_t));
+  parsed_struct = parse_url(argv[1]);
+  sockfd = malloc(sizeof(int));
+  sockfd = get_socket(parsed_struct->hostname, parsed_struct->port);
+  int request = send_request(sockfd, parsed_struct->hostname, parsed_struct->port, parsed_struct->path);
+  int bytes_recvd;
+  while (bytes_recvd > 0) {
+    bytes_recvd = recv(sockfd, buf, BUFSIZE - 1, 0);
+    printf(bytes_recvd);
+  }
+  close(sockfd);
+  free(parsed_struct);
+  free(sockfd);
 
   return 0;
 }
