@@ -81,7 +81,12 @@ int send_request(int fd, char *hostname, char *port, char *path)
     }
     return rv;
 }
-
+void clear_url_info(urlinfo_t *urlinfo) {
+  free(urlinfo->hostname);
+  free(urlinfo->port);
+  free(urlinfo->path);
+  free(urlinfo);
+}
 int main(int argc, char *argv[])
 {  
   int sockfd, numbytes;  
@@ -107,5 +112,7 @@ int main(int argc, char *argv[])
   while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
     printf("%s",buf);
   }
+  close(sockfd);
+  clear_url_info(urlinfo);
   return 0;
 }
