@@ -35,6 +35,15 @@ urlinfo_t *actual_parse_logic (char *url)
     i = 0, j = 0, k = 0, length = 0; 
     char colon = ':';
     char backslash = '/';
+    // const char * default_port = ":80"; 
+    // char *temp; 
+
+    // temp = strchr(url, ':');
+    // if(temp == NULL){
+    //   printf("no port concat the port to the string\n");
+    //   strcat(url, default_port); 
+    //   printf("%s \n", url); 
+    // }
 
     while (url[length] != '\0'){
       // printf("%c\n", full_site[length]);
@@ -50,8 +59,9 @@ urlinfo_t *actual_parse_logic (char *url)
 
     }  
 
-    printf("the numbers i j k length %d |  %d |  %d | %d \n", i, j, k, length); 
+    // printf("the numbers i j k length %d |  %d |  %d | %d \n", i, j, k, length); 
 
+    //if there is no colon then  j will equal 0 still. set the port to default 80 
 
     char test[j-i+1]; //hostname
     char test1[k-j]; //port 
@@ -148,15 +158,39 @@ int send_request(int fd, char *hostname, char *port, char *path)
   const int max_request_size = 16384;
   char request[max_request_size];
   int rv;
-
+  int make_request_differently = 0; 
+  int request_length; 
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
-
-  int request_length = sprintf(request, "GET /%s HTTP/1.1\n"
-  "Host: %s: %s\n"
-  "Connection: close",  path, hostname, port 
-  );
+  if(strlen(path) < 2)
+    printf("path is null\n"); 
+    make_request_differently--; 
+  if (strlen(port) < 2)
+    printf("port is null\n");
+    make_request_differently-=2; 
+  
+  if(make_request_differently == 0){
+    request_length = sprintf(request, "GET /%s HTTP/1.1\n"
+    "Host: %s: %s\n"
+    "Connection: close",  path, hostname, port 
+    );
+  } else if (make_request_differently == -1){
+      request_length = sprintf(request, "GET HTTP/1.1\n"
+      "Host: %s: %s\n"
+      "Connection: close", hostname, port 
+      );
+  } else if (make_request_differently == -3){
+    request_length = sprintf(request, "GET HTTP/1.1\n"
+      "Host: %s: %s\n"
+      "Connection: close", hostname, "80"
+      );
+  } else if (make_request_differently == -2){
+    request_length = sprintf(request, "GET /%s HTTP/1.1\n"
+      "Host: %s: %s\n"
+      "Connection: close",  path, hostname, "80"
+      );
+  }
 
 
   rv = send(fd, request,request_length, 0);
@@ -179,9 +213,10 @@ void free_struct(urlinfo_t *urlinfo)
 
 int main(int argc, char *argv[])
 {  
+  /*NEEED THIS BELOW */
   int sockfd, numbytes;  
   char buf[BUFSIZE];
-
+  /*NEEED THIS BELOW */
   if (argc != 2) {
     fprintf(stderr,"usage: client HOSTNAME:PORT/PATH\n");
     exit(1);
@@ -204,7 +239,7 @@ int main(int argc, char *argv[])
   int rv = send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path); 
 
   //recv 
-
+  /*NEEED THIS BELOW */
   while ((numbytes = recv(sockfd, buf, BUFSIZ -1, 0) > 0 )) {
     //print the data we got back to stdout 
     printf("%s\n", buf); 
@@ -212,13 +247,16 @@ int main(int argc, char *argv[])
 
   //free  struct because of strdup 
 
+  /*NEEED THIS BELOW */
   free_struct(urlinfo); 
+  close(sockfd);
 
   /*Performing tests for parse url */
   // urlinfo_t *urlinfo = parse_url("http://localhost:3490/d20");   tested and works 
   // urlinfo_t *urlinfo = parse_url("localhost:3490/d20");  tested and works. 
+  // urlinfo_t *urlinfo = parse_url("www.google.com");
 
-  // printf("%s %s %s\n", urlinfo->hostname, urlinfo->port, urlinfo->path);  only for testing
+  // printf("%s %s %s\n", urlinfo->hostname, urlinfo->port, urlinfo->path);  //only for testing
   return 0;
 
 }
