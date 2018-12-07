@@ -39,16 +39,18 @@ urlinfo_t *parse_url(char *url)
     2. Set the path pointer to 1 character after the spot returned by strchr.
     3. Overwrite the backslash with a '\0' so that we are no longer considering anything after the backslash.
   */
-  path = strchr(hostname, '/') + 1;
+  path = strchr(hostname, '/');
   *path = '\0';
+  path += 1;
 
 /*
     4. Use strchr to find the first colon in the URL.
     5. Set the port pointer to 1 character after the spot returned by strchr.
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
 */
-  port = strchr(hostname, ':') + 1;
+  port = strchr(hostname, ':');
   *port = '\0';
+  port += 1;
 
 // Next three lines of code storing strings in urlinfo structure
   urlinfo -> hostname = hostname;
@@ -80,7 +82,7 @@ int send_request(int fd, char *hostname, char *port, char *path)
 
   int request_length = sprintf(
         request,
-        "GET %s HTTP/1.1\nHOST: %s%s\nConnection: Close\n\n",
+        "GET /%s HTTP/1.1\nHOST: %s:%s\nConnection: Close\n\n",
         path, hostname, port
     );
 
@@ -122,7 +124,7 @@ int main(int argc, char *argv[])
     }
     // 5. Clean up any allocated memory and open file descriptors.
     free(urlinfo);
-    free(sockfd);
+    close(sockfd);
 
     return 0;
 }
