@@ -169,6 +169,14 @@ int send_request(int fd, char *hostname, char *port, char *path)
   return rv; 
 }
 
+void free_struct(urlinfo_t *urlinfo)
+{
+  free(urlinfo->hostname);
+  free(urlinfo->path);
+  free(urlinfo->port);
+  free(urlinfo);
+}
+
 int main(int argc, char *argv[])
 {  
   int sockfd, numbytes;  
@@ -201,6 +209,10 @@ int main(int argc, char *argv[])
     //print the data we got back to stdout 
     printf("%s\n", buf); 
   } 
+
+  //free  struct because of strdup 
+
+  free_struct(urlinfo); 
 
   /*Performing tests for parse url */
   // urlinfo_t *urlinfo = parse_url("http://localhost:3490/d20");   tested and works 
