@@ -45,13 +45,14 @@ urlinfo_t *parse_url(char *url)
     5. Set the port pointer to 1 character after the spot returned by strchr.
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
+
  urlinfo->hostname = hostname;
- urlinfo->path = strchr(hostname, '/') + 1;
- to_null = strchr(hostname, '/');
- to_null = '\0';
- urlinfo->port = strchr(hostname, ':') + 1;
- to_null = strchr(hostname, ':');
- to_null = '\0';
+ urlinfo->path = strchr(hostname, '/');
+ *urlinfo->path = '\0';
+  urlinfo->path++;
+ urlinfo->port = strchr(hostname, ':');
+ *urlinfo->port = '\0';
+  urlinfo->port++;
   return urlinfo;
 }
 
@@ -101,18 +102,9 @@ int main(int argc, char *argv[])
   send_request(sockfd, purl->hostname, purl->port, purl->path);
   while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
        // print the data we got back to stdout
-       printf("%s", buf);
+       printf("%s .", buf);
      }
-/*   msg_length = recv(fd, buf, BUFSIZE, MSG_WAITALL); 
-  if (msg_length == 0) {
-    printf("No message retrieved");
-  }
-  if (msg_length >= 1) {
-    printf("%s", buf);
-  }
-  if (msg_length < 0) {
-    printf("recv error");
-  } */
+  free(purl);
   
   return 0;
 }
