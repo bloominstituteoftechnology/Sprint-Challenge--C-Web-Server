@@ -44,16 +44,16 @@ urlinfo_t *parse_url(char *url)
     5. Set the port pointer to 1 character after the spot returned by strchr.
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
-  char *httpCheck = strstr(url, "//");
+  char *httpCheck = strstr(url, "//"); //sets new start of hostname if there is an http:// or https://
   if(httpCheck != NULL) {
-    httpCheck += 2;
+    httpCheck += 2; //increments httpCheck to move pointer past found // and start at the hostname
     path = strchr(httpCheck, '/');
     *path = '\0';
     path++;
     port = strchr(httpCheck, ':');
     *port = '\0';
     *port++;
-    *hostname = httpCheck;
+    hostname = httpCheck;
   }else {
     path = strchr(hostname, '/');  
     *path = '\0';
@@ -91,7 +91,7 @@ int send_request(int fd, char *hostname, char *port, char *path)
               "Connection: close",
               hostname,
               port,
-              path)
+              path);
   return 0;
 }
 
@@ -113,9 +113,10 @@ int main(int argc, char *argv[])
     5. Clean up any allocated memory and open file descriptors.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  urlinfo_t *urlinfo = parse_url(argv[1]);
+  sockfd = get_socket(urlinfo->hostname, urlinfo->port);
+  send_request(fd, urlinfo->hostname, urlinfo->port, urlinfo->path);
+  
 
   return 0;
 }
