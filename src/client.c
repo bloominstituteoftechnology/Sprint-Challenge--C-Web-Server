@@ -43,7 +43,23 @@ urlinfo_t *parse_url(char *url)
     4. Use strchr to find the first colon in the URL.
     5. Set the port pointer to 1 character after the spot returned by strchr.
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
+    https://google.com:80
   */
+  if(strstr(hostname, "https://") != NULL) hostname += 8;
+  else if(strstr(hostname, "http://") != NULL) hostname += 7;
+  path = strchr(hostname, '/');
+  path[0] = '\0';
+  path++;
+  port = strchr(hostname, ':');
+  if(port == NULL) port = "80";
+  else {
+    port[0] = '\0';
+    port++;
+  }
+
+  urlinfo->hostname = strdup(hostname);
+  urlinfo->path = strdup(path);
+  urlinfo->port = strdup(port);
 
   ///////////////////
   // IMPLEMENT ME! //
@@ -68,6 +84,14 @@ int send_request(int fd, char *hostname, char *port, char *path)
   char request[max_request_size];
   int rv;
 
+  rv = sprintf(request,
+    "GET /%s HTTP/1.1\n"
+    "Host: %s:%s\n"
+    "Connection: close\n\n",
+     path, hostname, port);
+
+  send(fd, request, rv, 0);
+
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
@@ -76,8 +100,8 @@ int send_request(int fd, char *hostname, char *port, char *path)
 }
 
 int main(int argc, char *argv[])
-{  
-  int sockfd, numbytes;  
+{
+  int sockfd, numbytes;
   char buf[BUFSIZE];
 
   if (argc != 2) {
@@ -92,10 +116,13 @@ int main(int argc, char *argv[])
     4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
     5. Clean up any allocated memory and open file descriptors.
   */
+  urlinfo_t *urlinfo = parse_url(argv[1]);
+  sockfd = get_socket(urlinfo->hostname, urlinfo->port);
+  send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
 
+  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
+    printf("%s\n", buf);
+  }
   return 0;
 }
