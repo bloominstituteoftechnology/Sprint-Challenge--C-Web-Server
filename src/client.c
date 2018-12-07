@@ -74,7 +74,6 @@ int send_request(int fd, char *hostname, char *port, char *path)
 {
   const int max_request_size = 16384;
   char request[max_request_size];
-  int rv;
 
   ///////////////////
   // IMPLEMENT ME! //
@@ -116,6 +115,18 @@ int main(int argc, char *argv[])
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
+  struct urlinfo_t *urlinfo = parse_url(argv[1]);
+  sockfd = get_socket(urlinfo->hostname, urlinfo->port);
+
+  send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
+
+  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
+    printf("%s\n", buf);
+  }
+
+
+  free(urlinfo);
+  close(sockfd);
 
   return 0;
 }
