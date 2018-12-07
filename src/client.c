@@ -12,7 +12,8 @@
 /**
  * Struct to hold all three pieces of a URL
  */
-typedef struct urlinfo_t {
+typedef struct urlinfo_t
+{
   char *hostname;
   char *port;
   char *path;
@@ -44,10 +45,17 @@ urlinfo_t *parse_url(char *url)
     5. Set the port pointer to 1 character after the spot returned by strchr.
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
+  char *colon = strstr(hostname, ":");
+  port = colon + 1;
+  *colon = '\0';
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  char *forwardslash = strstr(port, "/");
+  path = forwardslash + 1;
+  *forwardslash = '\0';
+
+  urlinfo->hostname = hostname;
+  urlinfo->port = port;
+  urlinfo->path = path;
 
   return urlinfo;
 }
@@ -66,36 +74,53 @@ int send_request(int fd, char *hostname, char *port, char *path)
 {
   const int max_request_size = 16384;
   char request[max_request_size];
-  int rv;
+  // int rv;
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  // Create HTTP reqeust and store in request
+  int request_length = sprintf(request, "GET /%s HTTP/1.1\nHost: %s:%s\nConnection:close\n\n", path, hostname, port);
 
-  return 0;
+  //Send the HTTP response w/ send() call
+  int rv = send(fd, request, request_length, 0);
+
+  // perror() prints a descriptive error msg
+  if (rv < 0) {
+      perror("Error sending request...");
+  }
+
+  return rv;
+
 }
 
 int main(int argc, char *argv[])
-{  
-  int sockfd, numbytes;  
+{
+  int sockfd, numbytes;
   char buf[BUFSIZE];
 
-  if (argc != 2) {
-    fprintf(stderr,"usage: client HOSTNAME:PORT/PATH\n");
+  if (argc != 2)
+  {
+    fprintf(stdout, "HOSTNAME:PORT/PATH\n");
     exit(1);
   }
 
-  /*
-    1. Parse the input URL
-    2. Initialize a socket
-    3. Call send_request to construct the request and send it
-    4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
-    5. Clean up any allocated memory and open file descriptors.
-  */
+  // 1. Parse the input URL
+  urlinfo_t *urlinfo = parse_url(argv[1]);
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  // 2. Initialize a socket
+  sockfd = get_socket(urlinfo->hostname, urlinfo->port);
+
+  // 3. Call send_request to construct the request and send it
+  int rv = send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
+  
+  // 4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
+  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) 
+  {
+    // print the data we got back to stdout
+      printf("\nServer response: \n%s\n", buf);
+    }
+
+  // 5. Clean up any allocated memory and open file descriptors.
+  free(urlinfo);
+  close(sockfd);
 
   return 0;
 }
