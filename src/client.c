@@ -54,8 +54,12 @@ urlinfo_t *parse_url(char *url)
   *backslash = '\0';
   
   char *colon = strchr(hostname, ':');
-  port = colon + 1;
-  *colon = '\0';
+  if (colon) {
+    port = colon + 1;
+    *colon = '\0';
+  } else {
+    port = "80";
+  }
 
   urlinfo->hostname = hostname;
   urlinfo->port = port;
