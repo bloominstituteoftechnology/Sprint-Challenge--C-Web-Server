@@ -42,8 +42,9 @@ urlinfo_t *parse_url(char *url)
   char *clean;
   clean = strstr(url, "://");
   printf("clean: %s\n", clean);
-
-  url = clean +3;
+  if(clean != NULL){
+    url = clean +3;
+  }
   printf("url: %s\n", url);
   
   path = strchr(url, '/');
@@ -70,12 +71,10 @@ urlinfo_t *parse_url(char *url)
     urlinfo->port = "80";
   } else {
     urlinfo->port = port +1;
+  // 6. Overwrite the colon with a '\0' so that we are just left with the hostname.
     *port = '\0';
   }
   printf("urlinfo->port: %s\n", urlinfo->port);
-
-  // 6. Overwrite the colon with a '\0' so that we are just left with the hostname.
-
   printf("url: %s\n", url);
 
   urlinfo->hostname = url;
@@ -147,8 +146,15 @@ int main(int argc, char *argv[])
 
   while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
        // print the data we got back to stdout
-       printf("%s\n", buf);
+       int *temp = 0;
+       printf("%s   ---%i\n", buf, temp);
+       temp++;
+       break;
      }
+
+     char *hey;
+     hey = strstr(buf, "301 Moved Permently");
+     printf("%s", hey);
 
   //5. Clean up any allocated memory and open file descriptors.
 
