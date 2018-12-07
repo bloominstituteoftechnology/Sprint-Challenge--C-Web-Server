@@ -12,7 +12,8 @@
 /**
  * Struct to hold all three pieces of a URL
  */
-typedef struct urlinfo_t {
+typedef struct urlinfo_t
+{
   char *hostname;
   char *port;
   char *path;
@@ -29,27 +30,44 @@ urlinfo_t *parse_url(char *url)
 {
   // copy the input URL so as not to mutate the original
   char *hostname = strdup(url);
-  char *port;
-  char *path;
+  char *port = "80";
+  char *path = "/";
 
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
 
-  /*
-    We can parse the input URL by doing the following:
+  char *http = strstr(hostname, "://");
+  if (http != NULL)
+  {
+    hostname = http + 3;
+  }
 
-    1. Use strchr to find the first backslash in the URL (this is assuming there is no http:// or https:// in the URL).
-    2. Set the path pointer to 1 character after the spot returned by strchr.
-    3. Overwrite the backslash with a '\0' so that we are no longer considering anything after the backslash.
-    4. Use strchr to find the first colon in the URL.
-    5. Set the port pointer to 1 character after the spot returned by strchr.
-    6. Overwrite the colon with a '\0' so that we are just left with the hostname.
-  */
+  http = strchr(hostname, '/');
+  if (http != NULL)
+  {
+    path = http + 1;
+    *http = '\0';
+  }
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  http = strchr(hostname, ':');
+  if (http != NULL)
+  {
+    port = http + 1;
+    *http = '\0';
+  }
+
+  urlinfo->hostname = strdup(hostname);
+  urlinfo->port = strdup(port);
+  urlinfo->path = strdup(path);
 
   return urlinfo;
+}
+
+void free_urlinfo(struct urlinfo_t *urlinfo)
+{
+  free(urlinfo->hostname);
+  free(urlinfo->port);
+  free(urlinfo->path);
+  free(urlinfo);
 }
 
 /**
@@ -66,36 +84,61 @@ int send_request(int fd, char *hostname, char *port, char *path)
 {
   const int max_request_size = 16384;
   char request[max_request_size];
-  int rv;
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  int request_length = sprintf(request, "GET /%s HTTP/1.1\r\nHost: %s:%s\r\nConnection: close\r\n\r\n", path, hostname, port);
 
-  return 0;
+  int rv = send(fd, request, request_length, 0);
+
+  return rv;
 }
 
 int main(int argc, char *argv[])
-{  
-  int sockfd, numbytes;  
+{
+  int sockfd, numbytes;
   char buf[BUFSIZE];
 
-  if (argc != 2) {
-    fprintf(stderr,"usage: client HOSTNAME:PORT/PATH\n");
+  if (argc < 2)
+  {
+    fprintf(stderr, "usage: client HOSTNAME:PORT/PATH\n");
     exit(1);
   }
 
-  /*
-    1. Parse the input URL
-    2. Initialize a socket
-    3. Call send_request to construct the request and send it
-    4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
-    5. Clean up any allocated memory and open file descriptors.
-  */
+  struct urlinfo_t *urlinfo = parse_url(argv[1]);
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  char *hostname = urlinfo->hostname;
+  char *port = urlinfo->port;
+  char *path = urlinfo->path;
+
+  sockfd = get_socket(hostname, port);
+
+  send_request(sockfd, hostname, port, path);
+
+  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0)
+  {
+    printf("%s\n", buf);
+  }
+
+  char request_protocol[16];
+  char request_status[16];
+
+  sscanf(buf, "%s %s", request_protocol, request_status);
+
+  if (strcmp(request_status, "301") == 0)
+  {
+    char *body = strstr(buf, "\r\n\r\n");
+    body = strstr(body, "HREF");
+    body = strtok(body, "\"");
+    body = strtok(NULL, "\"");
+
+    char *args[2];
+    args[0] = "./client";
+    args[1] = body;
+
+    main(2, args);
+  }
+
+  free_urlinfo(urlinfo);
+  close(sockfd);
 
   return 0;
 }
