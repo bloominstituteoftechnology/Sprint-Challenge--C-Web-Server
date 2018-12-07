@@ -48,6 +48,8 @@ urlinfo_t *parse_url(char *url)
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
+  path = strchr(hostname, "/") + 1;
+  
 
   return urlinfo;
 }
