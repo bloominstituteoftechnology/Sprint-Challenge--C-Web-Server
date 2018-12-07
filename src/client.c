@@ -137,12 +137,16 @@ int main(int argc, char *argv[])
   sockfd = get_socket(urlinfo->hostname, urlinfo->port);
   send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
 
-  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
-    printf("Response: %s\n", buf);
+  while ((numbytes = recv(sockfd, buf, BUFSIZE, 0)) > 0) {
+    // buf[numbytes] = '\0';
+    // printf("Response: %s\n", buf);
+    fwrite(buf, sizeof(char), numbytes, stdout);
   }
 
-  free(urlinfo);
   close(sockfd);
+  // free(urlinfo->hostname);
+  free(urlinfo);
+  
 
   return 0;
 }
