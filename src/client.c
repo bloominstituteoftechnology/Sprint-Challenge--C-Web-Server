@@ -66,7 +66,6 @@ int send_request(int fd, char *hostname, char *port, char *path)
 {
   const int max_request_size = 16384;
   char request[max_request_size];
-  int rv;
 
   ///////////////////
   // IMPLEMENT ME! //
