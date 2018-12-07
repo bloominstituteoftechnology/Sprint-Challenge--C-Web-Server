@@ -85,8 +85,10 @@ int send_request(int fd, char *hostname, char *port, char *path)
     request,
     "GET /%s HTTP/1.1"
     "Host: %s:%s\n"
-    "Connection: close\n"
-  );
+    "Connection: close\n\n",
+    hostname, port, path);
+
+  printf("before send ===> %s\n",request_length);
 
   rv = send(fd, request, request_length, 0);
 
@@ -128,10 +130,12 @@ int main(int argc, char *argv[])
        printf("%s\n", buf);
      }
     // 5. Clean up any allocated memory and open file descriptors.
+    // if(urlinfo) //need to only do this if there is data here
     free(urlinfo->hostname);
     free(urlinfo->port);
     free(urlinfo->path);
     free(urlinfo);
+
     close(sockfd);
 
   ///////////////////
