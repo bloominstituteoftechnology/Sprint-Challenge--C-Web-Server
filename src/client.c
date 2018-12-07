@@ -20,7 +20,7 @@ typedef struct urlinfo_t {
 
 char *replace_w_space(char *needs_space){
   for (int i=0; i<strlen(needs_space); i++){
-    if(needs_space[i] == "/" || needs_space[i] == "/" ){
+    if(needs_space[i] == "/" || needs_space[i] == ":" ){
       needs_space[i] = " ";
     } 
   }
@@ -40,7 +40,7 @@ urlinfo_t *parse_url(char *url)
   char *hostname = strdup(url);
   char *port;
   char *path;
-  char *temp_url[128];
+  char temp_url[128];
   char *point_break;
 
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
@@ -56,22 +56,21 @@ urlinfo_t *parse_url(char *url)
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
 
-  if(strstr(hostname, "http://" == 0)){
+  if(strstr(hostname, "http://") == 0){
     strncpy(temp_url, hostname+7, sizeof(temp_url));
-    printf("tEMPURL >>>> %s", temp_url);
     point_break = replace_w_space(temp_url);
     sscanf(point_break, "%s %s %s", hostname, port, path);
-    printf("hostname >> %s, port >>> %s, path >> %s\n", hostname, port, path);
+    // printf("hostname >> %s, port >>> %s, path >> %s\n", hostname, port, path);
   } else if (strstr(hostname, "https://") == 0) {
     strncpy(temp_url, hostname+8, sizeof(temp_url));
-    printf("tEMPURL >>>> %s", temp_url);
+    // printf("tEMPURL >>>> %s", temp_url);
     point_break = replace_w_space(temp_url);
     sscanf(point_break, "%s %s %s", hostname, port, path);
-    printf("hostname >> %s, port >>> %s, path >> %s\n", hostname, port, path);
+    // printf("hostname >> %s, port >>> %s, path >> %s\n", hostname, port, path);
   } else {
     point_break = replace_w_space(temp_url);
     sscanf(point_break, "%s %s %s", hostname, port, path);
-    printf("hostname >> %s, port >>> %s, path >> %s\n", hostname, port, path);
+    // printf("hostname >> %s, port >>> %s, path >> %s\n", hostname, port, path);
   }
 
   urlinfo->hostname = strdup(hostname);
@@ -136,11 +135,10 @@ int main(int argc, char *argv[])
   sockfd = get_socket(urlinfo->hostname, urlinfo->port);
 
   // 3. Call send_request to construct the request and send it
-  // send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
+  send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
 
   // 4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
-
-  while((numbytes = recv(sockfd, buf, BUFSIZE - numbytes, 0)) > 0) {
+  while((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
     printf("Response:\n %s", buf);
   }
 
@@ -150,7 +148,7 @@ int main(int argc, char *argv[])
   }
 
   // 5. Clean up any allocated memory and open file descriptors.
-  free(sockfd);
+  free(&sockfd);
   free(urlinfo);
 
   return 0;
