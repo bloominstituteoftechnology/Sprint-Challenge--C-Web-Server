@@ -12,7 +12,8 @@
 /**
  * Struct to hold all three pieces of a URL
  */
-typedef struct urlinfo_t {
+typedef struct urlinfo_t
+{
   char *hostname;
   char *port;
   char *path;
@@ -24,7 +25,9 @@ typedef struct urlinfo_t {
  * url: The input URL to parse.
  *
  * Store hostname, path, and port in a urlinfo_t struct and return the struct.
+ * 
 */
+
 urlinfo_t *parse_url(char *url)
 {
   // copy the input URL so as not to mutate the original
@@ -45,9 +48,19 @@ urlinfo_t *parse_url(char *url)
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  char *backslash, *colon;
+  
+  backslash = strchr(hostname, '/');
+
+  path = backslash + 1;
+
+  *backslash = '\0';
+
+  colon = strchr(hostname, ':');
+
+  port = colon + 1;
+
+  *colon = '\0';
 
   return urlinfo;
 }
@@ -76,12 +89,13 @@ int send_request(int fd, char *hostname, char *port, char *path)
 }
 
 int main(int argc, char *argv[])
-{  
-  int sockfd, numbytes;  
+{
+  int sockfd, numbytes;
   char buf[BUFSIZE];
 
-  if (argc != 2) {
-    fprintf(stderr,"usage: client HOSTNAME:PORT/PATH\n");
+  if (argc != 2)
+  {
+    fprintf(stderr, "usage: client HOSTNAME:PORT/PATH\n");
     exit(1);
   }
 
