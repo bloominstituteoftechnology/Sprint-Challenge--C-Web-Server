@@ -106,6 +106,7 @@ int main(int argc, char *argv[])
   */
 
   urlinfo_t *parse = parse_url(argv[1]); 
+  int socket; 
   socket = get_socket(parse->hostname, parse->port); 
   send_request(socket, parse->hostname, parse->port, parse->path); 
 
