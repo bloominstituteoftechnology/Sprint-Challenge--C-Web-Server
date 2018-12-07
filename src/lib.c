@@ -11,12 +11,13 @@
 
 // get sockaddr, IPv4 or IPv6:
 void *get_in_addr(struct sockaddr *sa)
-{  
-   if (sa->sa_family == AF_INET) {
-     return &(((struct sockaddr_in*)sa)->sin_addr);
-   }
+{
+  if (sa->sa_family == AF_INET)
+  {
+    return &(((struct sockaddr_in *)sa)->sin_addr);
+  }
 
-   return &(((struct sockaddr_in6*)sa)->sin6_addr);
+  return &(((struct sockaddr_in6 *)sa)->sin6_addr);
 }
 
 /**
@@ -40,7 +41,8 @@ int get_socket(char *hostname, char *port)
   hints.ai_family = AF_UNSPEC;
   hints.ai_socktype = SOCK_STREAM;
 
-  if ((rv = getaddrinfo(hostname, port, &hints, &servinfo)) != 0) {
+  if ((rv = getaddrinfo(hostname, port, &hints, &servinfo)) != 0)
+  {
     fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
     exit(1);
   }
@@ -48,14 +50,17 @@ int get_socket(char *hostname, char *port)
   // Once we have a list of potential interfaces, loop through them
   // and try to set up a socket on each. Quit looping the first time
   // we have success.
-  for(p = servinfo; p != NULL; p = p->ai_next) {
+  for (p = servinfo; p != NULL; p = p->ai_next)
+  {
     // Try to make a socket based on this candidate interface
-    if ((sockfd = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1) {
+    if ((sockfd = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1)
+    {
       perror("client: socket");
       continue;
     }
 
-    if (connect(sockfd, p->ai_addr, p->ai_addrlen) == -1) {
+    if (connect(sockfd, p->ai_addr, p->ai_addrlen) == -1)
+    {
       close(sockfd);
       perror("client: connect");
       continue;
@@ -67,7 +72,8 @@ int get_socket(char *hostname, char *port)
 
   // If p is NULL, it means we didn't break out of the above loop
   // and we don't have a good socket.
-  if (p == NULL)  {
+  if (p == NULL)
+  {
     fprintf(stderr, "client: failed to connect\n");
     exit(2);
   }
@@ -75,7 +81,7 @@ int get_socket(char *hostname, char *port)
   inet_ntop(p->ai_family, get_in_addr((struct sockaddr *)p->ai_addr), s, sizeof(s));
   printf("client: connecting to %s\n", s);
 
-  freeaddrinfo(servinfo);   // all done with this structure
+  freeaddrinfo(servinfo); // all done with this structure
 
   return sockfd;
 }

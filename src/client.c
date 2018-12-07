@@ -85,9 +85,9 @@ int send_request(int fd, char *hostname, char *port, char *path)
       "GET /%s HTTP/1.1\n"
       "Host: %s:%s\n"
       "Connection: close\n\n",
+      path,
       hostname,
-      port,
-      path);
+      port);
 
   rv = send(fd, request, request_length, 0);
 
@@ -113,9 +113,19 @@ int main(int argc, char *argv[])
   // 1. Parse the input URL
   struct urlinfo_t *urlinfo = parse_url(argv[1]);
   // 2. Initialize a socket
+  sockfd = get_socket(urlinfo->hostname, urlinfo->port);
   // 3. Call send_request to construct the request and send it
+  send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
   // 4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
+  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0)
+  {
+    // print the data we got back to stdout
+    printf("%s\n", buf);
+  }
   // 5. Clean up any allocated memory and open file descriptors.
+
+  free(urlinfo);
+  close(sockfd);
 
   ///////////////////
   // IMPLEMENT ME! //
