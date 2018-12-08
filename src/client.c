@@ -167,16 +167,20 @@ int main(int argc, char *argv[])
         // printf("everythingElse: %s\n", everythingElse);
         char *is301;
         char *redirectURL;
+        printf("firstLine2: %s\n", firstLine);
         is301 = strstr(firstLine, "301");
-        printf("is301 %s", is301);
+        printf("is301 %s\n", is301);
+        // int *is301Len = srtlen(is301);
         if(is301 != NULL){
-          printf("301 is not null");
+          printf("301 is not null\n");
           redirectURL = strstr(secondLine, "http");
-          printf("%s", redirectURL);
-          char *newArgv;
-          sprintf(newArgv, "./client %s", redirectURL);
-          main(2, newArgv);
+          printf("redirectURL %s\n", redirectURL);
+          char *hey = "./client";
+          strcat(hey, redirectURL);
+          printf("hey %s\n", hey);
+          main(2, hey);
         } else {
+          printf("301 is NULL\n");
           break;
         }
      }
