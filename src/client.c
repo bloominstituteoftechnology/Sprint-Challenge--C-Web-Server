@@ -33,6 +33,8 @@ urlinfo_t *parse_url(char *url)
   char *path;
 
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
+ 
+
 
   /*
     We can parse the input URL by doing the following:
@@ -44,10 +46,20 @@ urlinfo_t *parse_url(char *url)
     5. Set the port pointer to 1 character after the spot returned by strchr.
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
+const char backslash = '/';
+char *ret;
+ret = strchr(hostname,backslash);
+path = strdup(ret++);
+hostname[strlen(hostname) - strlen(ret)] = '\0';
+char* ret2;
+ret2 = strchr(hostname,':');
+port = strdup(ret2++);
+hostname[strlen(hostname) - strlen(ret2)] = '\0';
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+
+urlinfo->hostname = hostname;
+urlinfo->path = path;
+urlinfo->port = port;
 
   return urlinfo;
 }
@@ -68,23 +80,42 @@ int send_request(int fd, char *hostname, char *port, char *path)
   char request[max_request_size];
   int rv;
 
-  ///////////////////
+  int len = sprintf(request,"GET /%s HTTP/1.1\nHost:%s:%s\nConnection:close",path,hostname,port);
+  //////////////////
   // IMPLEMENT ME! //
   ///////////////////
+  rv = send(fd,request,len,0);
+  if (rv < 0) {
+    perror("error - send");
 
-  return 0;
+  }
+  return rv;
 }
 
 int main(int argc, char *argv[])
 {  
   int sockfd, numbytes;  
   char buf[BUFSIZE];
+  urlinfo_t *url;
 
   if (argc != 2) {
     fprintf(stderr,"usage: client HOSTNAME:PORT/PATH\n");
     exit(1);
   }
+  url = parse_url(argv[1]);
+   sockfd = get_socket(url -> hostname,url ->port);
+   if (sockfd == -1) {
+     perror("error - get_socket");
+   }
+   send_request(sockfd,url ->hostname,url->port,url->path);
+  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
+  printf("%s", buf);
+}
 
+free(url ->hostname);
+free(url ->path);
+free(url ->port);
+free(url);
   /*
     1. Parse the input URL
     2. Initialize a socket
@@ -93,9 +124,7 @@ int main(int argc, char *argv[])
     5. Clean up any allocated memory and open file descriptors.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+
 
   return 0;
 }
