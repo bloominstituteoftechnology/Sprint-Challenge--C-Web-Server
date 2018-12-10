@@ -47,12 +47,14 @@ urlinfo_t *parse_url(char *url)
   */
   if(strstr(hostname, "https://") != NULL) hostname += 8;
   else if(strstr(hostname, "http://") != NULL) hostname += 7;
+
   path = strchr(hostname, '/');
   if (path == NULL) path = "";
   else {
     path[0] = '\0';
     path++;
   }
+
   port = strchr(hostname, ':');
   if(port == NULL) port = "80";
   else {
@@ -60,9 +62,9 @@ urlinfo_t *parse_url(char *url)
     port++;
   }
 
-  urlinfo->hostname = strdup(hostname);
-  urlinfo->path = strdup(path);
-  urlinfo->port = strdup(port);
+  urlinfo->hostname = hostname;
+  urlinfo->path = path;
+  urlinfo->port = port;
 
   ///////////////////
   // IMPLEMENT ME! //
@@ -120,6 +122,7 @@ int main(int argc, char *argv[])
 
   while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
     fwrite(buf, sizeof(char), numbytes, stdout);
+    // printf("%s\n", buf);
   }
 
   free(urlinfo->hostname);
