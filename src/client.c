@@ -87,8 +87,8 @@ int main(int argc, char *argv[])
 
   /*
     1. Parse the input URL
-    2. Initialize a socket
-    3. Call send_request to construct the request and send it
+    2. Initialize a socket by calling the `get_socket` function from lib.c
+    3. Call `send_request` to construct the request and send it
     4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
     5. Clean up any allocated memory and open file descriptors.
   */
