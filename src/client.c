@@ -55,7 +55,7 @@ urlinfo_t *parse_url(char *url)
 /**
  * Constructs and sends an HTTP request
  *
- * fd:
+ * fd:       The file descriptor of the connection.
  * hostname: The hostname string.
  * port:     The port string.
  * path:     The path string.
