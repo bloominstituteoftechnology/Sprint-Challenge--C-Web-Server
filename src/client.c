@@ -28,7 +28,7 @@ typedef struct urlinfo_t {
 urlinfo_t *parse_url(char *url)
 {
   // copy the input URL so as not to mutate the original
-  char *hostname = strdup(url);
+  char *hostname = strdup(url);  // for MVP assume now http://
   char *port;
   char *path;
 
@@ -36,7 +36,6 @@ urlinfo_t *parse_url(char *url)
 
   /*
     We can parse the input URL by doing the following:
-
     1. Use strchr to find the first backslash in the URL (this is assuming there is no http:// or https:// in the URL).
     2. Set the path pointer to 1 character after the spot returned by strchr.
     3. Overwrite the backslash with a '\0' so that we are no longer considering anything after the backslash.
@@ -45,9 +44,18 @@ urlinfo_t *parse_url(char *url)
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
 
-  ///////////////////
   // IMPLEMENT ME! //
-  ///////////////////
+  char *colon = strstr(hostname, ":");
+  port = colon + 1;
+  *colon = '\0';
+
+  char *slash = strstr(port, "/");
+  path = slash + 1 ;
+  *slash = '\0';
+
+  urlinfo->hostname = hostname;
+  urlinfo->port = port;
+  urlinfo->path = path;
 
   return urlinfo;
 }
@@ -71,6 +79,14 @@ int send_request(int fd, char *hostname, char *port, char *path)
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
+
+  int req_len = sprintf(request, "GET /%s HTTP/1.1\nHost: %s:%s\nConnection:close\n\n", path, hostname, port);
+
+  rv = send(fd, request, req_len, 0);
+
+  if(rv < 0) {
+    printf("Bad request");
+  }
 
   return 0;
 }
@@ -96,6 +112,19 @@ int main(int argc, char *argv[])
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
+  
+  // grab the first argument from the command line
+  urlinfo_t *urlinfo = parse_url(argv[1]);
+  // set socket file descriptor using the given hostname and path.
+  sockfd = get_socket(urlinfo->hostname, urlinfo->port);
+  int rv = send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
+  // loop through each line returned
+  while((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
+    printf("Response: %s\n", buf);
+  }
+  // free allocated memory to prevent memory leaks :)
+  free(urlinfo);
+  close(sockfd);
 
   return 0;
 }
