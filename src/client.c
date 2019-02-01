@@ -45,15 +45,38 @@ urlinfo_t *parse_url(char *url)
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.✅
     7. Set the information inside the struct✅
 
-    EXAMPLE: localhost:3490/d20
+    8. STRETCH Cleave extra portions out of URL and deal with situation where no ports provided
+    - strstr returns the first occurrence of the substring in another string in the form of a character pointer pointing to the first character of the match
+    - However, if the string is not found, strstr returns NULL pointer.
+    - check if there's an "http://"" or "https://" in front and strip it off
+    - check if there's a ":", meaning there's a port or else set to 80 (hint: clients just assume a default port number of 80)
+
+    EXAMPLE: localhost:3490/d20✅
+    EXAMPLE: localhost:3490/index.html✅
+    EXAMPLE: www.google.com:80/✅
+    EXAMPLE: http:// or https://✅
+    EXAMPLE: www.google.com/
   */
+
+  if (strstr(hostname, "http://") != NULL) {
+    hostname = strdup(url+7);
+  }
+  else if (strstr(hostname, "https://") != NULL) {
+    hostname = strdup(url+8);
+  }
+
   char *backslash = strchr(hostname, '/');
   path = backslash + 1;
   *backslash = '\0';
 
   char *colon = strchr(hostname, ':');
-  port = colon + 1;
-  *colon = '\0';
+  // if (colon == NULL) {
+  //   port = "80";
+  // }
+  // else {
+    port = colon + 1;
+    *colon = '\0';
+  // }
 
   urlinfo->hostname = hostname;
   urlinfo->port = port;
