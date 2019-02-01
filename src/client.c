@@ -58,6 +58,7 @@ urlinfo_t *parse_url(char *url)
     EXAMPLE: www.google.com/
   */
 
+  // STRETCH
   if (strstr(hostname, "http://") != NULL) {
     hostname = strdup(url+7);
   }
@@ -146,9 +147,15 @@ int main(int argc, char *argv[])
 
   send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path); // 3
 
+  
   while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) { // 4
     fprintf(stdout, "%s\n", buf);
   }
+
+  // STRETCH /client google.com:80/
+  // if (strstr(buf, "301") != NULL) {
+  //   printf("Header:\n%s\n", "301 return detected");
+  // }
 
   free(urlinfo); // 5
   close(sockfd);
