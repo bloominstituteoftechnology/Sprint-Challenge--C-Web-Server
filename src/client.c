@@ -51,15 +51,23 @@ urlinfo_t *parse_url(char *url)
 	//first_backslash++;
 	path = first_backslash+1;
 	
-	//printf("path is %s\n", path);
+	printf("path is %s\n", path);
 	*first_backslash = '\0';
 	
 	// example localhost:3490/d20
 
 	char *first_colon = strchr(hostname, ':');
-	port = first_colon+1;
+	char *default_port = "80";
+		
+	if(first_colon == NULL){
+		//printf("no colon, port is %s\n", default_port);
+		port = default_port;
+	}
+	else{
+		port = first_colon+1;
+		*first_colon = '\0';
+	}	
 
-	*first_colon = '\0';
 	//printf("port is %s\n", port);
 
 
@@ -96,7 +104,8 @@ int send_request(int fd, char *hostname, char *port, char *path)
   int response_length = sprintf(request,
                                   "GET /%s HTTP/1.1\n"
                                   "Host: %s:%s\n"
-                                  "Connection: close\n\n"
+                                  "Connection: close\n"
+				  "\n"
                                   ,path, hostname, port);
   
   
@@ -168,9 +177,9 @@ int main(int argc, char *argv[])
 	
 
   	//2 Initialize a socket by calling the get_socket()
-	printf("url_info->hostname is %s and url_info->port is %s\n", url_info->hostname, url_info->port);
+	//printf("url_info->hostname is %s and url_info->port is %s\n", url_info->hostname, url_info->port);
 	sockfd = get_socket(url_info->hostname, url_info->port);
-	printf("socket_id is %d\n", sockfd);
+	//printf("socket_id is %d\n", sockfd);
 
 	//3. Call send_request() to construct the request and send it
 	rec = send_request(sockfd, url_info->hostname, url_info->port, url_info->path);
