@@ -44,7 +44,7 @@ urlinfo_t *parse_url(char *url)
     5. Set the port pointer to 1 character after the spot returned by strchr.✅
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.✅
     7. Set the information inside the struct✅
-    
+
     EXAMPLE: localhost:3490/d20
   */
   char *backslash = strchr(hostname, '/');
@@ -78,11 +78,20 @@ int send_request(int fd, char *hostname, char *port, char *path)
   char request[max_request_size];
   int rv;
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  int request_length = sprintf(request,
+    "GET /%s HTTP/1.1\n"
+    "Host: %s:%s\n"
+    "Connection: close\n\n",
 
-  return 0;
+    path,
+    hostname,
+    port
+  );
+
+  rv = send(fd, request, request_length, 0);
+  if (rv < 0) { perror("Error in send_request()."); }
+
+  return rv;
 }
 
 int main(int argc, char *argv[])
