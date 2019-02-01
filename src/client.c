@@ -96,7 +96,7 @@ int send_request(int fd, char *hostname, char *port, char *path)
 
 int main(int argc, char *argv[])
 {  
-  int sockfd, numbytes;  
+  int sockfd, numbytes;
   char buf[BUFSIZE];
 
   if (argc != 2) {
@@ -105,16 +105,29 @@ int main(int argc, char *argv[])
   }
 
   /*
-    1. Parse the input URL
-    2. Initialize a socket by calling the `get_socket` function from lib.c
-    3. Call `send_request` to construct the request and send it
-    4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
-    5. Clean up any allocated memory and open file descriptors.
+    ✅1. Parse the input URL (curl -D - www.google.com)
+    ✅2. Initialize a socket by calling the `get_socket` function from lib.c
+    ✅3. Call `send_request` to construct the request and send it
+    ✅4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
+    - recv(int socket, void *buffer, size_t length, int flags);
+    - Upon successful completion, recv() shall return the length of the message in bytes. If no messages are available to be received and the peer has performed an orderly shutdown, recv() shall return 0. Otherwise, -1 shall be returned and errno set to indicate the error.
+    ✅5. Clean up any allocated memory and open file descriptors.
+    - close mallocs and sockets
+    - `close(sockfd)`
   */
+  
+  urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
+  urlinfo = parse_url(argv[1]); // 1
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  sockfd = get_socket(urlinfo->hostname, urlinfo->port); // 2
 
+  send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path); // 3
+
+  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) { // 4
+    fprintf(stdout, "%s\n", buf);
+  }
+
+  free(urlinfo); // 5
+  close(sockfd);
   return 0;
 }
