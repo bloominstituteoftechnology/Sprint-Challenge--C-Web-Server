@@ -130,7 +130,7 @@ int main(int argc, char *argv[])
   sockfd = get_socket(urlinfo->hostname, urlinfo->port);
   send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
 
-  while ((numbytes = resv(sockfd, buf, BUFSIZE -1, 0)) > 0){
+  while ((numbytes = recv(sockfd, buf, BUFSIZE -1, 0)) > 0){
     printf("\nResponse: %s\n", buf);
   }
 
