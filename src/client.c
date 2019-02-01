@@ -48,37 +48,49 @@ urlinfo_t *parse_url(char *url)
     hostname = strdup(url);
   }
 
-// 1. Use strchr to find the first backslash in the URL (this is assuming there is no http:// or https:// in the URL).
-// 2. Set the path pointer to 1 character after the spot returned by strchr. 
-// 3. Overwrite the backslash with a '\0' so that we are no longer considering anything after the forward-slash. 
-  if ( strstr(hostname, "/") ) {      
-    path = strstr(hostname, "/") + 1; // --> This is now POINTING to 1 char after the /   
-    *(path - 1) = NULL;
-    // path++; // --> Return it back to what it was originally pointing at
+  char *backslash = strchr(hostname, '/');
+  path = backslash + 1;
+  *backslash = '\0';
+
+  char *colon = strchr(hostname, ':');
+  if (colon) {
+    port = colon + 1;
+    *colon = '\0';
   } else {
-    printf("HOSTNAME + / == ELSE\n");
-    path = "/";
+    port = "80";
   }
 
-// 4. Use strchr to find the first colon in the URL.
-  if ( strstr(hostname, ":") ) {
-// 5. Set the port pointer to 1 character after the spot returned by strchr.
-    port = strstr(hostname, ":") + 1;
-// 6. Overwrite the colon with a '\0' so that we are just left with the hostname.    
-    *(port - 1) = NULL;
-    // port++; // --> Return it back to what it was originally pointing at
-  } else {
-    printf("HOSTNAME + : == ELSE\n");
-// Using this to handle the conversion warning
-    char port_buffer[5];
-    sprintf(port_buffer, "%i", 80);
-    port = port_buffer;
-  }
+// // 1. Use strchr to find the first backslash in the URL (this is assuming there is no http:// or https:// in the URL).
+// // 2. Set the path pointer to 1 character after the spot returned by strchr. 
+// // 3. Overwrite the backslash with a '\0' so that we are no longer considering anything after the forward-slash. 
+//   if ( strstr(hostname, "/") ) {     
+//     path = strstr(hostname, "/") + 1; // --> This is now POINTING to 1 char after the /   
+//     *(path - 1) = NULL;
+//     // path++; // --> Return it back to what it was originally pointing at
+//   } else {
+//     printf("HOSTNAME + / == ELSE\n");
+//     path = "/";
+//   }
+
+// // 4. Use strchr to find the first colon in the URL.
+//   if ( strstr(hostname, ":") ) {
+// // 5. Set the port pointer to 1 character after the spot returned by strchr.
+//     port = strstr(hostname, ":") + 1;
+// // 6. Overwrite the colon with a '\0' so that we are just left with the hostname.    
+//     *(port - 1) = NULL;
+//     // port++; // --> Return it back to what it was originally pointing at
+//   } else {
+//     printf("HOSTNAME + : == ELSE\n");
+// // Using this to handle the conversion warning
+//     char port_buffer[5];
+//     sprintf(port_buffer, "%i", 80);
+//     port = port_buffer;
+//   }
 
 // * Store hostname, path, and port in a urlinfo_t struct and return the struct.
   urlinfo->hostname = hostname;
-  urlinfo->path = strdup(path);
-  urlinfo->port = strdup(port);
+  urlinfo->path = path;
+  urlinfo->port = port;
 
     
 
@@ -110,7 +122,7 @@ int send_request(int fd, char *hostname, char *port, char *path)
   int request_length = sprintf(request,
     "GET /%s HTTP/1.1\n"
     "Host: %s:%s\n"
-    "Connection: close",
+    "Connection: close\n\n",
     path,
     hostname,
     port
@@ -145,7 +157,7 @@ int main(int argc, char *argv[])
 //   1. Parse the input URL
 //   2. Initialize a socket by calling the `get_socket` function from lib.c
 //   3. Call `send_request` to construct the request and send it
-  struct urlinfo_t *urlinfo = parse_url(argv[1]);
+  urlinfo_t *urlinfo = parse_url(argv[1]);
   sockfd = get_socket(urlinfo->hostname, urlinfo->port);
   send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
 
@@ -153,11 +165,11 @@ int main(int argc, char *argv[])
     printf("%s\n", buf);
   }
   
-  close(sockfd);
-  free(urlinfo->hostname);
-  free(urlinfo->port);
-  free(urlinfo->path);
   free(urlinfo);
+  close(sockfd);
+  // free(urlinfo->hostname);
+  // free(urlinfo->port);
+  // free(urlinfo->path);  
 
   return 0;
 }
