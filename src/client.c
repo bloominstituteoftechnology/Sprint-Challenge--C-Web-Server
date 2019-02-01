@@ -34,10 +34,18 @@ urlinfo_t *parse_url(char *url)
 
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
 
+  char http_check[4];
   char backslash = '/';
   char *backslash_ptr;
   char colon = ':';
   char *colon_ptr;
+
+  strncpy(http_check, hostname, 4);
+
+  if (strcmp(http_check, "http") == 0) {
+    backslash_ptr = strchr(hostname, backslash) + 2;
+    hostname = strdup(backslash_ptr);
+  }
 
   // 1. Use strchr to find the first backslash in the URL (this is assuming there is no http:// or https:// in the URL).
   backslash_ptr = strchr(hostname, backslash);
@@ -47,10 +55,15 @@ urlinfo_t *parse_url(char *url)
   *backslash_ptr = '\0';
   // 4. Use strchr to find the first colon in the URL.
   colon_ptr = strchr(hostname, colon);
+  printf("colon_ptr: %s\n", colon_ptr);
   // 5. Set the port pointer to 1 character after the spot returned by strchr.
-  port = colon_ptr + 1;
+  if (colon_ptr != NULL){
+    port = colon_ptr + 1;
   // 6. Overwrite the colon with a '\0' so that we are just left with the hostname.
-  *colon_ptr = '\0';
+    *colon_ptr = '\0';
+  } else{
+    port = "80";
+  }
 
   urlinfo->hostname = hostname;
   urlinfo->port = port;
@@ -87,8 +100,8 @@ int send_request(int fd, char *hostname, char *port, char *path)
 }
 
 int main(int argc, char *argv[])
-{  
-  int sockfd, numbytes;  
+{
+  int sockfd, numbytes;
   char buf[BUFSIZE];
 
   if (argc != 2) {
