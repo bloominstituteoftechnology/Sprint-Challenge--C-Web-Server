@@ -34,15 +34,18 @@ urlinfo_t *parse_url(char *url)
 
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));  
 
-// 0. First you want to handle if the url has a https:// or http:// || could just add the amount of strings to the hostname
-  // if ( strstr(hostname, "https://") ) {
-  //   hostname += 8;
-  //   printf("%s", hostname);
-  // } else if ( strstr(hostname, "http://") ) {
-  //   hostname += 7;
-  // } else {
-  //   hostname = strdup(url);
-  // }
+// 0. STRETCH: First you want to handle if the url has a https:// or http:// || could just add the amount of strings to the hostname
+  if ( strstr(hostname, "https://") ) {
+    printf("We found an HTTPS\n");    
+    hostname += 8;
+    printf("%s", hostname);
+  } else if ( strstr(hostname, "http://") ) {
+    printf("We found an HTTP\n");
+    hostname += 7;
+  } else {
+    printf("We found a REGULAR URL\n");
+    hostname = strdup(url);
+  }
 
 // 1. Use strchr to find the first backslash in the URL (this is assuming there is no http:// or https:// in the URL).
 // 2. Set the path pointer to 1 character after the spot returned by strchr. 
