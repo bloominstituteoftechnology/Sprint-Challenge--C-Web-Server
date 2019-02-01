@@ -53,15 +53,17 @@ urlinfo_t *parse_url(char *url)
   if (ptr == NULL){
     path = "/";
   } else {
-
-  if(*ptr == *(ptr+1)){
-    hostname = ptr+2;
-    ptr = strchr(hostname,'/');
-  }
-
-
+    if(*ptr == *(ptr+1)){
+      hostname = ptr+2;
+      ptr = strchr(hostname,'/');
+    }
+    
+    if (ptr == NULL){
+      path = "/";
+    } else {
     path = ptr + 1;
     *ptr = '\0'; 
+    }
   }
 
 
