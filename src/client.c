@@ -28,26 +28,46 @@ typedef struct urlinfo_t {
 urlinfo_t *parse_url(char *url)
 {
   // copy the input URL so as not to mutate the original
-  char *hostname = strdup(url);
+  char *dup_url = strdup(url);
+  char *colon;
+  char *slash;
+  char *hostname;
   char *port;
   char *path;
+  char *p;
 
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
 
-  /*
-    We can parse the input URL by doing the following:
+  p = strstr(dup_url, "http://");
+  if (p != NULL)
+  {
+    hostname = strdup(&p[7]);
+  }
+  else
+  {
+    p = strstr(dup_url, "https://");
+    if (p != NULL)
+    {
+      hostname = strdup(&p[8]);
+    }
+    else {
+      hostname = strdup(dup_url);
+    }
+  }
 
-    1. Use strchr to find the first backslash in the URL (this is assuming there is no http:// or https:// in the URL).
-    2. Set the path pointer to 1 character after the spot returned by strchr.
-    3. Overwrite the backslash with a '\0' so that we are no longer considering anything after the backslash.
-    4. Use strchr to find the first colon in the URL.
-    5. Set the port pointer to 1 character after the spot returned by strchr.
-    6. Overwrite the colon with a '\0' so that we are just left with the hostname.
-  */
+  colon = strchr(hostname, ':');
+  port = colon + 1;
+  *colon = '\0';
+  slash = strchr(port, '/');
+  path = slash + 1;
+  *slash = '\0';
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  urlinfo->hostname = strdup(hostname);
+  urlinfo->port = strdup(port);
+  urlinfo->path = strdup(path);
+
+  free(dup_url);
+  free(hostname);
 
   return urlinfo;
 }
