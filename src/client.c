@@ -34,21 +34,29 @@ urlinfo_t *parse_url(char *url)
 
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
 
-  /*
-    We can parse the input URL by doing the following:
+  char backslash = '/';
+  char *backslash_ptr;
+  char colon = ':';
+  char *colon_ptr;
 
-    1. Use strchr to find the first backslash in the URL (this is assuming there is no http:// or https:// in the URL).
-    2. Set the path pointer to 1 character after the spot returned by strchr.
-    3. Overwrite the backslash with a '\0' so that we are no longer considering anything after the backslash.
-    4. Use strchr to find the first colon in the URL.
-    5. Set the port pointer to 1 character after the spot returned by strchr.
-    6. Overwrite the colon with a '\0' so that we are just left with the hostname.
-  */
+  // 1. Use strchr to find the first backslash in the URL (this is assuming there is no http:// or https:// in the URL).
+  backslash_ptr = strchr(hostname, backslash);
+  // 2. Set the path pointer to 1 character after the spot returned by strchr.
+  path = backslash_ptr + 1;
+  // 3. Overwrite the backslash with a '\0' so that we are no longer considering anything after the backslash.
+  *backslash_ptr = '\0';
+  // 4. Use strchr to find the first colon in the URL.
+  colon_ptr = strchr(hostname, colon);
+  // 5. Set the port pointer to 1 character after the spot returned by strchr.
+  port = colon_ptr + 1;
+  // 6. Overwrite the colon with a '\0' so that we are just left with the hostname.
+  *colon_ptr = '\0';
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  urlinfo->hostname = hostname;
+  urlinfo->port = port;
+  urlinfo->path = path;
 
+  printf("hostname, port, path: %s, %s, %s\n", hostname, port, path);
   return urlinfo;
 }
 
@@ -79,6 +87,11 @@ int main(int argc, char *argv[])
 {  
   int sockfd, numbytes;  
   char buf[BUFSIZE];
+
+  printf("\n");
+  char *url = "localhost:3490/d20";
+  parse_url(url);
+  printf("\n");
 
   if (argc != 2) {
     fprintf(stderr,"usage: client HOSTNAME:PORT/PATH\n");
