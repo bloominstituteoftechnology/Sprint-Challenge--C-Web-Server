@@ -55,34 +55,46 @@ urlinfo_t *parse_url(char *url)
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
 
-  path = strchr(hostname, '/');
+  if(strchr(hostname, '/')){
+    path = strchr(hostname, '/') + 1;
+    *(path-1) = '\0';
+  } else {
+    path = "";
+  }
   // printf("path: %s\n", path);
 
-  for(int i = 0; i < strlen(hostname); i++){
-    if(hostname[i] == '/'){
-      hostname[i] = '\0';
-    }
-  }
+  // for(int i = 0; i < strlen(hostname); i++){
+  //   if(hostname[i] == '/'){
+  //     hostname[i] = '\0';
+  //   }
+  // }
 
-  // printf("null slash: %s\n", url);
+  printf("null slash: %s\n", hostname);
 
-  path = &path[1];
+  // path = &path[1];
   urlinfo->path = path;
   // printf("path no slash: %s\n", path);
   // printf("struct path: %s\n", urlinfo->path);
 
-  port = strchr(hostname, ':');
+  if(strchr(hostname, ':')){
+    port = strchr(hostname, ':') + 1;
+    *(port-1) = '\0';
+  } else {
+    port = "80";
+  }
+
+  // port = strchr(hostname, ':');
   // printf("port: %s\n", port);
-  port = &port[1];
+  // port = &port[1];
   // printf("port no colon: %s\n", port);
 
   urlinfo->port = port;
 
-  for(int i = 0; i < strlen(hostname); i++){
-    if(hostname[i] == ':'){
-      hostname[i] = '\0';
-    }
-  }
+  // for(int i = 0; i < strlen(hostname); i++){
+  //   if(hostname[i] == ':'){
+  //     hostname[i] = '\0';
+  //   }
+  // }
 
   // printf("hostname: %s\n", url);
 
