@@ -84,11 +84,14 @@ int send_request(int fd, char *hostname, char *port, char *path)
   int response_length = sprintf(request,
     "GET /%s HTTP/1.1\n"
     "Host: %s:%s\n"
-    "Connection: close\n",
+    "Connection: close\n"
+    "\n",
     path,
-    hostname, port
+    hostname,
+    port
   );
   int reqv = send(fd, request, response_length, 0);
+  printf("request: %s\n", request);
 
   if(reqv < 0){
     perror("send request\n");
