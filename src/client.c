@@ -31,6 +31,7 @@ urlinfo_t *parse_url(char *url)
   char *hostname = strdup(url);
   char *port;
   char *path;
+  char *ptr;
 
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
 
