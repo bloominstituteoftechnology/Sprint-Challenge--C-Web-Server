@@ -6,12 +6,12 @@ Task List
   - [x]  use the `strchr` function to look for specific characters in a string;
 - [x] Construct the HTTP request;
   - [x] use `sprintf` in order to construct the request from the `hostname`, `port`, and `path`;
-- [ ] Connect to the server;
+- [x] Connect to the server;
   - [ ] call the `get_socket()`;
-- [ ] Send the request string down the socket;
-- [ ] Receive the response from the server and print it to `stdout`;
-- [ ] Clean up.
-  - [ ] `free` any allocated memory and `close` any open file descriptors.
+- [x] Send the request string down the socket;
+- [x] Receive the response from the server and print it to `stdout`;
+- [x] Clean up.
+  - [x] `free` any allocated memory and `close` any open file descriptors.
 
 
 # Sprint Challenge: C Web Server Sprint

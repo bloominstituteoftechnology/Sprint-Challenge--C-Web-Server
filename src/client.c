@@ -102,10 +102,18 @@ int main(int argc, char *argv[])
     4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
     5. Clean up any allocated memory and open file descriptors.
   */
+  struct urlinfo_t *urlinfo = parse_url(argv[1]);
+  sockfd = get_socket(urlinfo->hostname, urlinfo->port);
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
+
+  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
+    printf("%s\n", buf);
+  }
+
+
+  free(urlinfo);
+  close(sockfd);
 
   return 0;
 }
