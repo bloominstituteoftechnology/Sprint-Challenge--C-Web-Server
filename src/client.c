@@ -18,6 +18,7 @@ typedef struct urlinfo_t {
   char *path;
 } urlinfo_t;
 
+
 /**
  * Tokenize the given URL into hostname, path, and port.
  *
@@ -33,7 +34,6 @@ urlinfo_t *parse_url(char *url)
   char *path;
 
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
-
   /*
     We can parse the input URL by doing the following:
 
@@ -45,13 +45,26 @@ urlinfo_t *parse_url(char *url)
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  //find the first backslash, and add one so that it is one character over.
+  // path = strchr(hostname, '/') + 1; 
+  char *c = strstr(hostname, "/"); 
+  //overwrite the backslash, so that anything after the backslash will be considered.
+  // *(path - 1) = NULL; 
+  path = c + 1; 
+  *c = '\0'; 
+  //repeat what you did for path but instead of / it will be : . 
+  // port = strchr(hostname, ":") + 1;
+  // *(port - 1) = NULL;
+  c = strstr(hostname, ":");
+  port = c + 1; 
+  *c = '\0'; 
+
+  urlinfo->path = path; 
+  urlinfo->port = port; 
+  urlinfo->hostname = hostname; 
 
   return urlinfo;
 }
-
 /**
  * Constructs and sends an HTTP request
  *
@@ -68,9 +81,28 @@ int send_request(int fd, char *hostname, char *port, char *path)
   char request[max_request_size];
   int rv;
 
+  char get[30]; 
+  char connection[30]; 
+  char host[30]; 
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
+  // int response_length = sprintf(get, host, connection, 
+  // "%s\n"
+  // "Host: %s:%s\n"
+  // "Connection: close\n"
+  // "\n",
+
+  // port,
+  // path, 
+  // );
+  sprintf(get, "GET /%s HTTP/1.1", path); 
+  sprintf(host, "Host: %s:%s", hostname, port);
+  sprintf(connection, "Connection: close"); 
+ 
+  unsigned long int request_length = sprintf(request, "%s\n%s\n%s\n\n", get, host, connection); 
+
+  rv = send(fd, request, request_length, 0); 
 
   return 0;
 }
@@ -92,7 +124,19 @@ int main(int argc, char *argv[])
     4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
     5. Clean up any allocated memory and open file descriptors.
   */
+    struct urlinfo_t *url = parse_url(argv[1]);
 
+    printf("%s", argv[1]); 
+
+    sockfd = get_socket(url->hostname, url->port); 
+
+    printf("%d", sockfd); 
+
+    send_request(sockfd, url->hostname, url->port, url->path); 
+
+    while((numbytes = recv(sockfd, buf, BUFSIZE-1, 0)) > 0){
+      fprintf(stdout, "%s\n", buf);
+    };
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
