@@ -69,7 +69,7 @@ urlinfo_t *parse_url(char *url)
   //   }
   // }
 
-  printf("null slash: %s\n", hostname);
+  // printf("null slash: %s\n", hostname);
 
   // path = &path[1];
   urlinfo->path = path;
@@ -100,7 +100,7 @@ urlinfo_t *parse_url(char *url)
 
   urlinfo->hostname = hostname;
 
-  printf("%s, %s, %s\n", urlinfo->hostname, urlinfo->port, urlinfo->path);
+  // printf("%s, %s, %s\n", urlinfo->hostname, urlinfo->port, urlinfo->path);
 
 
   ///////////////////
@@ -131,7 +131,7 @@ int send_request(int fd, char *hostname, char *port, char *path)
   // Host: hostname:port
   // Connection: close
 
-  int request_length = sprintf(request, "GET /%s HTTP/1.1\nHost: %s:%s\nConnection: close\n", path, hostname, port);
+  int request_length = sprintf(request, "GET /%s HTTP/1.1\nHost: %s:%s\nConnection: close\n\n", path, hostname, port);
 
   // printf("request:\n%s\n", request);
   // send will return -1 on error, number of chars send if successful
@@ -142,8 +142,8 @@ int send_request(int fd, char *hostname, char *port, char *path)
     exit(1);
   }
 
-  // printf("request_length: %d\n", request_length);
-  printf("rv: %d\n", rv);
+  // // printf("request_length: %d\n", request_length);
+  // printf("rv: %d\n", rv);
 
   ///////////////////
   // IMPLEMENT ME! //
@@ -179,7 +179,7 @@ int main(int argc, char *argv[])
   send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
 
   while((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0){
-    printf("%d\n", numbytes);
+    // printf("%d\n", numbytes);
     // print the data to stdout
     // printf("Receiving...\n");
     printf("%s\n", buf);
@@ -195,7 +195,7 @@ int main(int argc, char *argv[])
   free(urlinfo->path);
   free(urlinfo);
 
-  printf("numbytes: %d\n", numbytes);
+  // printf("numbytes: %d\n", numbytes);
 
   ///////////////////
   // IMPLEMENT ME! //
