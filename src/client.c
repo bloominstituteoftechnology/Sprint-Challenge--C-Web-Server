@@ -46,14 +46,25 @@ urlinfo_t *parse_url(char *url)
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
 
-  // localhost:3490/d20
+
   ptr = strchr(hostname,'/');
-  path = ptr + 1;
-  *ptr = '\0';
+
+  if (ptr == NULL){
+    path = "/";
+  } else {
+    path = ptr + 1;
+    *ptr = '\0'; 
+  }
+
 
   ptr = strchr(hostname, ':');
-  port = ptr + 1;
-  *ptr = '\0';
+  if(ptr == NULL){
+    port = "80";
+  } else {
+    port = ptr + 1;
+    *ptr = '\0';  
+  }
+  
 
   urlinfo->hostname = hostname;
   urlinfo->path = path;
@@ -62,7 +73,6 @@ urlinfo_t *parse_url(char *url)
 
   return urlinfo;
 }
-
 /**
  * Constructs and sends an HTTP request
  *
