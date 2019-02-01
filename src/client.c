@@ -53,29 +53,40 @@ urlinfo_t *parse_url(char *url)
   if (strstr(url, "http://")) {
     // If URL contains 'http://'
     hostname = strdup(url + 7);
-    printf("hostname -> %s\n", hostname);
   } else if (strstr(url, "https://")) {
     // If URL contains 'https://'
     hostname = strdup(url + 8);
-    printf("hostname -> %s\n", hostname);
   } else {
     // If URL does not contain any HTTP
     hostname = strdup(url);
-    printf("hostname -> %s\n", hostname);
   }
 
   // Set the path
-  path = "/";
-  printf("path -> %s\n", path);
+  // If the hostname contains a /, set the path = /
+  if (strchr(hostname, '/')) {
+    path = strchr(hostname, '/') + 1;
 
-  char buffer[3];
+    *(path - 1) = NULL;
+  } else {
+    path = '/';
+  }
 
-  sprintf(buffer, "%i", 80);
+  // Set the port
+  // If the hostname contains a :, set the port to the number after
+  if (strchr(hostname, ':')) {
+    port = strchr(hostname, ':') + 1;
 
-  port = buffer;
-  printf("port -> %d\n", port);
+    *(port - 1) = NULL;
+  } else {
+    char buffer[3];
 
-  urlinfo->hostname = strdup(hostname);
+    sprintf(buffer, "%i", 80);
+
+    port = buffer;
+  }
+
+  // Set the properties in the urlinfo
+  urlinfo->hostname = hostname;
   urlinfo->path = strdup(path);
   urlinfo->port = strdup(port);
 
@@ -147,6 +158,7 @@ int main(int argc, char *argv[])
   // Send the request
   send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
 
+  // Print the response from the server
   while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
     printf("%s", buf);
   }
