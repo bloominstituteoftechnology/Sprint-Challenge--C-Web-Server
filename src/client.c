@@ -102,6 +102,17 @@ int send_request(int fd, char *hostname, char *port, char *path)
   // IMPLEMENT ME! //
   ///////////////////
 
+  // Set the request length
+  int request_length = sprintf(request, "GET /%s HTTP/1.1: %s%s\nConnection:close\n\n", path, hostname, port);
+
+  // Send the request
+  rv = send(fd, request, request_length, 0);
+
+  // If returned error, send error
+  if (rv < 0) {
+    perror("send");
+  }
+
   return 0;
 }
 
@@ -132,6 +143,13 @@ int main(int argc, char *argv[])
 
   // Initialize a socket
   sockfd = get_socket(urlinfo->hostname, urlinfo->port);
+
+  // Send the request
+  send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
+
+  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
+    printf("%s", buf);
+  }
 
   return 0;
 }
