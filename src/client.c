@@ -107,6 +107,7 @@ int send_request(int fd, char *hostname, char *port, char *path)
 {
   const int max_request_size = 16384;
   char request[max_request_size];
+  int request_length;
   int rv;
 
   ///////////////////
@@ -114,7 +115,13 @@ int send_request(int fd, char *hostname, char *port, char *path)
   ///////////////////
 
   // Set the request length
-  int request_length = sprintf(request, "GET /%s HTTP/1.1: %s%s\nConnection:close\n\n", path, hostname, port);
+  request_length = sprintf(
+    request,
+    "GET /%s HTTP/1.1\nHost: %s:%s\nConnection:close\n\n",
+    path,
+    hostname,
+    port
+  );
 
   // Send the request
   rv = send(fd, request, request_length, 0);
@@ -125,18 +132,6 @@ int send_request(int fd, char *hostname, char *port, char *path)
   }
 
   return 0;
-}
-
-/**
- * Frees the memory of the urlinfo
- *
- * urlinfo:       The urlinfo_t struct to free
-*/
-void free_url(urlinfo_t *urlinfo) {
-  free(urlinfo->hostname);
-  free(urlinfo->path);
-  free(urlinfo->port);
-  free(urlinfo);
 }
 
 int main(int argc, char *argv[])
