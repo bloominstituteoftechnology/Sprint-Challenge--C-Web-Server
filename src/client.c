@@ -81,11 +81,16 @@ int send_request(int fd, char *hostname, char *port, char *path)
   const int max_request_size = 16384;
   char request[max_request_size];
   int rv;
-
+  int socket;
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
 
+  //request
+  sprintf(request,"GET /%s HTTP/1.1\nHost: %s:%s\nConnection: close",path,hostname,port);
+
+  //request send
+  send(fd,request,strlen(request),0);
   return 0;
 }
 
@@ -107,9 +112,16 @@ int main(int argc, char *argv[])
     5. Clean up any allocated memory and open file descriptors.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  urlinfo_t *urlinfo = parse_url(argv[1]);
+  sockfd = get_socket(urlinfo->hostname,urlinfo->port);
+  send_request(sockfd,urlinfo->hostname,urlinfo->port,urlinfo->path);
+  
+  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
+    printf("%s\n",buf);
+  }
+
+  close(sockfd);
+  free(urlinfo);
 
   return 0;
 }
