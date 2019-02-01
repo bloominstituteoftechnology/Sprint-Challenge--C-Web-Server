@@ -90,7 +90,10 @@ int send_request(int fd, char *hostname, char *port, char *path)
   int rv;
 
   sprintf(request, "GET %s HTTP/1.1\nHost: %s:%s\nConnection: close", path, hostname, port);
+  // printf("request configured:\n");
+  // printf("%s", request);
   rv = send(fd, request, max_request_size, 0);
+
 
   return rv;
 }
@@ -119,7 +122,7 @@ int main(int argc, char *argv[])
   send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
 
   while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
-    printf("%d", numbytes);
+    printf("%s", buf);
   }
 
   return 0;
