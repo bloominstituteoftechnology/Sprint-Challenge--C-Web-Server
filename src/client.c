@@ -31,6 +31,7 @@ urlinfo_t *parse_url(char *url)
   char *hostname = strdup(url);
   char *port;
   char *path;
+  char *ptr;
 
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
 
@@ -52,7 +53,7 @@ urlinfo_t *parse_url(char *url)
 
   ptr = strchr(hostname, ':');
   port = ptr + 1;
-  *ptr = '\0'
+  *ptr = '\0';
 
   urlinfo->hostname = hostname;
   urlinfo->path = path;
@@ -106,12 +107,15 @@ int main(int argc, char *argv[])
   */
   
   urlinfo_t *urlinfo = parse_url(argv[1]);
-  sockfd = get_socket(url->hostname,url->port);
-  send_request(sockfd,url->hostname,url->port,url->path);
+  sockfd = get_socket(urlinfo->hostname,urlinfo->port);
+  send_request(sockfd,urlinfo->hostname,urlinfo->port,urlinfo->path);
   
   while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
     printf("%s\n",buf);
   }
+
+  close(sockfd);
+  free(urlinfo);
 
   return 0;
 }
