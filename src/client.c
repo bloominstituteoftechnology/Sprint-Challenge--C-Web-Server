@@ -48,12 +48,32 @@ urlinfo_t *parse_url(char *url)
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
+  char *duplicate1 = strdup(url);
+  char *duplicate2 = strdup(url);
+  duplicate1[7] = '\0';
+  duplicate2[8] = '\0';
+  char *p = hostname;
+  if(!strcmp(duplicate1, "http://")){
+    hostname += 7;
+    hostname = strdup(hostname);
+    free(p);
+  }else if(!strcmp(duplicate2, "https://")){
+    hostname += 8;
+    hostname = strdup(hostname);
+    free(p);
+  }
+  free(duplicate1);
+  free(duplicate2);
   path = strchr(hostname, '/');
   *path = '\0';
   path++;
   port = strchr(hostname, ':');
-  *port = '\0';
-  port++;
+  if(port == NULL){
+    port = "80";
+  }else{
+    *port = '\0';
+    port++;
+  }
 
   urlinfo->hostname = hostname;
   urlinfo->port = port;
@@ -121,20 +141,15 @@ int main(int argc, char *argv[])
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
-  printf("Checkpoint %d\n", 0);
   urlinfo_t *urlinfo = parse_url(argv[1]);
-  printf("Checkpoint %d\n", 1);
   sockfd = get_socket(urlinfo->hostname, urlinfo->port);
-  printf("Checkpoint %d\n", 2);
   int srr = send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
-  printf("Checkpoint %d\n", 3);
   while((numbytes = recv(sockfd, buf, BUFSIZE-1, 0)) > 0){
-    printf("Checkpoint %d\n", 4);
+
     fprintf(stdout, "%s\n", buf);
   }
   free(urlinfo->hostname);
   free(urlinfo);
   close(sockfd);
-  printf("Checkpoint %d\n", 5);
   return 0;
 }
