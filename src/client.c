@@ -149,10 +149,7 @@ int main(int argc, char *argv[])
   */
 
   // printf("%s\n", argv[1]);
-  urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
-
-  urlinfo = parse_url(argv[1]);
-  // parse_url(argv[1]);
+  urlinfo_t *urlinfo = parse_url(argv[1]);
 
   sockfd = get_socket(urlinfo->hostname, urlinfo->port);
   // printf("sockfd: %d\n", sockfd);
@@ -166,6 +163,23 @@ int main(int argc, char *argv[])
   }
 
   close(sockfd);
+  
+  urlinfo->port = NULL;
+  free(urlinfo->port);
+  urlinfo->hostname = NULL;
+  free(urlinfo->hostname);
+  urlinfo->path =NULL;
+  free(urlinfo->path);
+  free(urlinfo);
+
+  sockfd = NULL;
+  free(sockfd);
+
+  numbytes = NULL;
+  free(numbytes);
+  
+  buf[BUFSIZE] = NULL;
+  free(buf[BUFSIZE]);
 
   // printf("numbytes: %d\n", numbytes);
 
