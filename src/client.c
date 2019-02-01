@@ -89,9 +89,9 @@ int send_request(int fd, char *hostname, char *port, char *path)
   char request[max_request_size];
   int rv;
 
-  sprintf(request, "GET %s HTTP/1.1\nHost: %s:%s\nConnection: close", path, hostname, port);
-  // printf("request configured:\n");
-  // printf("%s", request);
+  sprintf(request, "GET %s HTTP/1.1\nHost: %s:%s\nConnection: close\n", path, hostname, port);
+  printf("request configured:\n");
+  printf("%s\n", request);
   rv = send(fd, request, max_request_size, 0);
 
 
