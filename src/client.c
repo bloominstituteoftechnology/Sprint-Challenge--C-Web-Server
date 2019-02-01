@@ -83,6 +83,24 @@ int send_request(int fd, char *hostname, char *port, char *path)
   // IMPLEMENT ME! //
   ///////////////////
 
+
+  // GET /path HTTP/1.1
+  // Host: hostname:port
+  // Connection: close
+  
+  int r_len = sprintf(
+    request,
+    "GET /%s HTTP/1.1\n"
+    "HOST: %s:%s\n"
+    "Connection: close\n"
+    '\n',
+    path,
+    hostname,
+    port
+  );
+
+  rv = send(fd, request, r_len, 0);
+
   return 0;
 }
 
