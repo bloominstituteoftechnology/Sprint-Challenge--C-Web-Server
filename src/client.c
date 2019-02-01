@@ -116,11 +116,9 @@ int main(int argc, char *argv[])
     fprintf(stdout, buf);
   }
   // 5. Clean up any allocated memory and open file descriptors.
-
-
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  free(input->hostname);
+  free(input);
+  close(sockfd);
 
   return 0;
 }
