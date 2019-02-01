@@ -44,10 +44,23 @@ urlinfo_t *parse_url(char *url)
     5. Set the port pointer to 1 character after the spot returned by strchr.
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
+  if (strstr(url, "https://")){
+    hostname = strdup(url + 8);
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  } else if (strstr(url, "http://")){
+    hostname = strdup(url + 7);
+  } else {
+    hostname = strdup(url);
+  }
+  
+  char *backslash=strchr(hostname, '/');
+  if (backslash){
+    path = backslash + 1;
+    *backslash='\0';
+
+  } else {
+    path ="/";
+  }
 
   return urlinfo;
 }
