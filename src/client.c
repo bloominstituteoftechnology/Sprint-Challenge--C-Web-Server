@@ -61,20 +61,8 @@ urlinfo_t *parse_url(char *url)
   } else {
     path = "";
   }
-  // printf("path: %s\n", path);
 
-  // for(int i = 0; i < strlen(hostname); i++){
-  //   if(hostname[i] == '/'){
-  //     hostname[i] = '\0';
-  //   }
-  // }
-
-  // printf("null slash: %s\n", hostname);
-
-  // path = &path[1];
   urlinfo->path = path;
-  // printf("path no slash: %s\n", path);
-  // printf("struct path: %s\n", urlinfo->path);
 
   if(strchr(hostname, ':')){
     port = strchr(hostname, ':') + 1;
@@ -83,20 +71,7 @@ urlinfo_t *parse_url(char *url)
     port = "80";
   }
 
-  // port = strchr(hostname, ':');
-  // printf("port: %s\n", port);
-  // port = &port[1];
-  // printf("port no colon: %s\n", port);
-
   urlinfo->port = port;
-
-  // for(int i = 0; i < strlen(hostname); i++){
-  //   if(hostname[i] == ':'){
-  //     hostname[i] = '\0';
-  //   }
-  // }
-
-  // printf("hostname: %s\n", url);
 
   urlinfo->hostname = hostname;
 
@@ -133,7 +108,6 @@ int send_request(int fd, char *hostname, char *port, char *path)
 
   int request_length = sprintf(request, "GET /%s HTTP/1.1\nHost: %s:%s\nConnection: close\n\n", path, hostname, port);
 
-  // printf("request:\n%s\n", request);
   // send will return -1 on error, number of chars send if successful
   rv = send(fd, request, request_length, 0);
 
@@ -142,11 +116,8 @@ int send_request(int fd, char *hostname, char *port, char *path)
     exit(1);
   }
 
-  // // printf("request_length: %d\n", request_length);
-  // printf("rv: %d\n", rv);
-
   ///////////////////
-  // IMPLEMENT ME! //
+  //   COMPLETE!   //
   ///////////////////
 
   return rv;
@@ -170,18 +141,13 @@ int main(int argc, char *argv[])
     5. Clean up any allocated memory and open file descriptors.
   */
 
-  // printf("%s\n", argv[1]);
   urlinfo_t *urlinfo = parse_url(argv[1]);
 
   sockfd = get_socket(urlinfo->hostname, urlinfo->port);
-  // printf("sockfd: %d\n", sockfd);
 
   send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
 
   while((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0){
-    // printf("%d\n", numbytes);
-    // print the data to stdout
-    // printf("Receiving...\n");
     printf("%s\n", buf);
   }
 
@@ -195,10 +161,8 @@ int main(int argc, char *argv[])
   free(urlinfo->path);
   free(urlinfo);
 
-  // printf("numbytes: %d\n", numbytes);
-
   ///////////////////
-  // IMPLEMENT ME! //
+  //   COMPLETE!   //
   ///////////////////
 
   return 0;
