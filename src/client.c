@@ -45,8 +45,44 @@ urlinfo_t *parse_url(char *url)
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
 
+  path = strchr(url, '/');
+  // printf("path: %s\n", path);
+
+  for(int i = 0; i < strlen(url); i++){
+    if(url[i] == '/'){
+      url[i] = '\0';
+    }
+  }
+
+  // printf("null slash: %s\n", url);
+
+  path = &path[1];
+  urlinfo->path = path;
+  // printf("path no slash: %s\n", path);
+  // printf("struct path: %s\n", urlinfo->path);
+
+  port = strchr(url, ':');
+  // printf("port: %s\n", port);
+  port = &port[1];
+  // printf("port no colon: %s\n", port);
+
+  urlinfo->port = port;
+
+  for(int i = 0; i < strlen(url); i++){
+    if(url[i] == ':'){
+      url[i] = '\0';
+    }
+  }
+
+  // printf("hostname: %s\n", url);
+
+  urlinfo->hostname = url;
+
+  // printf("%s, %s, %s\n", urlinfo->hostname, urlinfo->port, urlinfo->path);
+
+
   ///////////////////
-  // IMPLEMENT ME! //
+  //   COMPLETE!   //
   ///////////////////
 
   return urlinfo;
@@ -68,11 +104,30 @@ int send_request(int fd, char *hostname, char *port, char *path)
   char request[max_request_size];
   int rv;
 
+  // EXAMPLE REQUEST //
+  // GET /path HTTP/1.1
+  // Host: hostname:port
+  // Connection: close
+
+  int request_length = sprintf(request, "GET /%s HTTP/1.1\nHost: %s:%s\nConnection: close\n", path, hostname, port);
+
+  // printf("request:\n%s\n", request);
+  // send will return -1 on error, number of chars send if successful
+  rv = send(fd, request, request_length, 0);
+
+  if(rv < 0){
+    fprintf(stderr, "No data received from request.\n");
+    exit(1);
+  }
+
+  // printf("request_length: %d\n", request_length);
+  // printf("rv: %d\n", rv);
+
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
 
-  return 0;
+  return rv;
 }
 
 int main(int argc, char *argv[])
@@ -92,6 +147,28 @@ int main(int argc, char *argv[])
     4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
     5. Clean up any allocated memory and open file descriptors.
   */
+
+  // printf("%s\n", argv[1]);
+  urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
+
+  urlinfo = parse_url(argv[1]);
+  // parse_url(argv[1]);
+
+  sockfd = get_socket(urlinfo->hostname, urlinfo->port);
+  // printf("sockfd: %d\n", sockfd);
+
+  numbytes = send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
+
+  while((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0){
+    // print the data to stdout
+    // printf("Receiving...\n");
+    printf("%s\n", buf);
+  }
+
+  close(sockfd);
+
+  // printf("numbytes: %d\n", numbytes);
+
 
   ///////////////////
   // IMPLEMENT ME! //
