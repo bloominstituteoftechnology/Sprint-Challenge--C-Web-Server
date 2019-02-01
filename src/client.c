@@ -71,6 +71,11 @@ urlinfo_t *parse_url(char *url)
 
   }
   
+  urlinfo->hostname = hostname;
+  urlinfo->port= port;
+  urlinfo->path= path;
+
+  
 
   return urlinfo;
 }
