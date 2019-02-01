@@ -28,26 +28,55 @@ typedef struct urlinfo_t {
 urlinfo_t *parse_url(char *url)
 {
   // copy the input URL so as not to mutate the original
-  char *hostname = strdup(url);
+  char *dup_url = strdup(url);
+  char *colon;
+  char *slash;
+  char *hostname;
   char *port;
   char *path;
+  char *p;
 
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
 
-  /*
-    We can parse the input URL by doing the following:
+  p = strstr(dup_url, "http://");
+  if (p != NULL)
+  {
+    hostname = strdup(&p[7]);
+  }
+  else
+  {
+    p = strstr(dup_url, "https://");
+    if (p != NULL)
+    {
+      hostname = strdup(&p[8]);
+    }
+    else {
+      hostname = strdup(dup_url);
+    }
+  }
 
-    1. Use strchr to find the first backslash in the URL (this is assuming there is no http:// or https:// in the URL).
-    2. Set the path pointer to 1 character after the spot returned by strchr.
-    3. Overwrite the backslash with a '\0' so that we are no longer considering anything after the backslash.
-    4. Use strchr to find the first colon in the URL.
-    5. Set the port pointer to 1 character after the spot returned by strchr.
-    6. Overwrite the colon with a '\0' so that we are just left with the hostname.
-  */
+  colon = strchr(hostname, ':');
+  if (colon)
+  {
+    port = colon + 1;
+    *colon = '\0';
+    slash = strchr(port, '/');
+  }
+  else
+  {
+    port = "80";
+    slash = strchr(hostname, '/');
+  }
+  
+  path = slash + 1;
+  *slash = '\0';
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  urlinfo->hostname = strdup(hostname);
+  urlinfo->port = strdup(port);
+  urlinfo->path = strdup(path);
+
+  free(dup_url);
+  free(hostname);
 
   return urlinfo;
 }
@@ -68,34 +97,101 @@ int send_request(int fd, char *hostname, char *port, char *path)
   char request[max_request_size];
   int rv;
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  // Build HTTP request and store it in request
+  int request_length = sprintf(request,
+    "GET /%s HTTP/1.1\nHost: %s:%s\nConnection: close\n\n",
+    path,
+    hostname,
+    port
+  );
 
-  return 0;
+  // Send it all!
+  rv = send(fd, request, request_length, 0);
+
+  if (rv < 0) {
+      perror("send");
+  }
+
+  return rv;
 }
 
 int main(int argc, char *argv[])
 {  
   int sockfd, numbytes;  
   char buf[BUFSIZE];
+  char *url;
+  char res_status_code[3];
 
   if (argc != 2) {
     fprintf(stderr,"usage: client HOSTNAME:PORT/PATH\n");
     exit(1);
   }
 
-  /*
-    1. Parse the input URL
-    2. Initialize a socket by calling the `get_socket` function from lib.c
-    3. Call `send_request` to construct the request and send it
-    4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
-    5. Clean up any allocated memory and open file descriptors.
-  */
+  //Parse the input URL
+  url = argv[1];
+  urlinfo_t *urlinfo = parse_url(url);
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  // Initialize a socket by calling the `get_socket` function from lib.c
+  sockfd = get_socket(urlinfo->hostname, urlinfo->port);
+
+  // Call `send_request` to construct the request and send it
+  send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
+
+  // Call `recv` in a loop until there is no more data to receive from the server.
+  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
+    // print the data we got back to stdout
+    fprintf(stdout, "%s\n", buf);
+  }
+
+
+  // Read the three components of the first response line
+  char *location;
+  location = strstr(buf, "Location: ");
+  sscanf(buf, "%*s %s", res_status_code);
+
+  // If status code is 301, get the redirect link and issue another request for the correct location
+  if (strcmp(res_status_code, "301") == 0)
+  {
+    char *space, *new_line, *redirect_url;
+    space = strchr(location, ' ');
+    redirect_url = space + 1;
+    *space = '\0';
+    new_line = strchr(redirect_url, '\n');
+    *new_line = '\0';
+
+    // Clean up any allocated memory
+    if (urlinfo->hostname) free(urlinfo->hostname);
+    if (urlinfo->port) free(urlinfo->port);
+    if (urlinfo->path) free(urlinfo->path);
+    if (urlinfo) free(urlinfo);
+
+    // Close file descriptor
+    close(sockfd);
+
+    // Parse the new redirected URL
+    urlinfo = parse_url(redirect_url);
+
+    // Initialize a socket by calling the `get_socket` function from lib.c
+    sockfd = get_socket(urlinfo->hostname, urlinfo->port);
+
+    // Call `send_request` to construct the request and send it
+    send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
+
+    // Call `recv` in a loop until there is no more data to receive from the server.
+    while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
+      // print the data we got back to stdout
+      fprintf(stdout, "%s\n", buf);
+    }
+  }
+
+  // Clean up any allocated memory
+  if (urlinfo->hostname) free(urlinfo->hostname);
+  if (urlinfo->port) free(urlinfo->port);
+  if (urlinfo->path) free(urlinfo->path);
+  if (urlinfo) free(urlinfo);
+
+  // Close file descriptor
+  close(sockfd);
 
   return 0;
 }
