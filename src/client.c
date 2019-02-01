@@ -34,6 +34,24 @@ urlinfo_t *parse_url(char *url)
 
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
 
+  if (strncmp(url, "http://", 7) == 0)
+  {
+    hostname = hostname + 7;
+  }
+  if (strncmp(url, "https://", 8) == 0)
+  {
+    hostname = hostname + 8;
+  }
+
+  path = strchr(hostname, '/');
+  * path  = '\0';  
+  urlinfo->path = path + 1;
+
+  port = strchr(hostname, ":");
+  * port  = '\0';  
+  urlinfo->port = port + 1;
+
+
   /*
     We can parse the input URL by doing the following:
 
