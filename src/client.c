@@ -44,10 +44,14 @@ urlinfo_t *parse_url(char *url)
     5. Set the port pointer to 1 character after the spot returned by strchr.
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
+  path = strdup(strstr(hostname, "/") + 1);
+  hostname[strlen(hostname) - strlen(path) - 1] = '\0';
+  port = strdup(strstr(hostname, ":") + 1);
+  hostname[strlen(hostname) - strlen(port) - 1] = '\0';
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  urlinfo->path = path;
+  urlinfo->port = port;
+  urlinfo->hostname = hostname;
 
   return urlinfo;
 }
@@ -76,8 +80,8 @@ int send_request(int fd, char *hostname, char *port, char *path)
 }
 
 int main(int argc, char *argv[])
-{  
-  int sockfd, numbytes;  
+{
+  int sockfd, numbytes;
   char buf[BUFSIZE];
 
   if (argc != 2) {
