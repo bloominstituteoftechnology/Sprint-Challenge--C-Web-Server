@@ -91,25 +91,31 @@ int main(int argc, char *argv[])
   int sockfd, numbytes;  
   char buf[BUFSIZE];
 
-  printf("\n");
   char *url = "localhost:3490/d20";
-  urlinfo_t *st = parse_url(url);
-  send_request(1, st->hostname, st->port, st->path);
 
-  printf("\n");
+  // if (argc != 2) {
+  //   fprintf(stderr,"usage: client HOSTNAME:PORT/PATH\n");
+  //   exit(1);
+  // }
 
-  if (argc != 2) {
-    fprintf(stderr,"usage: client HOSTNAME:PORT/PATH\n");
+
+  // 1. Parse the input URL
+  urlinfo_t *input = parse_url(url);
+  // 2. Initialize a socket by calling the `get_socket` function from lib.c
+  sockfd = get_socket(input->hostname, input->port);
+
+  if (sockfd < 0) {
+    fprintf(stderr, "webserver: fatal error getting listening socket\n");
     exit(1);
   }
 
-  /*
-    1. Parse the input URL
-    2. Initialize a socket by calling the `get_socket` function from lib.c
-    3. Call `send_request` to construct the request and send it
-    4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
-    5. Clean up any allocated memory and open file descriptors.
-  */
+  printf("client: requesting connection to port %s...\n", input->port);
+
+  // 3. Call `send_request` to construct the request and send it
+  send_request(sockfd, input->hostname, input->port, input->path);
+  // 4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
+  // 5. Clean up any allocated memory and open file descriptors.
+
 
   ///////////////////
   // IMPLEMENT ME! //
