@@ -38,10 +38,11 @@ urlinfo_t *parse_url(char *url)
   if ( strstr(hostname, "https://") ) {
     printf("We found an HTTPS\n");    
     hostname += 8;
-    printf("%s", hostname);
+    printf("%s\n", hostname);
   } else if ( strstr(hostname, "http://") ) {
-    printf("We found an HTTP\n");
+    printf("We found an HTTP\n");    
     hostname += 7;
+    printf("%s\n", hostname);
   } else {
     printf("We found a REGULAR URL\n");
     hostname = strdup(url);
@@ -149,7 +150,7 @@ int main(int argc, char *argv[])
   send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
 
   while ( (numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0 ) {
-    printf("%s", buf);
+    printf("%s\n", buf);
   }
   
   close(sockfd);
