@@ -58,6 +58,7 @@ urlinfo_t *parse_url(char *url)
   urlinfo->hostname = hostname;
   urlinfo->path = path;
   urlinfo->port = port;
+  // printf("URLINFO:\n%s\n%s\n%s\n",hostname,path,port );
 
   return urlinfo;
 }
@@ -80,12 +81,11 @@ int send_request(int fd, char *hostname, char *port, char *path)
   int socket;
 
   //Construct request
-  sprintf(request,"GET /%s HTTP/1.1\nHost: %s:%s\nConnection: close",path,hostname,port);
-
+  sprintf(request,"GET /%s HTTP/1.1\nHost: %s:%s\nConnection: close\n\n",path,hostname,port);
   //send request
-  send(fd,request,strlen(request),0);
+  rv = send(fd,request,strlen(request),0);
 
-  return 0;
+  return rv;
 }
 
 int main(int argc, char *argv[])
@@ -108,6 +108,7 @@ int main(int argc, char *argv[])
   
   urlinfo_t *urlinfo = parse_url(argv[1]);
   sockfd = get_socket(urlinfo->hostname,urlinfo->port);
+  
   send_request(sockfd,urlinfo->hostname,urlinfo->port,urlinfo->path);
   
   while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
