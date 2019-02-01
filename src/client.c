@@ -28,7 +28,17 @@ typedef struct urlinfo_t {
 urlinfo_t *parse_url(char *url)
 {
   // copy the input URL so as not to mutate the original
-  char *hostname = strdup(url);
+  char *hostname;
+
+  // handles http and https by offsetting string by # of chars
+  if(strstr(url, "http://")){
+    hostname = strdup(url+7);
+  } else if (strstr(url, "https://")){
+    hostname = strdup(url+8);
+  } else {
+    hostname = strdup(url);
+  }
+
   char *port;
   char *path;
 
@@ -45,12 +55,12 @@ urlinfo_t *parse_url(char *url)
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
 
-  path = strchr(url, '/');
+  path = strchr(hostname, '/');
   // printf("path: %s\n", path);
 
-  for(int i = 0; i < strlen(url); i++){
-    if(url[i] == '/'){
-      url[i] = '\0';
+  for(int i = 0; i < strlen(hostname); i++){
+    if(hostname[i] == '/'){
+      hostname[i] = '\0';
     }
   }
 
@@ -61,24 +71,24 @@ urlinfo_t *parse_url(char *url)
   // printf("path no slash: %s\n", path);
   // printf("struct path: %s\n", urlinfo->path);
 
-  port = strchr(url, ':');
+  port = strchr(hostname, ':');
   // printf("port: %s\n", port);
   port = &port[1];
   // printf("port no colon: %s\n", port);
 
   urlinfo->port = port;
 
-  for(int i = 0; i < strlen(url); i++){
-    if(url[i] == ':'){
-      url[i] = '\0';
+  for(int i = 0; i < strlen(hostname); i++){
+    if(hostname[i] == ':'){
+      hostname[i] = '\0';
     }
   }
 
   // printf("hostname: %s\n", url);
 
-  urlinfo->hostname = url;
+  urlinfo->hostname = hostname;
 
-  // printf("%s, %s, %s\n", urlinfo->hostname, urlinfo->port, urlinfo->path);
+  printf("%s, %s, %s\n", urlinfo->hostname, urlinfo->port, urlinfo->path);
 
 
   ///////////////////
@@ -168,12 +178,11 @@ int main(int argc, char *argv[])
   free(urlinfo->port);
   urlinfo->hostname = NULL;
   free(urlinfo->hostname);
-  urlinfo->path =NULL;
+  urlinfo->path = NULL;
   free(urlinfo->path);
   free(urlinfo);
 
   // printf("numbytes: %d\n", numbytes);
-
 
   ///////////////////
   // IMPLEMENT ME! //
