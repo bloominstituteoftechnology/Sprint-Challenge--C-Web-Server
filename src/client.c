@@ -52,8 +52,8 @@ urlinfo_t *parse_url(char *url)
     *(path - 1) = NULL;
     // path++; // --> Return it back to what it was originally pointing at
   } else {
-    fprintf(stderr, "Hostname + / == NULL\n");
-    exit(1);
+    printf("HOSTNAME + / == ELSE\n");
+    path = "/";
   }
 
 // 4. Use strchr to find the first colon in the URL.
@@ -64,14 +64,17 @@ urlinfo_t *parse_url(char *url)
     *(port - 1) = NULL;
     // port++; // --> Return it back to what it was originally pointing at
   } else {
-    fprintf(stderr, "HOSTNAME + : == NULL\n");
-    exit(1);
+    printf("HOSTNAME + : == ELSE\n");
+// Using this to handle the conversion warning
+    char port_buffer[5];
+    sprintf(port_buffer, "%i", 80);
+    port = port_buffer;
   }
 
 // * Store hostname, path, and port in a urlinfo_t struct and return the struct.
   urlinfo->hostname = hostname;
-  urlinfo->path = path;
-  urlinfo->port = port;
+  urlinfo->path = strdup(path);
+  urlinfo->port = strdup(port);
 
     
 
@@ -145,10 +148,11 @@ int main(int argc, char *argv[])
   while ( (numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0 ) {
     printf("%s", buf);
   }
-
-  // free(urlinfo->hostname);
-  // free(urlinfo->port);
-  // free(urlinfo->path);
+  
+  close(sockfd);
+  free(urlinfo->hostname);
+  free(urlinfo->port);
+  free(urlinfo->path);
   free(urlinfo);
 
   return 0;
