@@ -95,7 +95,7 @@ int send_request(int fd, char *hostname, char *port, char *path)
   ///////////////////
 
   // Create request
-  int request_length = sprintf(request, "GET /%s HTTP/1.1 \nHost: %s%s \nConnection: close\n",
+  int request_length = sprintf(request, "GET /%s HTTP/1.1 \nHost: %s%s \nConnection: close\n\n",
                                path, hostname,
                                port);
 
