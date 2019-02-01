@@ -99,9 +99,9 @@ The steps that your client will need to execute are the following:
 
    * You can use the `strchr` function to look for specific characters in a
      string. You can also use the `strstr` function to look for specific
-     substrings in a string. 
+     substrings in a string.
 
-2. Construct the HTTP request. 
+2. Construct the HTTP request.
    * Just like in the web server, use `sprintf` in order to construct the
      request from the `hostname`, `port`, and `path`. Requests should look like
      the following:
@@ -150,7 +150,7 @@ The steps that your client will need to execute are the following:
 6. Clean up.
 
    * Don't forget to `free` any allocated memory and `close` any open file
-     descriptors. 
+     descriptors.
 
 In your solution, it is essential that you follow best practices and produce
 clean and professional results. Schedule time to review, refine, and assess your
@@ -221,12 +221,12 @@ goals:
      the fact that oftentimes, URLs don't actually include the port number. In
      such cases, clients just assume a default port number of 80. Improve the
      URL parsing logic such that it can handle being passed a URL without a port
-     number, such as `www.google.com/`. 
+     number, such as `www.google.com/`.
 
    * Also improve the parsing logic so that it can receive URLs prepended with
      `http://` or `https://`. Such URLs should not be treated any differently by
      the client, you'll just need to strip them off the input URL so that they
-     don't become part of the hostname. 
+     don't become part of the hostname.
 
 2. Implement the ability for the client to follow redirects.
 
