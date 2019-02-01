@@ -55,10 +55,7 @@ urlinfo_t *parse_url(char *url)
   urlinfo->port = port;
 
   urlinfo->hostname = hostname;
-
-  printf("%s\n %s\n %s\n", urlinfo->hostname, urlinfo->path, urlinfo->port);
-
-
+ 
   /*
     We can parse the input URL by doing the following:
 
@@ -99,9 +96,8 @@ int send_request(int fd, char *hostname, char *port, char *path)
 
   int request_length = sprintf(request, "GET /%s HTTP/1.1\r\nHost %s:%s\r\nConnection: close\r\n\r\n", path, hostname, port );
 
-  printf("%s\n",request);
-  rv = send(fd, request, request_length, 0);
-  printf("%i\n",rv);
+ 
+  rv = send(fd, request, request_length, 0);  
   if (rv < 0) 
   {
     perror("send");
