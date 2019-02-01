@@ -48,7 +48,26 @@ urlinfo_t *parse_url(char *url)
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
+  char *placeholder = strstr(hostname, "://");
+  
+  // if http://present, move hostname pointer just after
+  if(placeholder != NULL) {
+      placeholder++;
+      hostname = placeholder;
+  }
+  
+  // set path and port
+  path = strchr(hostname, '/');
+  *path = '\0';
+  path++;
+  port = strchar(hostname, ':');
+  *port = '\0';
+  port++;
 
+  // set path, port, and hostname in urlinfo
+  urlinfo->hostname = strdup(hostname);
+  urlinfo->path = strdup(path);
+  urlinfo->port = strdup(port);
   return urlinfo;
 }
 
