@@ -90,7 +90,7 @@ int send_request(int fd, char *hostname, char *port, char *path)
   sprintf(request,"GET /%s HTTP/1.1\nHost: %s:%s\nConnection: close",path,hostname,port);
 
   //request send
-  send(fd,request,strlen(request),0);
+  rv = send(fd,request,strlen(request),0);
   return 0;
 }
 

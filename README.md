@@ -187,7 +187,7 @@ Your cURL client will receive a 2 when it satisfies the following:
    status code with all the HTML that makes up Google's homepage and print it
    all to `stdout`. The response header will look something like this:
 
-   
+   ```http
    HTTP/1.1 200 OK
    Date: Tue, 02 Oct 2018 18:44:13 GMT
    Expires: -1
@@ -202,7 +202,7 @@ Your cURL client will receive a 2 when it satisfies the following:
    Accept-Ranges: none
    Vary: Accept-Encoding
    Connection: close
-
+   ```
   
 
 ## Stretch Problems
