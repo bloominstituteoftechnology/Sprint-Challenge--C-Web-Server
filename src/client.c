@@ -49,6 +49,36 @@ urlinfo_t *parse_url(char *url)
   // IMPLEMENT ME! //
   ///////////////////
 
+  // Check the if the URL contains HTTP
+  if (strstr(url, "http://")) {
+    // If URL contains 'http://'
+    hostname = strdup(url + 7);
+    printf("hostname -> %s\n", hostname);
+  } else if (strstr(url, "https://")) {
+    // If URL contains 'https://'
+    hostname = strdup(url + 8);
+    printf("hostname -> %s\n", hostname);
+  } else {
+    // If URL does not contain any HTTP
+    hostname = strdup(url);
+    printf("hostname -> %s\n", hostname);
+  }
+
+  // Set the path
+  path = "/";
+  printf("path -> %s\n", path);
+
+  char buffer[3];
+
+  sprintf(buffer, "%i", 80);
+
+  port = buffer;
+  printf("port -> %d\n", port);
+
+  urlinfo->hostname = strdup(hostname);
+  urlinfo->path = strdup(path);
+  urlinfo->port = strdup(port);
+
   return urlinfo;
 }
 
@@ -76,8 +106,8 @@ int send_request(int fd, char *hostname, char *port, char *path)
 }
 
 int main(int argc, char *argv[])
-{  
-  int sockfd, numbytes;  
+{
+  int sockfd, numbytes;
   char buf[BUFSIZE];
 
   if (argc != 2) {
@@ -96,6 +126,8 @@ int main(int argc, char *argv[])
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
+
+  urlinfo_t *urlinfo = parse_url(argv[1]);
 
   return 0;
 }
