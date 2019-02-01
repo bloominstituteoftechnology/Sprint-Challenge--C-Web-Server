@@ -1,17 +1,17 @@
 Task List
 
--[ ] Parse the input URL;
-  -[ ] Server is able to handle URLs such as `localhost:3490/d20` and `www.google.com:80/`;
-  -[ ] Implement the `parse_url()` function;
-  -[ ]  use the `strchr` function to look for specific characters in a string;
--[ ] Construct the HTTP request;
-  -[ ] use `sprintf` in order to construct the request from the `hostname`, `port`, and `path`;
--[ ] Connect to the server;
-  -[ ] call the `get_socket()`;
--[ ] Send the request string down the socket;
--[ ] Receive the response from the server and print it to `stdout`;
--[ ]Clean up.
-  -[ ] `free` any allocated memory and `close` any open file descriptors.
+- [ ] Parse the input URL;
+  - [ ] Server is able to handle URLs such as `localhost:3490/d20` and `www.google.com:80/`;
+  - [ ] Implement the `parse_url()` function;
+  - [ ]  use the `strchr` function to look for specific characters in a string;
+- [ ] Construct the HTTP request;
+  - [ ] use `sprintf` in order to construct the request from the `hostname`, `port`, and `path`;
+- [ ] Connect to the server;
+  - [ ] call the `get_socket()`;
+- [ ] Send the request string down the socket;
+- [ ] Receive the response from the server and print it to `stdout`;
+- [ ]Clean up.
+  - [ ] `free` any allocated memory and `close` any open file descriptors.
 
 
 # Sprint Challenge: C Web Server Sprint
