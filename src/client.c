@@ -45,9 +45,18 @@ urlinfo_t *parse_url(char *url)
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  // localhost:3490/d20
+  ptr = strchr(hostname,'/');
+  path = ptr + 1;
+  *ptr = '\0';
+
+  ptr = strchr(hostname, ':');
+  port = ptr + 1;
+  *ptr = '\0'
+
+  urlinfo->hostname = hostname;
+  urlinfo->path = path;
+  urlinfo->port = port;
 
   return urlinfo;
 }
@@ -67,10 +76,14 @@ int send_request(int fd, char *hostname, char *port, char *path)
   const int max_request_size = 16384;
   char request[max_request_size];
   int rv;
+  int socket;
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  //Construct request
+  sprintf(request,"GET /%s HTTP/1.1\nHost: %s:%s\nConnection: close",path,hostname,port);
+
+  //Get socket
+  socket = get_socket(hostname, port);
+  send(socket,request,strlen(request),0);
 
   return 0;
 }
