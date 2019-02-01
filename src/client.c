@@ -172,15 +172,6 @@ int main(int argc, char *argv[])
   free(urlinfo->path);
   free(urlinfo);
 
-  sockfd = NULL;
-  free(sockfd);
-
-  numbytes = NULL;
-  free(numbytes);
-  
-  buf[BUFSIZE] = NULL;
-  free(buf[BUFSIZE]);
-
   // printf("numbytes: %d\n", numbytes);
 
 
