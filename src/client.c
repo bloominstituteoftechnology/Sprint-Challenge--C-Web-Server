@@ -34,6 +34,7 @@ urlinfo_t *parse_url(char *url)
 
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
 
+  printf("Inside parse_url method URL is %s\n", url);
   /*
     We can parse the input URL by doing the following:
 
@@ -45,11 +46,28 @@ urlinfo_t *parse_url(char *url)
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+	char *first_backslash = strchr(hostname, '/');
 
-  return urlinfo;
+	//first_backslash++;
+	path = first_backslash+1;
+	
+	printf("path is %s\n", path);
+	*first_backslash = '\0';
+	
+	// example localhost:3490/d20
+
+	char *first_colon = strchr(hostname, ':');
+	port = first_colon+1;
+
+	*first_colon = '\0';
+	printf("port is %s\n", port);
+
+
+	urlinfo->hostname = hostname;
+	urlinfo->port = port;
+	urlinfo->path = path;
+ 
+	return urlinfo;
 }
 
 /**
@@ -80,6 +98,8 @@ int main(int argc, char *argv[])
   int sockfd, numbytes;  
   char buf[BUFSIZE];
 
+  char *URL;  
+
   if (argc != 2) {
     fprintf(stderr,"usage: client HOSTNAME:PORT/PATH\n");
     exit(1);
@@ -93,9 +113,45 @@ int main(int argc, char *argv[])
     5. Clean up any allocated memory and open file descriptors.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+
+
+	//1. check if there is http:// or https:// in the URL
+	char *check_1 = strstr(argv[1], "http://");
+
+	char *check_2 = strstr(argv[1], "https://");
+	
+	if(check_1){
+		printf("http present\n");
+		check_1+=7;
+		URL = check_1;
+
+		printf("URL: %s\n", URL);
+		
+	}
+	else if(check_2){
+		printf("https present\n");
+		check_2+=8;
+		URL = check_2;
+		
+		printf("URL: %s\n", URL);
+	}
+	else{
+		 printf("No http or https present\n");
+		 URL = argv[1];
+		 printf("URL: %s\n", URL);
+	}	
+
+	//making a call to parse_url() to get hostname, port
+	urlinfo_t *url_info = parse_url(URL);
+	
+
+  	//2 Initialize a socket by calling the get_socket()
+	printf("url_info->hostname is %s ans url_info->port is %s\n", url_info->hostname, url_info->port);
+	sockfd = get_socket(url_info->hostname, url_info->port);
+	printf("socket_id is %d\n", sockfd);
+
+
+
 
   return 0;
 }
