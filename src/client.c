@@ -179,7 +179,7 @@ int main(int argc, char *argv[])
   close(sockfd);
 
   // Free the URL
-  free_url(urlinfo);
+  free(urlinfo);
 
   return 0;
 }
