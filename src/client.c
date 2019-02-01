@@ -22,7 +22,7 @@ typedef struct urlinfo_t {
  * Tokenize the given URL into hostname, path, and port.
  *
  * url: The input URL to parse.
- *
+ 
  
 */
 urlinfo_t *parse_url(char *url)
@@ -35,34 +35,34 @@ urlinfo_t *parse_url(char *url)
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));  
 
 // 0. First you want to handle if the url has a https:// or http:// || could just add the amount of strings to the hostname
-  if ( strstr(hostname, "https://") ) {
-    hostname += 8;
-    printf("%s", hostname);
-  } else if ( strstr(hostname, "http://") ) {
-    hostname += 7;
-  } else {
-    hostname = strdup(url);
-  }
+  // if ( strstr(hostname, "https://") ) {
+  //   hostname += 8;
+  //   printf("%s", hostname);
+  // } else if ( strstr(hostname, "http://") ) {
+  //   hostname += 7;
+  // } else {
+  //   hostname = strdup(url);
+  // }
 
 // 1. Use strchr to find the first backslash in the URL (this is assuming there is no http:// or https:// in the URL).
 // 2. Set the path pointer to 1 character after the spot returned by strchr. 
 // 3. Overwrite the backslash with a '\0' so that we are no longer considering anything after the forward-slash. 
-  if ( strchr(hostname, "/") != NULL ) {      
-    path = strchr(hostname, "/") + 1; // --> This is now POINTING to 1 char after the /   
-    *(path - 1) = "\0";
-    path++; // --> Return it back to what it was originally pointing at
+  if ( strstr(hostname, "/") ) {      
+    path = strstr(hostname, "/") + 1; // --> This is now POINTING to 1 char after the /   
+    *(path - 1) = NULL;
+    // path++; // --> Return it back to what it was originally pointing at
   } else {
     fprintf(stderr, "Hostname + / == NULL\n");
     exit(1);
   }
 
 // 4. Use strchr to find the first colon in the URL.
-  if ( strchr(hostname, ":") != NULL ) {
+  if ( strstr(hostname, ":") ) {
 // 5. Set the port pointer to 1 character after the spot returned by strchr.
-    port = strchr(hostname, ":") + 1;
+    port = strstr(hostname, ":") + 1;
 // 6. Overwrite the colon with a '\0' so that we are just left with the hostname.    
-    *(port - 1) = "\0";
-    port++; // --> Return it back to what it was originally pointing at
+    *(port - 1) = NULL;
+    // port++; // --> Return it back to what it was originally pointing at
   } else {
     fprintf(stderr, "HOSTNAME + : == NULL\n");
     exit(1);
@@ -130,16 +130,26 @@ int main(int argc, char *argv[])
   }
 
   /*
-    1. Parse the input URL
-    2. Initialize a socket by calling the `get_socket` function from lib.c
-    3. Call `send_request` to construct the request and send it
+
     4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
     5. Clean up any allocated memory and open file descriptors.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+//   1. Parse the input URL
+//   2. Initialize a socket by calling the `get_socket` function from lib.c
+//   3. Call `send_request` to construct the request and send it
+  struct urlinfo_t *urlinfo = parse_url(argv[1]);
+  sockfd = get_socket(urlinfo->hostname, urlinfo->port);
+  send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
+
+  while ( (numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0 ) {
+    printf("%s", buf);
+  }
+
+  // free(urlinfo->hostname);
+  // free(urlinfo->port);
+  // free(urlinfo->path);
+  free(urlinfo);
 
   return 0;
 }
