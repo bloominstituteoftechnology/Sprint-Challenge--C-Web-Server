@@ -23,7 +23,7 @@ typedef struct urlinfo_t {
  *
  * url: The input URL to parse.
  *
- * Store hostname, path, and port in a urlinfo_t struct and return the struct.
+ 
 */
 urlinfo_t *parse_url(char *url)
 {
@@ -32,22 +32,48 @@ urlinfo_t *parse_url(char *url)
   char *port;
   char *path;
 
-  urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
+  urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));  
 
-  /*
-    We can parse the input URL by doing the following:
+// 0. First you want to handle if the url has a https:// or http:// || could just add the amount of strings to the hostname
+  if ( strstr(hostname, "https://") ) {
+    hostname += 8;
+    printf("%s", hostname);
+  } else if ( strstr(hostname, "http://") ) {
+    hostname += 7;
+  } else {
+    hostname = strdup(url);
+  }
 
-    1. Use strchr to find the first backslash in the URL (this is assuming there is no http:// or https:// in the URL).
-    2. Set the path pointer to 1 character after the spot returned by strchr.
-    3. Overwrite the backslash with a '\0' so that we are no longer considering anything after the backslash.
-    4. Use strchr to find the first colon in the URL.
-    5. Set the port pointer to 1 character after the spot returned by strchr.
-    6. Overwrite the colon with a '\0' so that we are just left with the hostname.
-  */
+// 1. Use strchr to find the first backslash in the URL (this is assuming there is no http:// or https:// in the URL).
+// 2. Set the path pointer to 1 character after the spot returned by strchr. 
+// 3. Overwrite the backslash with a '\0' so that we are no longer considering anything after the forward-slash. 
+  if ( strchr(hostname, "/") != NULL ) {      
+    path = strchr(hostname, "/") + 1; // --> This is now POINTING to 1 char after the /   
+    *(path - 1) = "\0";
+    path++; // --> Return it back to what it was originally pointing at
+  } else {
+    fprintf(stderr, "Hostname + / == NULL\n");
+    exit(1);
+  }
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+// 4. Use strchr to find the first colon in the URL.
+  if ( strchr(hostname, ":") != NULL ) {
+// 5. Set the port pointer to 1 character after the spot returned by strchr.
+    port = strchr(hostname, ":") + 1;
+// 6. Overwrite the colon with a '\0' so that we are just left with the hostname.    
+    *(port - 1) = "\0";
+    port++; // --> Return it back to what it was originally pointing at
+  } else {
+    fprintf(stderr, "HOSTNAME + : == NULL\n");
+    exit(1);
+  }
+
+// * Store hostname, path, and port in a urlinfo_t struct and return the struct.
+  urlinfo->hostname = hostname;
+  urlinfo->path = path;
+  urlinfo->port = port;
+
+    
 
   return urlinfo;
 }
@@ -68,9 +94,27 @@ int send_request(int fd, char *hostname, char *port, char *path)
   char request[max_request_size];
   int rv;
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  /*
+  GET /path HTTP/1.1
+  Host: hostname:port
+  Connection: close
+  */
+
+  int request_length = sprintf(request,
+    "GET /%s HTTP/1.1\n"
+    "Host: %s:%s\n"
+    "Connection: close",
+    path,
+    hostname,
+    port
+  );
+
+// Send it all
+  rv = send(fd, request, request_length, 0);
+  
+  if (rv < 0) {
+    perror("send");
+  }
 
   return 0;
 }
