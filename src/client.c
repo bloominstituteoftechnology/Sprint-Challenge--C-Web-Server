@@ -127,6 +127,18 @@ int send_request(int fd, char *hostname, char *port, char *path)
   return 0;
 }
 
+/**
+ * Frees the memory of the urlinfo
+ *
+ * urlinfo:       The urlinfo_t struct to free
+*/
+void free_url(urlinfo_t *urlinfo) {
+  free(urlinfo->hostname);
+  free(urlinfo->path);
+  free(urlinfo->port);
+  free(urlinfo);
+}
+
 int main(int argc, char *argv[])
 {
   int sockfd, numbytes;
@@ -162,6 +174,12 @@ int main(int argc, char *argv[])
   while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
     printf("%s", buf);
   }
+
+  // Close the socket
+  close(sockfd);
+
+  // Free the URL
+  free_url(urlinfo);
 
   return 0;
 }
