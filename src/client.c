@@ -114,5 +114,10 @@ int main(int argc, char *argv[])
     printf("%s", buf);
   }
 
+  free(urlinfo->hostname);
+  free(urlinfo->port);
+  free(urlinfo->path);
+  free(urlinfo);
+
   return 0;
 }
