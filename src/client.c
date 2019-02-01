@@ -50,6 +50,19 @@ urlinfo_t *parse_url(char *url)
   // IMPLEMENT ME! //
   ///////////////////
 
+  // localhost:3490/d20
+  ptr = strchr(hostname,'/');
+  path = ptr + 1;
+  *ptr = '\0';
+
+  ptr = strchr(hostname, ':');
+  port = ptr + 1;
+  *ptr = '\0';
+
+  urlinfo->hostname = hostname;
+  urlinfo->path = path;
+  urlinfo->port = port;
+
   return urlinfo;
 }
 
