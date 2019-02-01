@@ -29,6 +29,8 @@ urlinfo_t *parse_url(char *url)
 {
   // copy the input URL so as not to mutate the original
   char *hostname = strdup(url);
+  printf("\n~~~\nHOSTNAME\n~~~\n");
+  printf("hostname: %s\n", hostname);
   char *port;
   char *path;
 
@@ -55,7 +57,6 @@ urlinfo_t *parse_url(char *url)
   *backslash_ptr = '\0';
   // 4. Use strchr to find the first colon in the URL.
   colon_ptr = strchr(hostname, colon);
-  printf("colon_ptr: %s\n", colon_ptr);
   // 5. Set the port pointer to 1 character after the spot returned by strchr.
   if (colon_ptr != NULL){
     port = colon_ptr + 1;
@@ -89,7 +90,7 @@ int send_request(int fd, char *hostname, char *port, char *path)
   int rv;
 
   int request_length = sprintf(request, "GET /%s HTTP/1.1\nHost: %s:%s\nConnection: close\n\n", path, hostname, port);
-
+  
   rv = send(fd, request, request_length, 0);
 
    if (rv < 0) {
@@ -111,6 +112,7 @@ int main(int argc, char *argv[])
 
   // 1. Parse the input URL
   urlinfo_t *input = parse_url(argv[1]);
+
   // 2. Initialize a socket by calling the `get_socket` function from lib.c
   sockfd = get_socket(input->hostname, input->port);
 
@@ -123,11 +125,31 @@ int main(int argc, char *argv[])
 
   // 3. Call `send_request` to construct the request and send it
   send_request(sockfd, input->hostname, input->port, input->path);
+
+  //a4. check for 301 status
+  numbytes = recv(sockfd, buf, BUFSIZE - 1, 0);
+  char request_type[11], status[4], *location, location_[9], redirect[40];
+  sscanf(buf, "%s %s", request_type, status);
+
+    if (strcmp(status, "301") == 0){
+      // b4. find the redirect link
+      location = strstr(buf, "Location");
+      sscanf(location, "%s %s", location_, redirect);
+      // c4. reparse URL to the new link, update socket
+      input = parse_url(redirect);
+      sockfd = get_socket(input->hostname, input->port);
+      // d4. re-send_request();
+      send_request(sockfd, input->hostname, input->port, input->path);
+      numbytes = recv(sockfd, buf, BUFSIZE - 1, 0);
+    }
+
   // 4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
-  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
+  do {
   // print the data we got back to stdout
     fprintf(stdout, buf);
   }
+  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0);
+
   // 5. Clean up any allocated memory and open file descriptors.
   free(input->hostname);
   free(input);
