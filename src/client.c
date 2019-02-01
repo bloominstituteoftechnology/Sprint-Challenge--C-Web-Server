@@ -93,6 +93,12 @@ int send_request(int fd, char *hostname, char *port, char *path)
   return rv;
 }
 
+void free_urlinfo(urlinfo_t *urlinfo) {
+  free(urlinfo->port);
+  free(urlinfo->path);
+  free(urlinfo->hostname);
+  free(urlinfo);
+}
 
 
 int main(int argc, char *argv[])
@@ -105,6 +111,8 @@ int main(int argc, char *argv[])
     exit(1);
   }
 
+  
+
   /*
     1. Parse the input URL
     2. Initialize a socket by calling the `get_socket` function from lib.c
@@ -113,9 +121,7 @@ int main(int argc, char *argv[])
     5. Clean up any allocated memory and open file descriptors.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  
 
   return 0;
 }
