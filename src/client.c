@@ -81,9 +81,8 @@ int send_request(int fd, char *hostname, char *port, char *path)
   //Construct request
   sprintf(request,"GET /%s HTTP/1.1\nHost: %s:%s\nConnection: close",path,hostname,port);
 
-  //Get socket
-  socket = get_socket(hostname, port);
-  send(socket,request,strlen(request),0);
+  //send request
+  send(fd,request,strlen(request),0);
 
   return 0;
 }
@@ -105,10 +104,14 @@ int main(int argc, char *argv[])
     4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
     5. Clean up any allocated memory and open file descriptors.
   */
-
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  
+  urlinfo_t *urlinfo = parse_url(argv[1]);
+  sockfd = get_socket(url->hostname,url->port);
+  send_request(sockfd,url->hostname,url->port,url->path);
+  
+  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
+    printf("%s\n",buf);
+  }
 
   return 0;
 }
