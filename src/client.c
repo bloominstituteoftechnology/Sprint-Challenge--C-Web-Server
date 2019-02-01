@@ -143,7 +143,7 @@ int send_request(int fd, char *hostname, char *port, char *path)
   }
 
   // printf("request_length: %d\n", request_length);
-  // printf("rv: %d\n", rv);
+  printf("rv: %d\n", rv);
 
   ///////////////////
   // IMPLEMENT ME! //
@@ -176,9 +176,10 @@ int main(int argc, char *argv[])
   sockfd = get_socket(urlinfo->hostname, urlinfo->port);
   // printf("sockfd: %d\n", sockfd);
 
-  numbytes = send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
+  send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
 
   while((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0){
+    printf("%d\n", numbytes);
     // print the data to stdout
     // printf("Receiving...\n");
     printf("%s\n", buf);
@@ -194,7 +195,7 @@ int main(int argc, char *argv[])
   free(urlinfo->path);
   free(urlinfo);
 
-  // printf("numbytes: %d\n", numbytes);
+  printf("numbytes: %d\n", numbytes);
 
   ///////////////////
   // IMPLEMENT ME! //
