@@ -127,7 +127,11 @@ int main(int argc, char *argv[])
   // IMPLEMENT ME! //
   ///////////////////
 
+  // Parse the input URL
   urlinfo_t *urlinfo = parse_url(argv[1]);
+
+  // Initialize a socket
+  sockfd = get_socket(urlinfo->hostname, urlinfo->port);
 
   return 0;
 }
