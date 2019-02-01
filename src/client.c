@@ -48,6 +48,16 @@ urlinfo_t *parse_url(char *url)
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
+  path = strchr(hostname, '/');
+  *path = '\0';
+  path++;
+  port = strchr(hostname, ':');
+  *port = '\0';
+  port++;
+
+  urlinfo->hostname = hostname;
+  urlinfo->port = port;
+  urlinfo->path = path;
 
   return urlinfo;
 }
@@ -71,8 +81,20 @@ int send_request(int fd, char *hostname, char *port, char *path)
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
+  int response_length = sprintf(request,
+    "GET /%s HTTP/1.1\n"
+    "Host: %s:%s\n"
+    "Connection: close\n",
+    path,
+    hostname, port
+  );
+  int reqv = send(fd, request, response_length, 0);
 
-  return 0;
+  if(reqv < 0){
+    perror("send request\n");
+  }
+
+  return reqv;
 }
 
 int main(int argc, char *argv[])
@@ -96,6 +118,20 @@ int main(int argc, char *argv[])
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
-
+  printf("Checkpoint %d\n", 0);
+  urlinfo_t *urlinfo = parse_url(argv[1]);
+  printf("Checkpoint %d\n", 1);
+  sockfd = get_socket(urlinfo->hostname, urlinfo->port);
+  printf("Checkpoint %d\n", 2);
+  int srr = send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
+  printf("Checkpoint %d\n", 3);
+  while((numbytes = recv(sockfd, buf, BUFSIZE-1, 0)) > 0){
+    printf("Checkpoint %d\n", 4);
+    fprintf(stdout, "%s\n", buf);
+  }
+  free(urlinfo->hostname);
+  free(urlinfo);
+  close(sockfd);
+  printf("Checkpoint %d\n", 5);
   return 0;
 }
