@@ -58,26 +58,44 @@ urlinfo_t *parse_url(char *url)
     EXAMPLE: www.google.com/
   */
 
-  // STRETCH
-  if (strstr(hostname, "http://") != NULL) {
-    hostname = strdup(url+7);
+  // Solution
+  char *tmp = strstr(hostname, "://");
+  if (tmp != NULL) {
+    hostname = tmp + 3;
   }
-  else if (strstr(hostname, "https://") != NULL) {
-    hostname = strdup(url+8);
+  tmp = strchr(hostname, '/');
+  path = tmp +1;
+  *tmp = '\0';
+
+  tmp = strchr(hostname, ':');
+  if (tmp == NULL) {
+    port = "80";
+  }
+  else {
+    port = tmp + 1;
+    *tmp = '\0';
   }
 
-  char *backslash = strchr(hostname, '/');
-  path = backslash + 1;
-  *backslash = '\0';
+  // // Half working and make stretch attempt
+  // if (strstr(hostname, "http://") != NULL) {
+  //   hostname = strdup(url+7);
+  // }
+  // else if (strstr(hostname, "https://") != NULL) {
+  //   hostname = strdup(url+8);
+  // }
 
-  char *colon = strchr(hostname, ':');
-  // if (colon == NULL) {
-  //   port = "80";
-  // }
-  // else {
-    port = colon + 1;
-    *colon = '\0';
-  // }
+  // char *backslash = strchr(hostname, '/');
+  // path = backslash + 1;
+  // *backslash = '\0';
+
+  // char *colon = strchr(hostname, ':');
+  // // if (colon == NULL) {
+  // //   port = "80";
+  // // }
+  // // else {
+  //   port = colon + 1;
+  //   *colon = '\0';
+  // // }
 
   urlinfo->hostname = hostname;
   urlinfo->port = port;
@@ -147,7 +165,6 @@ int main(int argc, char *argv[])
 
   send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path); // 3
 
-  
   while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) { // 4
     fprintf(stdout, "%s\n", buf);
   }
