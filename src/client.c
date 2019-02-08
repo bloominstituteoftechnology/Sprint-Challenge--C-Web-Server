@@ -49,13 +49,13 @@ urlinfo_t *parse_url(char *url){
     urlinfo->hostname = substr_pointer + 3; // moves hostname pointer 3 places ahead of substring pointer
   }
 
-  char *char_pointer = strchr(urlinfo->hostname, "/"); // returns pointer to first occurence of character
+  char *char_pointer = strchr(urlinfo->hostname, '/'); // returns pointer to first occurence of character
   if(char_pointer != NULL){
     urlinfo->path = char_pointer + 1; // moves path pointer 1 place ahead of character pointer
     *char_pointer = '\0';  //changes "/" to '\0' to terminate the string at the occurence of '\0'. Nothing will be considered after that character.
   }
 
-  char *char2_pointer = strchr(urlinfo->hostname, ":"); // returns pointer to first occurence of character 
+  char *char2_pointer = strchr(urlinfo->hostname, ':'); // returns pointer to first occurence of character 
   char default_port = "80";
   if(char2_pointer != NULL){
     urlinfo->port = char2_pointer + 1; // moves port pointer 1 place ahead of character pointer
@@ -118,6 +118,14 @@ int main(int argc, char *argv[])
     4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
     5. Clean up any allocated memory and open file descriptors.
   */ 
+  urlinfo_t *urlinfo = parse_url(argv[1]); // create urlinfo struct type to store the result of parse_url.
+  sockfd = get_socket(urlinfo->hostname, urlinfo->port); //store result of get_socket in sockfd
+  send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path); //Send request
+  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {  
+        printf("%s\n", buf);// print the data we got back to stdout 
+      }
+  free(urlinfo);// free memory allocated when parse_url was called
+  close(sockfd); // close socket file
 
   return 0;
 }
