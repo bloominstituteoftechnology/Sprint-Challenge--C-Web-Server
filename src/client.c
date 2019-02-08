@@ -168,3 +168,6 @@ send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
 
   return 0;
 }
+
+//https://en.wikibooks.org/wiki/C_Programming/string.h/strstr
+//https://clc-wiki.net/wiki/strrchr
