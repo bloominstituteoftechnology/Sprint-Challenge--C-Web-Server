@@ -57,8 +57,11 @@ urlinfo_t *parse_url(char *url)
     // 6. Overwrite the colon with a '\0' so that we are just left with the hostname.
     *temp_ptr = '\0';
   }
+  urlinfo->hostname = hostname;
+  urlinfo->path = path;
+  urlinfo->port = port;
   
-  printf("hostname: %s, path: %s, port: %s\n", hostname, path, port);
+  // printf("hostname: %s, path: %s, port: %s\n", hostname, path, port);
 
   return urlinfo;
 }
@@ -111,10 +114,12 @@ int main(int argc, char *argv[])
       fprintf(stderr,"usage: client HOSTNAME:PORT/PATH\n");
       exit(1);
     }
-
+    printf("arg0: %s, arg1: %s\n", argv[0], argv[1]);
     // 1. Parse the input URL
-    urlinfo_t *url_parsed = parse_url(argv[1]);
+    urlinfo_t *url_parsed;
+    url_parsed = parse_url(argv[1]);
     // 2. Initialize a socket by calling the `get_socket` function from lib.c
+    printf("hostname: %s, path: %s, port: %s\n", url_parsed->hostname, url_parsed->path, url_parsed->port);
     int new_socket = get_socket(url_parsed->hostname, url_parsed->port);
     
     // 3. Call `send_request` to construct the request and send it
