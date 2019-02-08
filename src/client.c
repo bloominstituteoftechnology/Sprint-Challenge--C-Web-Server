@@ -51,6 +51,32 @@ urlinfo_t *parse_url(char *url)
   // IMPLEMENT ME! //
   ///////////////////
 
+  /*strchar is to find certain characters*/
+
+  // we only want to try to get the address with "http://"
+  char *temp = strstr(hostname, "://"); /*to look for a string*/
+
+  if (temp != NULL) {
+    hostname = temp + 3; /*this is to move after the colon and two slashes*/
+  }
+  // need someway to look for the path
+  temp = strchr(hostname, '/');
+  path = temp + 1;
+  *temp = '\0'; 
+
+  // we need to look for the port number 
+  temp = strchr(hostname, ':');
+  if (temp == NULL) {
+    port = "80";
+  } else {
+    port = temp + 1;
+    *temp = '\0';
+  }
+
+  urlinfo->hostname = hostname;
+  urlinfo->port = port;
+  urlinfo->path = path;
+
   return urlinfo;
 }
 
@@ -64,6 +90,8 @@ urlinfo_t *parse_url(char *url)
  *
  * Return the value from the send() function.
 */
+
+// this is almost the same as the homework!
 int send_request(int fd, char *hostname, char *port, char *path)
 {
   const int max_request_size = 16384;
@@ -74,7 +102,26 @@ int send_request(int fd, char *hostname, char *port, char *path)
   // IMPLEMENT ME! //
   ///////////////////
 
-  return 0;
+  int request_length = sprintf(request,
+  /*this is going to be the path*/
+    "GET /%s HTTP/1.1\n"
+    "Host: $s:%s\n"
+    "Connection: close\n"
+    "\n", /*we need this new line to know that its and of a response*/
+    path,
+    hostname,
+    port
+  );
+
+  if ((rv = send(fd, request, request_length, 0) < 0)) {
+    fprintf(stderr, "client: send");
+    exit(3);
+  }
+    //   if (rv < 0) {
+    //     perror("send");
+    // }
+
+  return rv;
 }
 
 int main(int argc, char *argv[])
@@ -106,12 +153,21 @@ int main(int argc, char *argv[])
 urlinfo_t *urlinfo = parse_url(argv[1]);
 /*get_sockets requires a hostname and port*/
 sockfd = get_socket(urlinfo->hostname, urlinfo->port);
+printf("REQUEST: host %s, port $s, path %s\n", urlinfo->hostname, urlinfo->port, urlinfo->path );
 send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
 /*use the loop from README*/
    while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
        // print the data we got back to stdout
        fwrite(buf, 1, numbytes, stdout);
      }
+    if (numbytes < 0) {
+      fprintf(stderr, "client: recieve");
+      exit(2);
+    }
+      printf("\n");
+
+      free(urlinfo); /*don't forget to free it*/
+      close(sockfd);
 
   return 0;
 }
