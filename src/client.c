@@ -123,5 +123,22 @@ int main(int argc, char *argv[])
   // IMPLEMENT ME! //
   ///////////////////
 
+  urlinfo_t *urlinfo = parse_url(argv[1]);
+
+  sockfd = get_socket(urlinfo->hostname, urlinfo->port);
+
+  int rv = send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
+
+  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
+    printf("Response: %s\n", buf);
+  }
+
+  free(urlinfo->hostname);
+  free(urlinfo->port);
+  free(urlinfo->path);
+  free(urlinfo);
+
+  close(sockfd);
+
   return 0;
 }
