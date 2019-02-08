@@ -105,21 +105,18 @@ int send_request(int fd, char *hostname, char *port, char *path)
   int request_length = sprintf(request,
   /*this is going to be the path*/
     "GET /%s HTTP/1.1\n"
-    "Host: $s:%s\n"
+    "Host: %s:%s\n" /*type here*/
     "Connection: close\n"
     "\n", /*we need this new line to know that its and of a response*/
     path,
     hostname,
     port
   );
-
+  // sending it down// call send // do some error checking //  
   if ((rv = send(fd, request, request_length, 0) < 0)) {
     fprintf(stderr, "client: send");
     exit(3);
   }
-    //   if (rv < 0) {
-    //     perror("send");
-    // }
 
   return rv;
 }
@@ -153,7 +150,7 @@ int main(int argc, char *argv[])
 urlinfo_t *urlinfo = parse_url(argv[1]);
 /*get_sockets requires a hostname and port*/
 sockfd = get_socket(urlinfo->hostname, urlinfo->port);
-printf("REQUEST: host %s, port $s, path %s\n", urlinfo->hostname, urlinfo->port, urlinfo->path );
+// printf("REQUEST: host %s, port $s, path %s\n", urlinfo->hostname, urlinfo->port, urlinfo->path );
 send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
 /*use the loop from README*/
    while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
