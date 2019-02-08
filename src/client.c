@@ -49,6 +49,24 @@ urlinfo_t *parse_url(char *url)
   // IMPLEMENT ME! //
   ///////////////////
 
+  if (strchr(hostname, '/')) {
+    path = strchr(hostname, '/') + 1;
+    *(path - 1) = '\0';
+  } else {
+    path = '/';
+  }
+
+  if (strchr(hostname, ':')) {
+    port = strchr(hostname, ':') + 1;
+    *(port - 1) = '\0';
+  } else {
+    port = '80';
+  }
+
+  urlinfo->hostname = hostname;
+  urlinfo->path = path;
+  urlinfo->port = port;
+
   return urlinfo;
 }
 
