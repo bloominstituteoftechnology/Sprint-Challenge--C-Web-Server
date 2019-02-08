@@ -45,24 +45,24 @@ urlinfo_t *parse_url(char *url)
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
 
-  char *substr_pointer = strstr(hostname, "://"); //returns pointer to beginning of substring
+  char *substr_pointer = strstr(urlinfo->hostname, "://"); //returns pointer to beginning of substring
   if(substr_pointer != NULL){
-    hostname = substr_pointer + 3; // moves hostname pointer 3 places ahead of substring pointer
+    urlinfo->hostname = substr_pointer + 3; // moves hostname pointer 3 places ahead of substring pointer
   }
 
-  substr_pointer = strchr(hostname, "/");
+  substr_pointer = strchr(urlinfo->hostname, "/");
   if(substr_pointer != NULL){
-    path = substr_pointer + 1; // moves path pointer 1 place ahead of character pointer
+    urlinfo->path = substr_pointer + 1; // moves path pointer 1 place ahead of character pointer
     substr_pointer = '\0';  //changes "/" to '\0' to terminate the string at the occurence of '\0'. Nothing will be considered after that character.
   }
 
-  substr_pointer = strchr(hostname, ":"); // returns pointer to first occurence of character 
+  substr_pointer = strchr(urlinfo->hostname, ":"); // returns pointer to first occurence of character 
   char default_port = "80";
   if(substr_pointer != NULL){
-    port = substr_pointer + 1; // moves port pointer 1 place ahead of character pointer
+    urlinfo->port = substr_pointer + 1; // moves port pointer 1 place ahead of character pointer
     substr_pointer = '\0'; // changes ":" to '\0' to terminate the string at the occurence of '\0'. Nothing will be considered after that. Leaving hostname isolated  
   }else{
-    port = default_port;
+    urlinfo->port = default_port;
     substr_pointer = '\0';
   }
   return urlinfo;
@@ -120,9 +120,7 @@ int main(int argc, char *argv[])
     5. Clean up any allocated memory and open file descriptors.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  
 
   return 0;
 }
