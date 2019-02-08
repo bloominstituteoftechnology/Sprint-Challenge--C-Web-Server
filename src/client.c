@@ -51,6 +51,10 @@ urlinfo_t *parse_url(char *url)
   // IMPLEMENT ME! //
   ///////////////////
 
+  // The protocol ("http")
+  // The server name ("www.google.com")
+  // The file name ("web-server.htm")
+
   /*strchar is to find certain characters*/
 
   // we only want to try to get the address with "http://"
@@ -67,7 +71,7 @@ urlinfo_t *parse_url(char *url)
   // we need to look for the port number 
   temp = strchr(hostname, ':');
   if (temp == NULL) {
-    port = "80";
+    port = "80"; /*port 80 is the port that the server "listens to" or expects to receive from a Web client */
   } else {
     port = temp + 1;
     *temp = '\0';
@@ -105,7 +109,7 @@ int send_request(int fd, char *hostname, char *port, char *path)
   int request_length = sprintf(request,
   /*this is going to be the path*/
     "GET /%s HTTP/1.1\n"
-    "Host: %s:%s\n" /*type here*/
+    "Host: %s:%s\n" /*typo here*/
     "Connection: close\n"
     "\n", /*we need this new line to know that its and of a response*/
     path,
@@ -117,7 +121,7 @@ int send_request(int fd, char *hostname, char *port, char *path)
     fprintf(stderr, "client: send");
     exit(3);
   }
-
+// rv = return value
   return rv;
 }
 
@@ -146,6 +150,7 @@ int main(int argc, char *argv[])
   ///////////////////
 
 /*pass it the one argument that is pass to our client*/
+
 /*the info_t is what we will get back*/
 urlinfo_t *urlinfo = parse_url(argv[1]);
 /*get_sockets requires a hostname and port*/
@@ -178,4 +183,7 @@ send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
 // https://computer.howstuffworks.com/web-server2.htm
 // https://www.ibm.com/support/knowledgecenter/en/SS6PEW_9.4.0/com.ibm.help.custom.restapis.doc/c_SpecifyingHTTPHeaders.html
 // https://stackoverflow.com/questions/2092527/what-happens-when-you-type-in-a-url-in-browser/2092602#2092602
-// 
+// https://en.wikipedia.org/wiki/Server_(computing)
+// https://www.sqa.org.uk/e-learning/HardOSSupp01CD/page_19.htm
+// https://searchnetworking.techtarget.com/definition/port-80
+// http://pubs.opengroup.org/onlinepubs/009696899/functions/send.html
