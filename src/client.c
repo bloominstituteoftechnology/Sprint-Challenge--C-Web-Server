@@ -39,21 +39,19 @@ urlinfo_t *parse_url(char *url)
 
    // 1. Use strchr to find the first backslash in the URL (this is assuming there is no http:// or https:// in the URL).
  
-  char *temp = strchr(hostname,'/');
+  char *temp = strchr(url,'/');
    // 2. Set the path pointer to 1 character after the spot returned by strchr.
    path = temp + 1;
    // 3. Overwrite the backslash with a '\0' so that we are no longer considering anything after the backslash.
-  temp ='\0';
+  *temp ='\0';
    // 4. Use strchr to find the first colon in the URL.
-   char *temp2 = strchr(hostname,':');
+   char *temp2 = strchr(url,':');
    // 5. Set the port pointer to 1 character after the spot returned by strchr.
-  port = temp2 + 1;
+  port = temp2+1 ;
    // 6. Overwrite the colon with a '\0' so that we are just left with the hostname.
-   temp2 = '\0';
-   
-printf("%s", hostname);
-printf("%s", path);
-printf("%s",  port);
+   *temp2 = '\0';
+ hostname = temp2;
+
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
@@ -80,29 +78,36 @@ int send_request(int fd, char *hostname, char *port, char *path)
   char request[max_request_size];
   int rv;
   char *header;
-  int response_length = sprintf(header,"GET /%s HTTP/1.1\r\nHost: %s:%s \r\n\r\n",path,hostname,port);
-  printf("%s",header);
+
+  int response_length = sprintf(header,"GET /%s HTTP/1.1\nHost: %s:%d\n",path,hostname,atoi(port));
+ printf("%s",header);
   
   send(fd,header,response_length,0);
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
-
+   char *message[20000];
+   rv = recv(fd,message,512,0);
+   while(rv!=-1){
+      printf("%s",message); 
+   }
+  
+  
   return 0;
 } 
 
 
 //char **rec(int fd){
-//  FILE *input = fopen(fd,"r");
-//  if(input==NULL){
+// FILE *input = fopen(fd,"r");
+ //if(input==NULL){
  //   printf(stderr,"error");
- //   exit(1);
+ //exit(1);
  // }
- // char T[20000];
+ //char T[20000];
  // while(fgets(T,sizeof(T),input)!=NULL){
  //   printf("%s\n",T);
- // }
- // return 0;
+ //}
+//return 0;
 //}
 int main(int argc, char *argv[])
 {  
@@ -118,18 +123,16 @@ int main(int argc, char *argv[])
    // 1. Parse the input URL
   urlinfo_t *pl = malloc(sizeof(urlinfo_t));
   pl = parse_url(argv[1]);
-
+printf("%s",pl->hostname);
    // 2. Initialize a socket by calling the `get_socket` function from lib.c
    get_socket(pl->hostname,pl->port);
    // 3. Call `send_request` to construct the request and send it
    send_request(sockfd,pl->hostname,pl->port,pl->path);
-   
+   //printf(pl->hostname,pl->port,pl->path);
    // 4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
-  char message[20000];
-  int read_len;
-  while((read_len=recv(sockfd,message,2000,0))>0){
-    write(sockfd,message,strlen(message));
-   }
+ 
+  
+   
    // 5. Clean up any allocated memory and open file descriptors.
   free(pl);
 
