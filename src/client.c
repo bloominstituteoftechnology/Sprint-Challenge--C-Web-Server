@@ -169,5 +169,13 @@ send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
   return 0;
 }
 
-//https://en.wikibooks.org/wiki/C_Programming/string.h/strstr
-//https://clc-wiki.net/wiki/strrchr
+// https://en.wikibooks.org/wiki/C_Programming/string.h/strstr
+// https://clc-wiki.net/wiki/strrchr
+// https://searchnetworking.techtarget.com/definition/TCP
+// https://medium.com/@vienchitang/what-is-an-lru-cache-3e8ad1853584
+// https://medium.com/@vienchitang/what-is-an-lru-cache-3e8ad1853584
+// https://searchnetworking.techtarget.com/definition/UDP-User-Datagram-Protocol
+// https://computer.howstuffworks.com/web-server2.htm
+// https://www.ibm.com/support/knowledgecenter/en/SS6PEW_9.4.0/com.ibm.help.custom.restapis.doc/c_SpecifyingHTTPHeaders.html
+// https://stackoverflow.com/questions/2092527/what-happens-when-you-type-in-a-url-in-browser/2092602#2092602
+// 
