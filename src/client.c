@@ -13,9 +13,9 @@
  * Struct to hold all three pieces of a URL
  */
 typedef struct urlinfo_t {
-  char *hostname;
-  char *port;
-  char *path;
+  char *hostname; /* the domain*/
+  char *port; /*port number*/
+  char *path; /*path on the domain*/
 } urlinfo_t;
 
 /**
@@ -25,6 +25,8 @@ typedef struct urlinfo_t {
  *
  * Store hostname, path, and port in a urlinfo_t struct and return the struct.
 */
+
+/*this returns urlinfo_t struct*/
 urlinfo_t *parse_url(char *url)
 {
   // copy the input URL so as not to mutate the original
@@ -77,7 +79,9 @@ int send_request(int fd, char *hostname, char *port, char *path)
 
 int main(int argc, char *argv[])
 {  
+  /*socket file discripter*/ 
   int sockfd, numbytes;  
+  /*buffer*/
   char buf[BUFSIZE];
 
   if (argc != 2) {
@@ -86,7 +90,7 @@ int main(int argc, char *argv[])
   }
 
   /*
-    1. Parse the input URL
+    1. Parse the input URL call parse_url.
     2. Initialize a socket by calling the `get_socket` function from lib.c
     3. Call `send_request` to construct the request and send it
     4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
@@ -96,6 +100,18 @@ int main(int argc, char *argv[])
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
+
+/*pass it the one argument that is pass to our client*/
+/*the info_t is what we will get back*/
+urlinfo_t *urlinfo = parse_url(argv[1]);
+/*get_sockets requires a hostname and port*/
+sockfd = get_socket(urlinfo->hostname, urlinfo->port);
+send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
+/*use the loop from README*/
+   while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
+       // print the data we got back to stdout
+       fwrite(buf, 1, numbytes, stdout);
+     }
 
   return 0;
 }
