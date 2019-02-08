@@ -37,14 +37,14 @@ urlinfo_t *parse_url(char *url)
   // 1. Use strchr to find the first backslash in the URL (this is assuming there is no http:// or https:// in the URL).
   char *temp_ptr;
   temp_ptr = strchr(hostname, '/');
-  printf("slash ptr: %s\n", temp_ptr);
+  // printf("slash ptr: %s\n", temp_ptr);
   // 2. Set the path pointer to 1 character after the spot returned by strchr. 
   if (temp_ptr != NULL) {
     path = temp_ptr + 1;
     // 3. Overwrite the backslash with a '\0' so that we are no longer considering anything after the backslash.
     *temp_ptr = '\0';
   }
-  printf("Path: %s\n", path);
+  // printf("Path: %s\n", path);
   
   // printf("hostname: %s\n", hostname);
 
@@ -60,9 +60,6 @@ urlinfo_t *parse_url(char *url)
   urlinfo->hostname = hostname;
   urlinfo->path = path;
   urlinfo->port = port;
-  
-  // printf("hostname: %s, path: %s, port: %s\n", hostname, path, port);
-
   return urlinfo;
 }
 
@@ -76,34 +73,33 @@ urlinfo_t *parse_url(char *url)
  *
  * Return the value from the send() function.
 */
-// int send_request(int fd, char *hostname, char *port, char *path)
-// {
-//   const int max_request_size = 16384;
-//   char request[max_request_size];
-//   int request_length;
+int send_request(int fd, char *hostname, char *port, char *path)
+{
+  printf("here");
+  const int max_request_size = 16384;
+  char request[max_request_size];
+  int request_length;
+ 
+  // Build HTTP request and store it in request
+  char *full_path = "/";
+  strcat(full_path, path);
+  char *full_hostname;
+  strcpy(full_hostname, hostname);
+  strcat(full_hostname, ":");
+  strcat(full_hostname, port);
+  printf("full path: %s, full hostname: %s\n", full_path, full_hostname);
+  sprintf(request, "GET %s HTTP/1.1\nHost: %s\nConnection: close\n", full_path, full_hostname);
 
-//   // Initiate variables for displaying time
-//   time_t rawtime;
-//   struct tm * timeinfo;
-//   time (&rawtime);
-//   timeinfo = localtime (&rawtime); 
-//   extern char *tzname[2];
+  request_length = strlen(request);
+  printf("Request: %s, request length: %d\n", request, request_length);
+  // int rv = send(fd, request, request_length+1, 0);
+  // if (rv < 0) {
+  //     perror("send");
+  // }
 
-//   //build header: first line, 
-
-//   // Build HTTP request and store it in request
-//   sprintf(request, "%s\nDate: %sConnection: close\nContent-Length: %d\nContent-Type: %s\n\n%s", header, asctime(timeinfo), content_length, content_type, body);
-
-//   request_length = strlen(request);
-
-//   int rv = send(fd, request, request_length+1, 0);
-//   if (rv < 0) {
-//       // printf("rv <0\n");
-//       perror("send");
-//   }
-
-//   return rv;
-// }
+  // return rv;
+  return 0;
+}
 
 int main(int argc, char *argv[])
 {  
@@ -114,21 +110,30 @@ int main(int argc, char *argv[])
       fprintf(stderr,"usage: client HOSTNAME:PORT/PATH\n");
       exit(1);
     }
-    printf("arg0: %s, arg1: %s\n", argv[0], argv[1]);
+    // printf("arg0: %s, arg1: %s\n", argv[0], argv[1]);
     // 1. Parse the input URL
     urlinfo_t *url_parsed;
     url_parsed = parse_url(argv[1]);
     // 2. Initialize a socket by calling the `get_socket` function from lib.c
-    printf("hostname: %s, path: %s, port: %s\n", url_parsed->hostname, url_parsed->path, url_parsed->port);
-    int new_socket = get_socket(url_parsed->hostname, url_parsed->port);
+    sockfd = get_socket(url_parsed->hostname, url_parsed->port);
+    if (sockfd < 0) {
+        fprintf(stderr, "webserver: fatal error getting listening socket\n");
+        exit(1);
+    }
+    printf("webserver: waiting for connections on port %s...\n", url_parsed->port);
     
+    printf("send socket: %d, hostname: %s, path: %s, port: %s\n", sockfd, url_parsed->hostname, url_parsed->path, url_parsed->port);
     // 3. Call `send_request` to construct the request and send it
-    // send_request(new_socket, url_parsed->hostname, url_parsed->port, url_parsed->path);
+    // send_request(sockfd, url_parsed->hostname, url_parsed->port, url_parsed->path);
     
     // 4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
-    while(1){
-
-    }
+    // int recvfd;
+    // struct sockaddr_storage their_addr; // connector's address information
+    // char s[INET6_ADDRSTRLEN];
+    // while(1){
+      // socklen_t sin_size = sizeof their_addr;
+      // recvfd = recv(sockfd, )
+    // }
     // 5. Clean up any allocated memory and open file descriptors.
 
   return 0;
