@@ -75,30 +75,30 @@ urlinfo_t *parse_url(char *url)
 */
 int send_request(int fd, char *hostname, char *port, char *path)
 {
-  printf("here");
   const int max_request_size = 16384;
   char request[max_request_size];
   int request_length;
  
   // Build HTTP request and store it in request
-  char *full_path = "/";
+  char *full_path;
+  strcpy(full_path,"/");
   strcat(full_path, path);
   char *full_hostname;
   strcpy(full_hostname, hostname);
   strcat(full_hostname, ":");
   strcat(full_hostname, port);
-  printf("full path: %s, full hostname: %s\n", full_path, full_hostname);
+  // printf("full path: %s, full hostname: %s\n", full_path, full_hostname);
   sprintf(request, "GET %s HTTP/1.1\nHost: %s\nConnection: close\n", full_path, full_hostname);
 
   request_length = strlen(request);
-  printf("Request: %s, request length: %d\n", request, request_length);
-  // int rv = send(fd, request, request_length+1, 0);
-  // if (rv < 0) {
-  //     perror("send");
-  // }
+  // printf("Request: %s, request length: %d\n", request, request_length);
+  int rv = send(fd, request, request_length+1, 0);
+  if (rv < 0) {
+      perror("send");
+  }
 
-  // return rv;
-  return 0;
+  return rv;
+  // return 0;
 }
 
 int main(int argc, char *argv[])
@@ -124,7 +124,7 @@ int main(int argc, char *argv[])
     
     printf("send socket: %d, hostname: %s, path: %s, port: %s\n", sockfd, url_parsed->hostname, url_parsed->path, url_parsed->port);
     // 3. Call `send_request` to construct the request and send it
-    // send_request(sockfd, url_parsed->hostname, url_parsed->port, url_parsed->path);
+    send_request(sockfd, url_parsed->hostname, url_parsed->port, url_parsed->path);
     
     // 4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
     // int recvfd;
