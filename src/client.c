@@ -86,11 +86,7 @@ int send_request(int fd, char *hostname, char *port, char *path)
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
-   char *message[20000];
-   rv = recv(fd,message,512,0);
-   while(rv!=-1){
-      printf("%s",message); 
-   }
+   
   
   
   return 0;
@@ -130,7 +126,12 @@ printf("%s",pl->hostname);
    send_request(sockfd,pl->hostname,pl->port,pl->path);
    //printf(pl->hostname,pl->port,pl->path);
    // 4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
- 
+ char *message[20000];
+ int rv;
+   while(rv > 0){
+     rv = recv(sockfd,message,512,0);
+     printf("%s",message); 
+   }
   
    
    // 5. Clean up any allocated memory and open file descriptors.
