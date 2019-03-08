@@ -93,8 +93,7 @@ int send_request(int fd, char *hostname, char *port, char *path)
 
   sprintf(request, "GET %s HTTP/1.1\nHost: %s:%s\nConnection: Close\n", path, hostname, port);
   request_size = strlen(request);
-  printf("%s\n", request);
-  printf("socket FD: %d\n", fd);
+
   //Send the request
   rv = send(fd, request, request_size, 0);
 
@@ -148,6 +147,7 @@ int main(int argc, char *argv[])
     // print the data we got back to stdout
     printf("%s", buf);
   }
+  close(sockfd);
 
   return 0;
 }
