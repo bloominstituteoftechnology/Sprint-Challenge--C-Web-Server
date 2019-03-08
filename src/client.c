@@ -29,10 +29,10 @@ typedef struct urlinfo_t
 urlinfo_t *parse_url(char *url)
 {
   // copy the input URL so as not to mutate the original
-  char *hostname = strdup(url);
+  char *copyUrl = strdup(url);
+  char *hostname;
   char *port;
   char *path;
-
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
 
   /*
@@ -45,23 +45,28 @@ urlinfo_t *parse_url(char *url)
     5. Set the port pointer to 1 character after the spot returned by strchr.
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
-  path = strrchr(hostname, '/');
+  path = strrchr(copyUrl, '/');
   *path = '\0';
   path++;
-  port = strrchr(hostname, ':');
+  port = strrchr(copyUrl, ':');
   *port = '\0';
   port++;
 
-  if (hostname[0] == 'h')
+  if (copyUrl[0] == 'h')
   {
-    hostname = strrchr(hostname, '/');
+    hostname = strrchr(copyUrl, '/');
     hostname++;
+    urlinfo->hostname = strdup(hostname);
+  }
+  else
+  {
+    urlinfo->hostname = strdup(copyUrl);
   }
 
-  urlinfo->hostname = strdup(hostname);
   urlinfo->port = strdup(port);
   urlinfo->path = strdup(path);
 
+  free(copyUrl);
   return urlinfo;
 }
 
@@ -81,9 +86,6 @@ int send_request(int fd, char *hostname, char *port, char *path)
   char request[max_request_size];
   int rv;
 
-  //  GET /path HTTP/1.1
-  // Host: hostname:port
-  // Connection: close
   int request_length = snprintf(request, max_request_size,
                                 "GET /%s HTTP/1.1\n"
                                 "Host: %s:%s\n"
@@ -128,5 +130,14 @@ int main(int argc, char *argv[])
   {
     fprintf(stdout, "%s", buf);
   }
+
+  // Free and close all allocated memory
+  free(urlinfo->hostname);
+  free(urlinfo->port);
+  free(urlinfo->path);
+  free(urlinfo);
+
+  close(sockfd);
+
   return 0;
 }
