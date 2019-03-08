@@ -99,7 +99,21 @@ int send_request(int fd, char *hostname, char *port, char *path)
   // IMPLEMENT ME! //
   ///////////////////
 
-  return 0;
+  int request_length = snprintf(request, max_request_size,
+                                "GET /%s HTTP/1.1\n"
+                                "Host: %s:%s"
+                                "Connection: close",
+                                path, hostname, port);
+
+  rv = send(fd, request, request_length, 0);
+
+  if (rv < 0)
+  {
+    printf("request err");
+    return;
+  }
+
+  return rv;
 }
 
 int main(int argc, char *argv[])
