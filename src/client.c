@@ -71,8 +71,14 @@ int send_request(int fd, char *hostname, char *port, char *path)
   char request[max_request_size];
   int rv;
   int request_length = sprintf(request, "GET %s HTTP/1.1\nHost: %s:%s\nConnection: Close\n\n",path,hostname,port);
-  get_socket();//hostname, port
-  return 0;
+  // int socket = get_socket(hostname, port);//hostname, port   returns integer
+  // send(socket, request, request_length, 0);
+  // recv()
+  rv = send(fd, request, request_length, 0);
+  if(rv < 0){
+    perror("Send Request Failed");
+  }
+  return rv;
 }
 
 int main(int argc, char *argv[])
