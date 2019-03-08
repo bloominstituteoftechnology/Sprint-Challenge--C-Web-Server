@@ -75,9 +75,6 @@ int send_request(int fd, char *hostname, char *port, char *path)
   char request[max_request_size];
   int rv;
 
-  time_t rawtime = time(NULL);
-  struct tm *info = localtime(&rawtime);
-
   int request_length = sprintf(request, "GET /%s HTTP/1.1\n"
                                         "Connection: close\n"
                                         "Host: %s:%s\n"
@@ -113,7 +110,7 @@ int main(int argc, char *argv[])
   sockfd = get_socket(urlinfo->hostname, urlinfo->port);
 
   // 3. Call `send_request` to construct the request and send it
-  int rv = send_request(socket, urlinfo->hostname, urlinfo->port, urlinfo->path);
+  int rv = send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
 
   // 4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
   while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0)
