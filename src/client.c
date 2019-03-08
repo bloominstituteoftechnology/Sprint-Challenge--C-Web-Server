@@ -45,6 +45,14 @@ urlinfo_t *parse_url(char *url)
     5. Set the port pointer to 1 character after the spot returned by strchr.
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
+  path = (strchr(hostname, '/') + 1);
+  strchr(hostname, '/')[0] = '\0';
+  port = (strchr(hostname, ':') + 1);
+  strchr(hostname, ':')[0] = '\0';
+
+  urlinfo->hostname = hostname;
+  urlinfo->path = path;
+  urlinfo->port = port;
 
   return urlinfo;
 }
@@ -77,11 +85,12 @@ int main(int argc, char *argv[])
   int sockfd, numbytes;
   char buf[BUFSIZE];
 
-  if (argc != 2)
-  {
-    fprintf(stderr, "usage: client HOSTNAME:PORT/PATH\n");
-    exit(1);
-  }
+  // Uncomment when done with hardcode
+  // if (argc != 2)
+  // {
+  //   fprintf(stderr, "usage: client HOSTNAME:PORT/PATH\n");
+  //   exit(1);
+  // }
 
   /*
     1. Parse the input URL
@@ -91,9 +100,7 @@ int main(int argc, char *argv[])
     5. Clean up any allocated memory and open file descriptors.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  urlinfo_t *url = parse_url("lordnikon.tech:80/lambda_notes/");
 
   return 0;
 }
