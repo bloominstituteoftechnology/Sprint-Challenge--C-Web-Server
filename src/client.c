@@ -67,11 +67,20 @@ int send_request(int fd, char *hostname, char *port, char *path)
     char request[max_request_size];
     int rv;
 
-    ///////////////////
-    // IMPLEMENT ME! //
-    ///////////////////
+    int req_len = sprintf(request,
+                          "GET /%s HTTP/1.1\n"
+                          "Host: %s:%s\n"
+                          "Connection: close\n\n",
+                          path, hostname, port);
 
-    return 0;
+    rv = send(fd, request, req_len, 0);
+
+    if (rv < 0)
+    {
+        perror("send_request");
+    }
+
+    return rv;
 }
 
 int main(int argc, char *argv[])
@@ -93,9 +102,8 @@ int main(int argc, char *argv[])
     5. Clean up any allocated memory and open file descriptors.
   */
 
-    ///////////////////
-    // IMPLEMENT ME! //
-    ///////////////////
+    urlinfo_t *urlinfo = malloc(sizeof(*urlinfo));
+    urlinfo = parse_url(argv[1]);
 
     return 0;
 }
