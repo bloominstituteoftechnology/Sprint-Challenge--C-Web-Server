@@ -126,5 +126,20 @@ int main(int argc, char *argv[])
   // IMPLEMENT ME! //
   ///////////////////
 
+  urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
+  urlinfo = parse_url(argv[1]); // Parse the input URL
+  sockfd = get_socket(urlinfo->hostname, urlinfo->port); // Initialize socket - get_socket() from lib.h
+
+  
+  send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path); //construct request & send 
+
+  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
+    //loop until there is no more data to receive from the server
+    fprintf(stdout, "%s\n", buf); // Receive the response from the server and print it to `stdout`.
+  }
+
+  free(urlinfo); //Clean up any allocated memory
+  close(sockfd); // `close` any open file descriptors
+
   return 0;
 }
