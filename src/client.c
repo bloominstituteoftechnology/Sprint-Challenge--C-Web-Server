@@ -12,7 +12,8 @@
 /**
  * Struct to hold all three pieces of a URL
  */
-typedef struct urlinfo_t {
+typedef struct urlinfo_t
+{
   char *hostname;
   char *port;
   char *path;
@@ -28,26 +29,58 @@ typedef struct urlinfo_t {
 urlinfo_t *parse_url(char *url)
 {
   // copy the input URL so as not to mutate the original
-  char *hostname = strdup(url);
+  char *hostname;
   char *port;
   char *path;
+  char *slash;
+  char *colon;
 
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
 
-  /*
-    We can parse the input URL by doing the following:
+  // Handle http:// or https://
+  if (strstr(url, "http://"))
+  {
+    hostname = strdup(&url[7]);
+  }
+  else
+  {
+    if (strstr(url, "https://"))
+    {
+      hostname = strdup(&url[8]);
+    }
+    else
+    {
+      hostname = strdup(url);
+    }
+  }
 
-    1. Use strchr to find the first backslash in the URL (this is assuming there is no http:// or https:// in the URL).
-    2. Set the path pointer to 1 character after the spot returned by strchr.
-    3. Overwrite the backslash with a '\0' so that we are no longer considering anything after the backslash.
-    4. Use strchr to find the first colon in the URL.
-    5. Set the port pointer to 1 character after the spot returned by strchr.
-    6. Overwrite the colon with a '\0' so that we are just left with the hostname.
-  */
+  // Find first backslash in URL
+  slash = strchr(hostname, '/');
+  // set path pointer to 1 character after slash
+  path = slash + 1;
+  // Set backslash to '\0'
+  *slash = '\0';
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  // Find first colon in URL
+  colon = strchr(hostname, ':');
+  // If colon found set port
+  if (colon)
+  {
+    // set port to 1 character after the colon
+    port = colon + 1;
+    // Set colon to '\0'
+    *colon = '\0';
+  }
+  else
+  {
+    // If no colon set port to default
+    port = "80";
+  }
+
+  // Assign to fields on urlinfo
+  urlinfo->hostname = hostname;
+  urlinfo->path = path;
+  urlinfo->port = port;
 
   return urlinfo;
 }
@@ -68,34 +101,57 @@ int send_request(int fd, char *hostname, char *port, char *path)
   char request[max_request_size];
   int rv;
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  // Build HTTP request
+  int request_length = sprintf(request,
+                               "GET /%s HTTP/1.1\n"
+                               "Host: %s:%s\n"
+                               "Connection: close\n"
+                               "\n",
+                               path,
+                               hostname,
+                               port);
 
-  return 0;
+  // Send it all!
+  rv = send(fd, request, request_length, 0);
+
+  if (rv < 0)
+  {
+    perror("send");
+  }
+
+  return rv;
 }
 
 int main(int argc, char *argv[])
-{  
-  int sockfd, numbytes;  
+{
+  int sockfd, numbytes;
   char buf[BUFSIZE];
 
-  if (argc != 2) {
-    fprintf(stderr,"usage: client HOSTNAME:PORT/PATH\n");
+  if (argc != 2)
+  {
+    fprintf(stderr, "usage: client HOSTNAME:PORT/PATH\n");
     exit(1);
   }
 
-  /*
-    1. Parse the input URL
-    2. Initialize a socket by calling the `get_socket` function from lib.c
-    3. Call `send_request` to construct the request and send it
-    4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
-    5. Clean up any allocated memory and open file descriptors.
-  */
+  // Parse input URL
+  urlinfo_t *urlinfo = parse_url(argv[1]);
+  // Initialize socket
+  sockfd = get_socket(urlinfo->hostname, urlinfo->port);
+  // call send_request to contruct the request and send it
+  send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
+  // Call 'recv' in a loop until there is no more data to receive from the server
+  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0)
+  {
+    // Print out response to stdout
+    fprintf(stdout, "%s\n", buf);
+  }
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  // Clean allocated memory
+  free(urlinfo->hostname);
+  free(urlinfo);
+
+  // Close file descriptor
+  close(sockfd);
 
   return 0;
 }
