@@ -73,11 +73,15 @@ int send_request(int fd, char *hostname, char *port, char *path)
   char request[max_request_size];
   int rv;
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  int response_length = snprintf(request, max_request_size,
+                                 "GET/%s HTTP/1.1\n"
+                                 "Host: %s:%s\n"
+                                 "Connection: close\n\n",
+                                 path, hostname, port);
 
-  return 0;
+  rv = send(fd, request, response_length, 0);
+
+  return rv;
 }
 
 int main(int argc, char *argv[])
