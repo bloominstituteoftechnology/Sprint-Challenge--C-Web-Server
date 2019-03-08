@@ -144,6 +144,7 @@ int main(int argc, char *argv[])
     printf("%s\n", buf);
   }
   close(sockfd);
+  free(url);
 
   return 0;
 }
