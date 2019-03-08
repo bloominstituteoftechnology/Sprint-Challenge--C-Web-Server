@@ -46,9 +46,29 @@ urlinfo_t *parse_url(char *url)
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  //Retrieve path from URL
+  char ch = '/';
+  char *ret = strchr(hostname, ch);
+  path = ret + 1;
+  *ret = '\0';
+
+  //Retrieve port from URL
+  char ch2 = ':';
+  char *tmp = strchr(hostname, ch2);
+
+  if (tmp == NULL)
+  {
+    port = 80;
+  }
+  else
+  {
+    port = tmp + 1;
+    *tmp = '\0';
+  }
+
+  printf("hostname: %s\n", hostname);
+  printf("port: %s\n", port);
+  printf("path: %s\n", path);
 
   return urlinfo;
 }
@@ -83,6 +103,10 @@ int main(int argc, char *argv[])
 
   if (argc != 2)
   {
+
+    //------debug0-------
+    parse_url("hostname:3490/index.html");
+
     fprintf(stderr, "usage: client HOSTNAME:PORT/PATH\n");
     exit(1);
   }
