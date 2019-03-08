@@ -31,7 +31,7 @@ urlinfo_t *parse_url(char *url)
   char *hostname = strdup(url);
   char *port;
   char *path;
-  char *parsed_path;
+  // char *path_parsed;
 
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
 
@@ -84,17 +84,17 @@ int send_request(int fd, char *hostname, char *port, char *path)
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
-  int req_len = sprintf(request,
+  int request_length = sprintf(request,
                             "GET /%s HTTP/1.1\n"
                             "Host: %s:%s\n"
                             "Connection: close\n\n",
                             path, hostname, port);
 
-  rv = send(fd, request, req_len, 0);
+  rv = send(fd, request, request_length, 0);
   
   if (rv < 0)
     {
-        perror("send_request");
+        perror("send_request error");
     }
 
   return rv;
@@ -138,5 +138,5 @@ int main(int argc, char *argv[])
     close(sockfd);
 
     return 0;
-    
+
 }
