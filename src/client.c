@@ -114,6 +114,12 @@ int main(int argc, char *argv[])
   int socket = get_socket(urlinfo->hostname, urlinfo->port);
   printf("\n");
   
+  int sendResult = send_request(socket, urlinfo->hostname, urlinfo->port, urlinfo->path);
+  if (sendResult >= 0) {
+    // success
+  }
+  
+  printf("\n");
   
   free(urlinfo->hostname);
   free(urlinfo->port);
