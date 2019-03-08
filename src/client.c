@@ -64,6 +64,13 @@ urlinfo_t *parse_url(char *url)
       return urlinfo;
 }
 
+void clear_url_info(urlinfo_t *urlinfo) {
+      free(urlinfo->hostname);
+      free(urlinfo->port);
+      free(urlinfo->path);
+      free(urlinfo);
+}
+
 /**
  * Constructs and sends an HTTP request
  *
@@ -102,25 +109,28 @@ int send_request(int fd, char *hostname, char *port, char *path)
 
 int main(int argc, char *argv[])
 {  
-  int sockfd, numbytes;  
-  char buf[BUFSIZE];
+      int sockfd, numbytes;  
+      char buf[BUFSIZE];
 
-  if (argc != 2) {
-    fprintf(stderr,"usage: client HOSTNAME:PORT/PATH\n");
-    exit(1);
-  }
+      if (argc != 2) {
+        fprintf(stderr,"usage: client HOSTNAME:PORT/PATH\n");
+        exit(1);
+      }
 
-  /*
-    1. Parse the input URL
-    2. Initialize a socket by calling the `get_socket` function from lib.c
-    3. Call `send_request` to construct the request and send it
-    4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
-    5. Clean up any allocated memory and open file descriptors.
-  */
-
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
-
-  return 0;
+      //1. Parse the input URL -- using parse_url function 
+      //-- will return urlinfo_t struct with hostname, path and port
+      urlinfo_t *URL_INFO = parse_url(argv[1]); 
+      //2. Initialize a socket by calling the `get_socket` function from lib.c
+      sockfd = get_socket(URL_INFO->hostname, URL_INFO->port);
+      //3. Call `send_request` to construct the request and send it
+      send_request(sockfd, URL_INFO->hostname, URL_INFO->port, URL_INFO->path);
+      //4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
+      while((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0))  >  0) {
+            printf("%s",buf);
+      }
+      //5. Clean up any allocated memory and open file descriptors.
+      close(sockfd);
+      clear_url_info(URL_INFO);
+      return 0;
+      
 }
