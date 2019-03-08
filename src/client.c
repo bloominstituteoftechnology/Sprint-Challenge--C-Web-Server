@@ -65,7 +65,7 @@ int send_request(int fd, char *hostname, char *port, char *path)
   char request[max_request_size];
   int rv;
 
-  //Just like in the web server, use `sprintf` in order to construct the request from the `hostname`, `port`, and `path`
+  //use `sprintf` in order to construct the request from the `hostname`, `port`, and `path`
   int request_length = sprintf(request,
     "GET /%s HTTP/1.1\n"
     "Host: %s:%s\n"
