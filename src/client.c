@@ -48,6 +48,17 @@ urlinfo_t *parse_url(char *url)
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
+  char *first_bs = strchr(hostname, '/');// Use strchr to find the first backslash in the URL
+  path = first_bs + 1; //Set the path pointer to 1 character after the spot returned by strchr.
+  *first_bs = '\0'; //Overwrite the backslash with a '\0' 
+
+  char *first_colon = strchr(hostname, ':'); //Use strchr to find the first colon in the URL.
+  port = first_colon + 1;//Set the port pointer to 1 character after the spot returned by strchr.
+  *first_colon = '\0';//Overwrite the colon with a '\0'
+
+  urlinfo->hostname = hostname;
+  urlinfo->port = port;
+  urlinfo->path = path;
 
   return urlinfo;
 }
