@@ -93,7 +93,7 @@ int main(int argc, char *argv[])
 
     // 1. Parse the input URL
   struct urlinfo_t *parsed = parse_url(argv[1]);
-  printf("Parsed Host: %s\nParsed Port: %s\n Parsed Path %s", parsed->hostname, parsed->port, parsed->path);
+  // printf("Parsed Host: %s\nParsed Port: %s\n Parsed Path %s", parsed->hostname, parsed->port, parsed->path);
     // 2. Initialize a socket by calling the `get_socket` function from lib.c
   int socket = get_socket(parsed->hostname, parsed->port);
     // 3. Call `send_request` to construct the request and send it
@@ -107,4 +107,4 @@ int main(int argc, char *argv[])
   free(parsed);
   close(socket);
   return 0;
-}
+}//Everything is 404 for some reason
