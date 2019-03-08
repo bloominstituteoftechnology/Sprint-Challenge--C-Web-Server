@@ -83,7 +83,25 @@ int send_request(int fd, char *hostname, char *port, char *path)
   // IMPLEMENT ME! //
   ///////////////////
 
-  return 0;
+  //Just like in the web server, use `sprintf` in order to construct the request from the `hostname`, `port`, and `path`
+  int request_length = sprintf(request,
+    "GET /%s HTTP/1.1\n"
+    "Host: %s:%s\n"
+    "Connection: close\n\n",
+
+    path,
+    hostname,
+    port
+  );
+  
+ // Send it all!
+  rv = send(fd, request, request_length, 0);
+
+  if (rv < 0) {
+      perror("error in send_request()");
+  }
+
+  return rv;
 }
 
 int main(int argc, char *argv[])
