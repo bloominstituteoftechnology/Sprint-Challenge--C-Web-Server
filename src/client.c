@@ -49,7 +49,7 @@ urlinfo_t *parse_url(char *url)
     char *backslash = strchr(hostname, '/');
     path = backslash + 1;
     *backslash = '\0';
-    
+
     char *colon = strchr(hostname, ':');
     port = colon + 1;
     *colon = '\0';
@@ -84,8 +84,20 @@ int send_request(int fd, char *hostname, char *port, char *path)
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
+  int req_len = sprintf(request,
+                            "GET /%s HTTP/1.1\n"
+                            "Host: %s:%s\n"
+                            "Connection: close\n\n",
+                            path, hostname, port);
 
-  return 0;
+  rv = send(fd, request, req_len, 0);
+  
+  if (rv < 0)
+    {
+        perror("send_request");
+    }
+
+  return rv;
 }
 
 int main(int argc, char *argv[])
