@@ -73,13 +73,13 @@ int send_request(int fd, char *hostname, char *port, char *path)
   char request[max_request_size];
   int rv;
 
-  int response_length = snprintf(request, max_request_size,
-                                 "GET/%s HTTP/1.1\n"
-                                 "Host: %s:%s\n"
-                                 "Connection: close\n\n",
-                                 path, hostname, port);
+  int request_length = snprintf(request, max_request_size,
+                                "GET/%s HTTP/1.1\n"
+                                "Host: %s:%s\n"
+                                "Connection: close\n\n",
+                                path, hostname, port);
 
-  rv = send(fd, request, response_length, 0);
+  rv = send(fd, request, request_length, 0);
 
   return rv;
 }
@@ -89,12 +89,11 @@ int main(int argc, char *argv[])
   int sockfd, numbytes;
   char buf[BUFSIZE];
 
-  // Uncomment when done with hardcode
-  // if (argc != 2)
-  // {
-  //   fprintf(stderr, "usage: client HOSTNAME:PORT/PATH\n");
-  //   exit(1);
-  // }
+  if (argc != 2)
+  {
+    fprintf(stderr, "usage: client HOSTNAME:PORT/PATH\n");
+    exit(1);
+  }
 
   /*
     1. Parse the input URL
@@ -104,7 +103,19 @@ int main(int argc, char *argv[])
     5. Clean up any allocated memory and open file descriptors.
   */
 
-  urlinfo_t *url = parse_url("lordnikon.tech:80/lambda_notes/");
+  urlinfo_t *url = parse_url(argv[1]);
+
+  printf("REQUESTING HOSTNAME: %s PORT: %s PATH: %s\n",
+         url->hostname, url->port, url->path); // <--debugging
+
+  sockfd = get_socket(url->hostname, url->port);
+  send_request(sockfd, url->hostname, url->port, url->path);
+  numbytes = recv(sockfd, buf, BUFSIZE - 1, 0);
+  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0)
+  {
+    printf("%s\n", buf);
+  }
+  close(sockfd);
 
   return 0;
 }
