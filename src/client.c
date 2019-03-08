@@ -42,7 +42,7 @@ urlinfo_t *parse_url(char *url)
     // 3. Overwrite the backslash with a '\0' so that we are no longer considering anything after the backslash.
   *backslash = '\0';
     // 4. Use strchr to find the first colon in the URL.
-  char *colon = strchr(hostname, '/');
+  char *colon = strchr(hostname, ':');
     // 5. Set the port pointer to 1 character after the spot returned by strchr.
   port = colon + 1;
     // 6. Overwrite the colon with a '\0' so that we are just left with the hostname.
@@ -93,6 +93,7 @@ int main(int argc, char *argv[])
 
     // 1. Parse the input URL
   struct urlinfo_t *parsed = parse_url(argv[1]);
+  printf("Parsed Host: %s\nParsed Port: %s\n Parsed Path %s", parsed->hostname, parsed->port, parsed->path);
     // 2. Initialize a socket by calling the `get_socket` function from lib.c
   int socket = get_socket(parsed->hostname, parsed->port);
     // 3. Call `send_request` to construct the request and send it
