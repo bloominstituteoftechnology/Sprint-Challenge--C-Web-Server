@@ -84,12 +84,12 @@ int send_request(int fd, char *hostname, char *port, char *path)
   //  GET /path HTTP/1.1
   // Host: hostname:port
   // Connection: close
-  sprintf(request,
-          "GET /%s HTTP/1.1\n"
-          "Host: %s:%s\n"
-          "Connection: close\n"
-          "\n",
-          path, hostname, port);
+  int request_length = snprintf(request, max_request_size,
+                                "GET /%s HTTP/1.1\n"
+                                "Host: %s:%s\n"
+                                "Connection: close\n"
+                                "\n",
+                                path, hostname, port);
 
   return 0;
 }
@@ -114,6 +114,7 @@ int main(int argc, char *argv[])
   */
 
   urlinfo_t *urlinfo = parse_url(argv[1]);
-  send_request(NULL, urlinfo->hostname, urlinfo->port, urlinfo->path);
+  sockfd = get_socket(urlinfo->hostname, urlinfo->port);
+  send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
   return 0;
 }
