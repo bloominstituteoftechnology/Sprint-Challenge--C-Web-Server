@@ -117,6 +117,11 @@ int main(int argc, char *argv[])
   int sendResult = send_request(socket, urlinfo->hostname, urlinfo->port, urlinfo->path);
   if (sendResult >= 0) {
     // success
+    
+    while ((numbytes = recv(socket, buf, BUFSIZE - 1, 0)) > 0) {
+      buf[numbytes] = '\0';
+      printf("%s", buf);
+    }
   }
   
   printf("\n");
