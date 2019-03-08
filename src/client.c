@@ -49,7 +49,7 @@ urlinfo_t *parse_url(char *url)
   //Retrieve path from URL
   char ch = '/';
   char *ret = strchr(hostname, ch);
-  path = ret + 1;
+  path = strdup(ret);
   *ret = '\0';
 
   //Retrieve port from URL ------- need to modify to handle URLs without port number
@@ -58,7 +58,7 @@ urlinfo_t *parse_url(char *url)
 
   if (tmp == NULL)
   {
-    *port = 80;
+    port = "80";
   }
   else
   {
@@ -91,7 +91,8 @@ int send_request(int fd, char *hostname, char *port, char *path)
   int request_size;
   int rv;
 
-  sprintf(request, "GET %s HTTP/1.1\nHost: %s:%s\nConnection: Close\n", path, hostname, port);
+  sprintf(request, "GET %s HTTP/1.1\nHost: %s:%s\nConnection: Close\n\n", path, hostname, port);
+  printf("%s\n", request);
   request_size = strlen(request);
 
   //Send the request
@@ -116,7 +117,7 @@ int main(int argc, char *argv[])
 
     //------debug0-------
 
-    urlinfo_t *url = parse_url("localhost:3490/index.html");
+    urlinfo_t *url = parse_url("google.com/index.html");
     printf("\nlets send req, with hostname: %s\n", url->hostname);
     send_request(1, url->hostname, url->port, url->path);
 
@@ -136,16 +137,11 @@ int main(int argc, char *argv[])
   sockfd = get_socket(url->hostname, url->port);
   int rv = send_request(sockfd, url->hostname, url->port, url->path);
 
-  // while (1)
-  // {
-  //   int numbytes = recv(sockfd, buf, BUFSIZ, 0);
-  //   printf("d\n", numbytes);
-  // }
-
   while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0)
   {
     // print the data we got back to stdout
-    printf("%s", buf);
+    printf("%d\n", numbytes);
+    printf("%s\n", buf);
   }
   close(sockfd);
 
