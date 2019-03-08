@@ -29,7 +29,7 @@ typedef struct urlinfo_t
 urlinfo_t *parse_url(char *url)
 {
   // copy the input URL so as not to mutate the original
-  char *hostname = strdup(url);
+  char *hostname;
   char *port;
   char *path;
   char *slash;
@@ -37,8 +37,24 @@ urlinfo_t *parse_url(char *url)
 
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
 
+  // Handle http:// or https://
+  if (strstr(url, "http://"))
+  {
+    hostname = strdup(&url[7]);
+  }
+  else
+  {
+    if (strstr(url, "https://"))
+    {
+      hostname = strdup(&url[8]);
+    }
+    else
+    {
+      hostname = strdup(url);
+    }
+  }
+
   // Find first backslash in URL
-  // TODO: Check for protocol in URL (ie. http://, https://)
   slash = strchr(hostname, '/');
   // set path pointer to 1 character after slash
   path = slash + 1;
