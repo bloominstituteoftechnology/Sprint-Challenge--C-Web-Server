@@ -115,9 +115,21 @@ int main(int argc, char *argv[])
     5. Clean up any allocated memory and open file descriptors.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  // parse the url
+  urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
+  urlinfo = parse_url(argv[1]);
+  // get socket
+  sockfd = get_socket(urlinfo->hostname, urlinfo->port);
+  // send it
+  send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
+  // loop and print response
+  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0)
+  {
+    fprintf(stdout, "%s\n", buf);
+  }
+  // clean up
+  free(urlinfo);
+  close(sockfd);
 
   return 0;
 }
