@@ -33,6 +33,8 @@ urlinfo_t *parse_url(char *url)
   char *port;
   char *path;
 
+  char *result;
+
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
 
   /*
@@ -45,6 +47,15 @@ urlinfo_t *parse_url(char *url)
     5. Set the port pointer to 1 character after the spot returned by strchr.
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
+
+  //Strip out the http:// text from the URL
+
+  result = strstr(hostname, "//");
+  printf("result: %s\n", result);
+  if (result != NULL)
+  {
+    hostname = result + 2;
+  }
 
   //Retrieve path from URL
   char ch = '/';
@@ -117,7 +128,7 @@ int main(int argc, char *argv[])
 
     //------debug0-------
 
-    urlinfo_t *url = parse_url("google.com/index.html");
+    urlinfo_t *url = parse_url("http://localhost:3490/index.html");
     printf("\nlets send req, with hostname: %s\n", url->hostname);
     send_request(1, url->hostname, url->port, url->path);
 
