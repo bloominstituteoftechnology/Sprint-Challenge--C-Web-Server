@@ -91,7 +91,7 @@ int send_request(int socket, char *hostname, char *port, char *path)
 
 int main(int argc, char *argv[])
 {  
-  int sockfd, numbytes;  
+  int numbytes;  
   char buf[BUFSIZE];
 
   if (argc != 2) {
@@ -111,12 +111,16 @@ int main(int argc, char *argv[])
   
   urlinfo_t *urlinfo = parse_url(url);
   
+  int socket = get_socket(urlinfo->hostname, urlinfo->port);
+  printf("\n");
   
   
   free(urlinfo->hostname);
   free(urlinfo->port);
   free(urlinfo->path);
   free(urlinfo);
+  
+  close(socket);
 
   return 0;
 }
