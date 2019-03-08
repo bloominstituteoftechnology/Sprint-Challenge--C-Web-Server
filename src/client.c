@@ -72,15 +72,26 @@ urlinfo_t *parse_url(char *url)
  *
  * Return the value from the send() function.
 */
+
+// http
+//      GET /path HTTP/1.1
+//      Host: hostname:port
+//      Connection: close
+
 int send_request(int fd, char *hostname, char *port, char *path)
 {
   const int max_request_size = 16384;
   char request[max_request_size];
   int rv;
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  int request_length = sprintf(request, "GET /%s HTTP/1.1\nHost: %s:%s\nConnection:close\n\n", path, hostname, port);
+
+  rv = send(fd, request, request_length, 0);
+
+  if (rv < 0)
+  {
+    perror("Send request error.");
+  }
 
   return 0;
 }
