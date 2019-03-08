@@ -27,13 +27,6 @@ typedef struct urlinfo_t {
 */
 urlinfo_t *parse_url(char *url)
 {
-  // copy the input URL so as not to mutate the original
-  char *hostname = strdup(url);
-  char *port;
-  char *path;
-
-  urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
-
   /*
     We can parse the input URL by doing the following:
 
@@ -45,10 +38,28 @@ urlinfo_t *parse_url(char *url)
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
 
+  // Copy the input url so we don't mutate the original
+  // hostname = localhost:3490/something\0
+  urlinfo->hostname = strdup(url); 
+  
+  // Find the first backslash
+  // Copy the path after the backslash
+  // Replace the backslash with \0
+  // hostname = localhost:3490\0something\0
+  char *backslash = strchr(urlinfo->hostname, '/');
+  urlinfo->path = strdup(backslash+1);
+  backslash[0] = '\0';
+  
+  // Find the first colon
+  // Copy the port after the colon
+  // Replace the colon with \0
+  // hostname = localhost\03490\0something\0
+  char *colon = strchr(urlinfo->hostname, ':');
+  urlinfo->port = strdup(colon+1);
+  colon[0] = '\0';
+  
   return urlinfo;
 }
 
