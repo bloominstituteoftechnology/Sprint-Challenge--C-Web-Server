@@ -49,19 +49,13 @@ urlinfo_t *parse_url(char *url)
   // IMPLEMENT ME! //
   ///////////////////
 
-  if(strchr(hostname, "/")) {
-    path = strchr(hostname, "/") + 1;
-    *(path - 1) = "\0";
-  } else {
-    path = "/";
-  }
+  char *backslash = strchr(hostname, '/');
+  path = backslash + 1;
+  *backslash = '\0';
 
-  if(strchr(hostname, ":")) {
-    path = strchr(hostname, ":") + 1;
-    *(path - 1) = "\0";
-  } else {
-    port = "80";
-  }
+  char *colon = strchr(hostname, ':');
+  port = colon + 1;
+  *colon = '\0';
 
   urlinfo -> hostname = hostname;
   urlinfo -> port = port;
@@ -126,22 +120,19 @@ int main(int argc, char *argv[])
   // IMPLEMENT ME! //
   ///////////////////
 
-  urlinfo_t *urlinfo = parse_url(argv[1]);
-
+  struct urlinfo_t *urlinfo = parse_url(argv[1]);
+  
   sockfd = get_socket(urlinfo -> hostname, urlinfo -> port);
-
-  int sendRequest = send_request(sockfd, urlinfo -> hostname, urlinfo -> port, urlinfo -> path);
-
-  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
-    buf[numbytes] = "\0";
-    printf("%s", buf);
+  
+  send_request(sockfd, urlinfo -> hostname, urlinfo -> port, urlinfo -> path);
+  
+  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0)
+  {
+    printf("%s\n", buf);
   }
-
-  free(urlinfo -> hostname);
-  free(urlinfo -> port);
-  free(urlinfo -> path);
+  
   free(urlinfo);
-
+  
   close(sockfd);
 
   return 0;
