@@ -45,7 +45,8 @@ urlinfo_t *parse_url(char *url)
     5. Set the port pointer to 1 character after the spot returned by strchr.
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
-  // Will cut https or http off so it will be treated the same
+
+  // Will stripe https or http off
   if (copyUrl[0] == 'h')
   {
     hostname = strchr(copyUrl, '/');
@@ -56,8 +57,7 @@ urlinfo_t *parse_url(char *url)
     hostname = copyUrl;
   }
 
-  printf("hostname: %s\n", hostname);
-
+  // Check for path, if none will be blank
   path = strrchr(hostname, '/');
   if (path)
   {
@@ -66,10 +66,10 @@ urlinfo_t *parse_url(char *url)
   }
   else
   {
-    urlinfo->path = "";
+    path = "";
   }
 
-  // Finds the port, if none defautl is 80
+  // Finds the port, if none default is 80
   port = strrchr(hostname, ':');
   if (port)
   {
@@ -80,6 +80,10 @@ urlinfo_t *parse_url(char *url)
   {
     port = "80";
   }
+
+  printf("hostname: %s\n", hostname);
+  printf("port: %s\n", port);
+  printf("path: %s\n", path);
 
   urlinfo->hostname = strdup(hostname);
   urlinfo->port = strdup(port);
