@@ -34,6 +34,20 @@ urlinfo_t *parse_url(char *url)
 
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
 
+  char *backslash = strstr(hostname, "/");
+  path = backslash + 1;
+  *backslash = '\0';
+
+  char *colon = strstr(hostname, ":");
+  port = colon+1;
+  *colon = '\0';
+
+  urlinfo->hostname = hostname;
+  urlinfo->port = port;
+  urlinfo->path = path;
+  
+  return urlinfo;
+
   /*
     We can parse the input URL by doing the following:
 
@@ -45,9 +59,11 @@ urlinfo_t *parse_url(char *url)
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
 
+
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
+
 
   return urlinfo;
 }
@@ -63,10 +79,29 @@ urlinfo_t *parse_url(char *url)
  * Return the value from the send() function.
 */
 int send_request(int fd, char *hostname, char *port, char *path)
+
 {
+    //  GET /path HTTP/1.1
+    //  Host: hostname:port
+    //  Connection: close
   const int max_request_size = 16384;
   char request[max_request_size];
   int rv;
+  printf(hostname);
+  printf(port);
+  printf(path);
+
+  int request_length = sprintf(request,
+                    "GET /%s HTTPS/1.1\n"
+                    "Host: %s:%s\n"
+                    "Connection: close\n\n",
+                    path, hostname, port);
+
+  rv = send(fd, request, request_length, 0);
+
+  if(rv< 0){
+    perror("Send");
+  }
 
   ///////////////////
   // IMPLEMENT ME! //
@@ -79,11 +114,19 @@ int main(int argc, char *argv[])
 {  
   int sockfd, numbytes;  
   char buf[BUFSIZE];
-
   if (argc != 2) {
     fprintf(stderr,"usage: client HOSTNAME:PORT/PATH\n");
     exit(1);
   }
+  // printf("Hello");
+  urlinfo_t *urlinfo = parse_url(argv[1]);
+  // printf("Hello");
+  sockfd = get_socket(urlinfo->hostname, urlinfo->port);
+  send_request(sockfd,urlinfo->hostname, urlinfo->port,urlinfo->path);
+  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
+       // print the data we got back to stdout
+       printf("Server response: %s\n", buf);
+   }
 
   /*
     1. Parse the input URL
@@ -92,7 +135,8 @@ int main(int argc, char *argv[])
     4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
     5. Clean up any allocated memory and open file descriptors.
   */
-
+  free(urlinfo);
+  close(sockfd);  
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
