@@ -104,9 +104,16 @@ int main(int argc, char *argv[])
     5. Clean up any allocated memory and open file descriptors.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  char *url = argv[1];
+  
+  urlinfo_t *urlinfo = parse_url(url);
+  
+  
+  
+  free(urlinfo->hostname);
+  free(urlinfo->port);
+  free(urlinfo->path);
+  free(urlinfo);
 
   return 0;
 }
