@@ -52,13 +52,13 @@ urlinfo_t *parse_url(char *url)
   path = ret + 1;
   *ret = '\0';
 
-  //Retrieve port from URL
+  //Retrieve port from URL ------- need to modify to handle URLs without port number
   char ch2 = ':';
   char *tmp = strchr(hostname, ch2);
 
   if (tmp == NULL)
   {
-    port = 80;
+    *port = 80;
   }
   else
   {
@@ -66,9 +66,10 @@ urlinfo_t *parse_url(char *url)
     *tmp = '\0';
   }
 
-  printf("hostname: %s\n", hostname);
-  printf("port: %s\n", port);
-  printf("path: %s\n", path);
+  //Store in urlinfo struct
+  urlinfo->hostname = hostname;
+  urlinfo->port = port;
+  urlinfo->path = path;
 
   return urlinfo;
 }
@@ -87,13 +88,23 @@ int send_request(int fd, char *hostname, char *port, char *path)
 {
   const int max_request_size = 16384;
   char request[max_request_size];
+  int request_size;
   int rv;
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  sprintf(request, "GET %s HTTP/1.1\nHost: %s:%s\nConnection: Close\n", path, hostname, port);
+  request_size = strlen(request);
+  printf("%s\n", request);
 
-  return 0;
+  //Send the request
+  rv = send(fd, request, request_size, 0);
+
+  if (rv < 0)
+  {
+    printf("error sending the request");
+    exit(1);
+  }
+
+  return rv;
 }
 
 int main(int argc, char *argv[])
@@ -105,7 +116,10 @@ int main(int argc, char *argv[])
   {
 
     //------debug0-------
-    parse_url("hostname:3490/index.html");
+
+    urlinfo_t *url = parse_url("localhost:3490/index.html");
+    printf("\nlets send req, with hostname: %s\n", url->hostname);
+    send_request(1, url->hostname, url->port, url->path);
 
     fprintf(stderr, "usage: client HOSTNAME:PORT/PATH\n");
     exit(1);
