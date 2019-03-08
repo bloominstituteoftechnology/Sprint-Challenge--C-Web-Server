@@ -50,18 +50,18 @@ urlinfo_t *parse_url(char *url)
   ///////////////////
       if(strchr(hostname, '/')) {
           path = strchr(hostname, '/') + 1;
-          
+          //Overwrite the backslash with a '\0' so that we are no longer considering anything after the backslash.
+          *(path - 1) = '\0';       
       }
-
-
-
-
-
-
-
-
-
-  return urlinfo;
+      if(strchr(hostname, ':')) {
+          port = strchr(hostname, ':') + 1;
+          *(port - 1) = '/0';
+      }
+      
+      urlinfo->hostname = hostname;
+      urlinfo->path = strdup(path);
+      urlinfo->port = strdup(port);
+      return urlinfo;
 }
 
 /**
