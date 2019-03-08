@@ -75,11 +75,23 @@ int send_request(int fd, char *hostname, char *port, char *path)
   char request[max_request_size];
   int rv;
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  time_t rawtime = time(NULL);
+  struct tm *info = localtime(&rawtime);
 
-  return 0;
+  int request_length = sprintf(request, "GET /%s HTTP/1.1\n"
+                                        "Connection: close\n"
+                                        "Host: %s:%s\n"
+                                        "\n",
+                               path, hostname, port);
+
+  rv = send(fd, request, request_length, 0);
+
+  if (rv < 0)
+  {
+    perror("send");
+  }
+
+  return rv;
 }
 
 int main(int argc, char *argv[])
