@@ -39,13 +39,13 @@ urlinfo_t *parse_url(char *url)
   // 1. Use strchr to find the first backslash in the URL (this is assuming there is no http:// or https:// in the URL).
   slash = strchr(hostname, '/');
   // 2. Set the path pointer to 1 character after the spot returned by strchr.
-  path = slash + 1;
+  path = strdup(slash);
   // 3. Overwrite the backslash with a '\0' so that we are no longer considering anything after the backslash.
   *slash = '\0';
   // 4. Use strchr to find the first colon in the URL.
   colon = strchr(hostname, ':');
   // 5. Set the port pointer to 1 character after the spot returned by strchr.
-  port = colon + 1;
+  port = strdup(colon + 1);
   // 6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   *colon = '\0';
 
@@ -74,8 +74,8 @@ int send_request(int fd, char *hostname, char *port, char *path)
   int request_length;
 
   sprintf(request, "GET /%s HTTP/1.1\n"
-                   "Host: %s:%s"
-                   "Connection: close",
+                   "Host: %s:%s\n"
+                   "Connection: close\n",
           path, hostname, port);
 
   request_length = strlen(request);
@@ -111,9 +111,13 @@ int main(int argc, char *argv[])
   // 4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
   while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0)
   {
-    printf("%s", buf);
+    fprintf(stdout, "%s\n", buf);
   }
   // 5. Clean up any allocated memory and open file descriptors.
+  fclose(stdout);
+  free(url_info->path);
+  free(url_info->port);
+  free(url_info->hostname);
   free(url_info);
   return 0;
 }
