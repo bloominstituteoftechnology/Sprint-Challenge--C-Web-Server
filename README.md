@@ -65,7 +65,7 @@ HTTP/1.1 200 OK
 Date: Wed Dec 20 13:05:11 PST 2017
 Connection: close
 Content-Length: 41749
-Content-Type: text/html
+Content-Type: text/htmldd
 
 <!DOCTYPE html><html><head><title>Lambda School ...
 ```
