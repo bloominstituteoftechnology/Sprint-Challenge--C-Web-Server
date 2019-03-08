@@ -54,8 +54,6 @@ urlinfo_t *parse_url(char *url)
   urlinfo->path = strdup(path);
   urlinfo->port = strdup(port);
 
-  // printf("HOST: %s PATH: %s PORT: %s\n", urlinfo->hostname, urlinfo->path, urlinfo->port);
-
   return urlinfo;
 }
 
@@ -107,15 +105,14 @@ int main(int argc, char *argv[])
 
   urlinfo_t *url = parse_url(argv[1]);
 
-  printf("REQUESTING HOSTNAME: %s PORT: %s PATH: %s\n",
-         url->hostname, url->port, url->path); // <--debugging
-
   sockfd = get_socket(url->hostname, url->port);
   send_request(sockfd, url->hostname, url->port, url->path);
   numbytes = recv(sockfd, buf, BUFSIZE - 1, 0);
-  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0)
+
+  while (numbytes > 0)
   {
     printf("%s\n", buf);
+    numbytes = recv(sockfd, buf, BUFSIZE - 1, 0);
   }
   close(sockfd);
 
