@@ -47,10 +47,19 @@ urlinfo_t *parse_url(char *url)
 
   // Find first colon in URL
   colon = strchr(hostname, ':');
-  // set port to 1 character after the colon
-  port = colon + 1;
-  // Set colon to '\0'
-  *colon = '\0';
+  // If colon found set port
+  if (colon)
+  {
+    // set port to 1 character after the colon
+    port = colon + 1;
+    // Set colon to '\0'
+    *colon = '\0';
+  }
+  else
+  {
+    // If no colon set port to default
+    port = "80";
+  }
 
   // Assign to fields on urlinfo
   urlinfo->hostname = hostname;
@@ -75,6 +84,7 @@ int send_request(int fd, char *hostname, char *port, char *path)
   const int max_request_size = 16384;
   char request[max_request_size];
   int rv;
+
   // Build HTTP request
   int request_length = sprintf(request,
                                "GET /%s HTTP/1.1\n"
@@ -106,14 +116,6 @@ int main(int argc, char *argv[])
     fprintf(stderr, "usage: client HOSTNAME:PORT/PATH\n");
     exit(1);
   }
-
-  /*
-    1. Parse the input URL
-    2. Initialize a socket by calling the `get_socket` function from lib.c
-    3. Call `send_request` to construct the request and send it
-    4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
-    5. Clean up any allocated memory and open file descriptors.
-  */
 
   // Parse input URL
   urlinfo_t *urlinfo = parse_url(argv[1]);
