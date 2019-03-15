@@ -110,8 +110,8 @@ int main(int argc, char *argv[])
     5. Clean up any allocated memory and open file descriptors.
   */
 
-  char *url = argv[1];
-  parse_url(url);
+  urlinfo_t *urlinfo;
+  urlinfo = parse_url(argv[1]);
   
   int sockfd = get_socket(urlinfo->hostname, urlinfo->port);
 
@@ -122,5 +122,10 @@ int main(int argc, char *argv[])
     fprintf(stdout, "%s\n", buf);
   }
 
+  free(urlinfo->path);
+  free(urlinfo->port);
+  free(urlinfo->hostname);
+  free(urlinfo);
+  
   return 0;
 }
