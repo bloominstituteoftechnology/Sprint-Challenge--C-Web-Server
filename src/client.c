@@ -48,17 +48,23 @@ urlinfo_t *parse_url(char *url)
   // IMPLEMENT ME! //
   ///////////////////
 
-  path = strchr(hostname, '/');
-  path++;
-  hostname[*hostname - *path] = '\0';
-  printf("\npath: %s\n", path);
+  printf("\nhostname is : %s\n", hostname);
 
-  port = strchr(hostname, ':');
-  port++;
-  hostname[hostname - port] = '\0';
-  printf("\nport: %s\n", port);
+  path = strchr(hostname, '/') + 1;
+  hostname[*path - *hostname] = '\0';
+  printf("\nhostname is : %s\n", hostname);
+  printf("should be   : google.com:80\n\n");
 
-  printf("\nhostname: %s\n", hostname);
+  printf("hostname pointer is : %d\n", *hostname);
+  printf("path pointer is : %d\n\n", *path);
+
+  port = strchr(hostname, ':') + 1;
+  hostname[*port - *hostname ] = '\0';
+  printf("hostname is : %s\n", hostname);
+  printf("should be   : google.com\n\n");
+
+  printf("hostname pointer is : %d\n", *hostname);
+  printf("port pointer is : %d\n\n", *port);
   // printf("\nurlinfo->path[0]: %d\n", urlinfo->path[0] );
 
   // printf("\nurlinfo->path: %s\n", urlinfo->path );
