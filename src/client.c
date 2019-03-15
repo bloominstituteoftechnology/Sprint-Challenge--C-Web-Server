@@ -52,14 +52,14 @@ urlinfo_t *parse_url(char *url)
     path = strchr(hostname, '/') + 1;
     *(path - 1) = '\0';
   } else {
-    path = '/';
+    path = "/";
   }
 
    if (strchr(hostname, ':')) {
     port = strchr(hostname, ':') + 1;
     *(port - 1) = '\0';
   } else {
-    port = '80';
+    port = "80";
   }
 
   urlinfo->hostname = hostname;
@@ -88,8 +88,16 @@ int send_request(int fd, char *hostname, char *port, char *path)
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
+  int request_length = sprintf(request, "GET /%s HTTP/1.1\nHost: %s:%s\nConnection: close\n\n", path, hostname, port);
 
-  return 0;
+  rv = send(fd, request, request_length, 0);
+
+  if (rv < 0) {
+    perror("Error sending request to server");
+    exit(2);
+  }
+   return rv;
+
 }
 
 int main(int argc, char *argv[])
@@ -110,9 +118,11 @@ int main(int argc, char *argv[])
     5. Clean up any allocated memory and open file descriptors.
   */
 
+
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
+  
 
   return 0;
 }
