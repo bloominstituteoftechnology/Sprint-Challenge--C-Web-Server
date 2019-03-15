@@ -45,9 +45,19 @@ urlinfo_t *parse_url(char *url)
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+    // 1 & 2
+    path = &strchr(hostname, '/')[1];
+    // 3
+    strchr(hostname, '/')[0] = '\0';
+    // 4 & 5
+    port = &strchr(hostname, ':')[1];
+    // 6
+    strchr(hostname, ':')[0] = '\0';
+    
+    // Test
+    printf("Hostname: %s\n", hostname);
+    printf("Port: %s\n", port);
+    printf("Path: %s\n", path);
 
   return urlinfo;
 }
@@ -92,10 +102,9 @@ int main(int argc, char *argv[])
     4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
     5. Clean up any allocated memory and open file descriptors.
   */
-
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
-
+    
+    // Pass the second argument, which is the url, to parse_url
+    parse_url(argv[1]);
+    
   return 0;
 }
