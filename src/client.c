@@ -126,6 +126,6 @@ int main(int argc, char *argv[])
   free(urlinfo->port);
   free(urlinfo->hostname);
   free(urlinfo);
-  
+  close(sockfd);
   return 0;
 }
