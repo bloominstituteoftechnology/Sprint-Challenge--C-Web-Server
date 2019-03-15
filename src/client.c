@@ -33,6 +33,22 @@ urlinfo_t *parse_url(char *url)
   char *path;
   
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
+  char *https = strstr(hostname, "https://");
+  if (https != NULL)
+  {
+    hostname = https + strlen("https://");
+    *https = '\0';
+  }
+  else
+  {
+    char *http = strstr(hostname, "http://");
+
+    if (http != NULL)
+    {
+      hostname = http + strlen("http://");
+      *http = '\0';
+    }
+  }
 
   char *first_backslash = strchr(hostname, '/');
   path = first_backslash + 1;
