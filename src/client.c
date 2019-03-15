@@ -48,16 +48,14 @@ urlinfo_t *parse_url(char *url)
   // IMPLEMENT ME! //
   ///////////////////
 
-  printf("\nhostname is : %s\n", hostname);
+  if (path = strchr(hostname, '/') + 1) {
+    hostname[*path - *hostname] = '\0';
+    printf("\nhostname is : %s\n", hostname);
+    printf("should be   : google.com:80\n\n");
 
-  path = strchr(hostname, '/') + 1;
-  hostname[*path - *hostname] = '\0';
-  printf("\nhostname is : %s\n", hostname);
-  printf("should be   : google.com:80\n\n");
-
-  printf("hostname pointer is : %d\n", *hostname);
-  printf("path pointer is : %d\n\n", *path);
-
+    printf("hostname pointer is : %d\n", *hostname);
+    printf("path pointer is : %d\n\n", *path);
+  }
   port = strchr(hostname, ':') + 1;
   hostname[*port - *hostname ] = '\0';
   printf("hostname is : %s\n", hostname);
@@ -135,16 +133,18 @@ int main(int argc, char *argv[])
   // IMPLEMENT ME! //
   ///////////////////
   struct urlinfo_t *parsed_url;
-
-  parsed_url = parse_url(argv[1]);
   
+  parsed_url = parse_url(argv[1]);
+  parsed_url->hostname = "msn.com";
+  // parsed_url->path = "test";
+  parsed_url->port = "80";
   sockfd = get_socket(parsed_url->hostname, parsed_url->port);
 
   int request = send_request(sockfd, parsed_url->hostname, parsed_url->port,parsed_url->path);
   
   while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0)
   {
-    fprintf( stdout, "%d", numbytes);
+    fprintf( stdout, "%s\n", buf);
   }
   return 0;
 }
