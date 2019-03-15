@@ -34,45 +34,31 @@ urlinfo_t *parse_url(char *url)
 
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
 
-  /*
-    We can parse the input URL by doing the following:
-    1. Use strchr to find the first forward slash in the URL (this is assuming there is no http:// or https:// in the URL).
-    2. Set the path pointer to 1 character after the spot returned by strchr.
-    3. Overwrite the forward slash with a '\0' so that we are no longer considering anything after the forward slash.
-    4. Use strchr to find the first colon in the URL.
-    5. Set the port pointer to 1 character after the spot returned by strchr.
-    6. Overwrite the colon with a '\0' so that we are just left with the hostname.
-  */
+  
+    // We can parse the input URL by doing the following:
+    // 1. Use strchr to find the first forward slash in the URL (this is assuming there is no http:// or https:// in the URL).
+    // if (strchr(hostname, '/') == NULL)
+    char *forward = strchr(hostname, '/');
+    // 2. Set the path pointer to 1 character after the spot returned by strchr.
+    path = forward + 1;
+    // 3. Overwrite the forward slash with a '\0' so that we are no longer considering anything after the forward slash.
+    *forward = '\0';
+    // 4. Use strchr to find the first colon in the URL.
+    char *bracket = strchr(hostname, ':');
+    // 5. Set the port pointer to 1 character after the spot returned by strchr.
+    port = bracket + 1;
+    // 6. Overwrite the colon with a '\0' so that we are just left with the hostname.
+    *bracket = '\0';
+
 
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
 
-  if (path = strchr(hostname, '/') + 1) {
-    hostname[*path - *hostname] = '\0';
-    printf("\nhostname is : %s\n", hostname);
-    printf("should be   : google.com:80\n\n");
-
-    printf("hostname pointer is : %d\n", *hostname);
-    printf("path pointer is : %d\n\n", *path);
-  }
-  port = strchr(hostname, ':') + 1;
-  hostname[*port - *hostname ] = '\0';
-  printf("hostname is : %s\n", hostname);
-  printf("should be   : google.com\n\n");
-
-  printf("hostname pointer is : %d\n", *hostname);
-  printf("port pointer is : %d\n\n", *port);
-  // printf("\nurlinfo->path[0]: %d\n", urlinfo->path[0] );
-
-  // printf("\nurlinfo->path: %s\n", urlinfo->path );
-
-  // *urlinfo->path = path;
-  // urlinfo->port = strchr(hostname, ':');
-  // urlinfo->port++;
-  // urlinfo->port[0] = '\0';
-  // printf("\nurlinfo->port: %s\n", urlinfo->port );
-
+  urlinfo->hostname = hostname;
+  urlinfo->path = path;
+  urlinfo->port = port;
+  
   return urlinfo;
 }
 
@@ -135,9 +121,6 @@ int main(int argc, char *argv[])
   struct urlinfo_t *parsed_url;
   
   parsed_url = parse_url(argv[1]);
-  parsed_url->hostname = "msn.com";
-  // parsed_url->path = "test";
-  parsed_url->port = "80";
   sockfd = get_socket(parsed_url->hostname, parsed_url->port);
 
   int request = send_request(sockfd, parsed_url->hostname, parsed_url->port,parsed_url->path);
