@@ -50,11 +50,16 @@ urlinfo_t *parse_url(char *url)
   
   urlinfo->path = strchr(hostname, '/');
   urlinfo->path++;
-  urlinfo->path[0] = '\0';
-  
+  hostname[*urlinfo->path - 1] = '\0';
+  // urlinfo->path[0] = '\0';
+  printf("\nurlinfo->path[1]: %d\n", urlinfo->path[1] );
+
+  printf("\nurlinfo->path: %s\n", urlinfo->path );
+
   urlinfo->port = strchr(hostname, ':');
   urlinfo->port++;
-  urlinfo->port[0] = '\0';
+  // urlinfo->port[0] = '\0';
+  printf("\nurlinfo->port: %s\n", urlinfo->port );
 
   return urlinfo;
 }
@@ -95,10 +100,10 @@ int send_request(int fd, char *hostname, char *port, char *path)
 }
 
 int main(int argc, char *argv[])
-{  
+{
+  
   int sockfd, numbytes;  
   char buf[BUFSIZE];
-
   if (argc != 2) {
     fprintf(stderr,"usage: client HOSTNAME:PORT/PATH\n");
     exit(1);
@@ -115,6 +120,17 @@ int main(int argc, char *argv[])
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
+  struct urlinfo_t *parsed_url;
 
+  parsed_url = parse_url(argv[1]);
+  
+  sockfd = get_socket(parsed_url->hostname, parsed_url->port);
+
+  int request = send_request(sockfd, parsed_url->hostname, parsed_url->port,parsed_url->path);
+  
+  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0)
+  {
+    fprintf( stdout, "%d", numbytes);
+  }
   return 0;
 }
