@@ -40,11 +40,7 @@ urlinfo_t *parse_url(char *url)
 
   urlinfo->port = strtok(NULL, "/");
 
-  // printf("TOKENIZED:%s\n", tokenized_hn);
-
   urlinfo->path = strtok(NULL, "/");
-
-  // printf("TOKENIZED:%s\n", tokenized_hn);
   
 
   /*
@@ -57,10 +53,6 @@ urlinfo_t *parse_url(char *url)
     5. Set the port pointer to 1 character after the spot returned by strchr.
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
-
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
 
   return urlinfo;
 }
@@ -83,6 +75,8 @@ int send_request(int fd, char *hostname, char *port, char *path)
 
   // GET REQUEST
 
+  
+
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
@@ -101,6 +95,14 @@ int main(int argc, char *argv[])
     printf("HostName: %s\n", url->hostname);
     printf("Port: %s\n", url->port);
     printf("Path: %s\n", url->path);
+
+    unsigned int socket = get_socket(url->hostname, url->port);
+
+    if (socket == -1){
+      fprintf(stderr, "ERROR: Could not get socket. Try again.\n");
+    }
+
+    send_request(socket, url->hostname, url->port, url->path);
     
   } else {
 
