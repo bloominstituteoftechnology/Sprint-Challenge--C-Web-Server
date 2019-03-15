@@ -87,7 +87,8 @@ int send_request(int fd, char *hostname, char *port, char *path)
     sprintf(request,
             "GET /%s HTTP/1.1\n"
             "Host: %s:%s\n"
-            "Connection: close\n",
+            "Connection: close\n"
+            "\n",
             path,
             hostname,
             port
@@ -130,18 +131,24 @@ int main(int argc, char *argv[])
     // Pass the second argument, which is the url, to parse_url
     urlinfo = parse_url(argv[1]);
     
+    // Connect to server
     sockfd = get_socket(urlinfo->hostname, urlinfo->port);
     
+    // Send request
     send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
     
+    // Receive response and print it
     while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
-        if (numbytes == 0) {
-            printf("No data was returned");
-            exit(1);
-        }
         printf("******data******\n");
         printf("%s\n", buf);
     }
+    
+    // Free allocated memory
+    free(urlinfo->hostname);
+    free(urlinfo);
+    
+    // Close open file descriptors
+    close(sockfd);
     
   return 0;
 }
