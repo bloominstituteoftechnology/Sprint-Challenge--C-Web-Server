@@ -54,6 +54,10 @@ urlinfo_t *parse_url(char *url)
     // 6
     strchr(hostname, ':')[0] = '\0';
     
+    urlinfo->hostname = hostname;
+    urlinfo->port = port;
+    urlinfo->path = path;
+    
     // Test
     printf("Hostname: %s\n", hostname);
     printf("Port: %s\n", port);
@@ -77,18 +81,36 @@ int send_request(int fd, char *hostname, char *port, char *path)
   const int max_request_size = 16384;
   char request[max_request_size];
   int rv;
-
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
-
-  return 0;
+    int request_length;
+    
+    sprintf(request,
+            "GET /%s HTTP/1.1\n"
+            "Host: %s:%s\n"
+            "Connection: close\n",
+            path,
+            hostname,
+            port
+            );
+    
+    request_length = strlen(request);
+    
+    rv = send(fd, request, request_length, 0);
+    
+    if (rv < 0) {
+        perror("send");
+    }
+    
+    // Test
+    printf("%s", request);
+    
+  return rv;
 }
 
 int main(int argc, char *argv[])
 {  
   int sockfd, numbytes;  
   char buf[BUFSIZE];
+    urlinfo_t *urlinfo;
 
   if (argc != 2) {
     fprintf(stderr,"usage: client HOSTNAME:PORT/PATH\n");
@@ -104,7 +126,9 @@ int main(int argc, char *argv[])
   */
     
     // Pass the second argument, which is the url, to parse_url
-    parse_url(argv[1]);
+    urlinfo = parse_url(argv[1]);
+    
+    send_request(0, urlinfo->hostname, urlinfo->port, urlinfo->path);
     
   return 0;
 }
