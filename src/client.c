@@ -49,14 +49,12 @@ urlinfo_t *parse_url(char *url)
   if(fs != NULL) {
     path = fs + 1;
     *fs = '\0';
-    // printf("%s\n", path);
   }
 
   char *fc = strchr(hostname, ':');
   if(fc != NULL) {
     port = fc + 1;
     *fc = '\0';
-    // printf("%s\n", port);
   }
   urlinfo->hostname = hostname;
   urlinfo->port = port;
@@ -90,9 +88,6 @@ int send_request(int fd, char *hostname, char *port, char *path)
                                 "\n", path, hostname, port);
 
   rv = send(fd, request, request_length, 0);
-
-  // printf("%s\n", request);
-  // printf("%d\n", rv);
   ///////////////////
 
   return rv;
@@ -109,12 +104,14 @@ int main(int argc, char *argv[])
   }
 
   urlinfo_t *urlinfo = parse_url(argv[1]);
+  ///////////////////
   sockfd = get_socket(urlinfo->hostname, urlinfo->port);
   printf("%d\n", sockfd);
   send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
   while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
     printf("%s\n\n", buf);
   }
+
   /*
     // 1. Parse the input URL
     // 2. Initialize a socket by calling the `get_socket` function from lib.c
@@ -122,9 +119,6 @@ int main(int argc, char *argv[])
     // 4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
     5. Clean up any allocated memory and open file descriptors.
   */
-
-  ///////////////////
-  // IMPLEMENT ME! //
   ///////////////////
 
   return 0;
