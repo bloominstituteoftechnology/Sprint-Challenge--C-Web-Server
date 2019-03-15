@@ -59,6 +59,7 @@ urlinfo_t *parse_url(char *url)
     urlinfo->path = path;
     
     // Test
+    printf("******url info******\n");
     printf("Hostname: %s\n", hostname);
     printf("Port: %s\n", port);
     printf("Path: %s\n", path);
@@ -90,7 +91,7 @@ int send_request(int fd, char *hostname, char *port, char *path)
             path,
             hostname,
             port
-            );
+    );
     
     request_length = strlen(request);
     
@@ -101,6 +102,7 @@ int send_request(int fd, char *hostname, char *port, char *path)
     }
     
     // Test
+    printf("******request******\n");
     printf("%s", request);
     
   return rv;
@@ -128,7 +130,18 @@ int main(int argc, char *argv[])
     // Pass the second argument, which is the url, to parse_url
     urlinfo = parse_url(argv[1]);
     
-    send_request(0, urlinfo->hostname, urlinfo->port, urlinfo->path);
+    sockfd = get_socket(urlinfo->hostname, urlinfo->port);
+    
+    send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
+    
+    while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
+        if (numbytes == 0) {
+            printf("No data was returned");
+            exit(1);
+        }
+        printf("******data******\n");
+        printf("%s\n", buf);
+    }
     
   return 0;
 }
