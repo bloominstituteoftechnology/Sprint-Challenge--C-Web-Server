@@ -71,8 +71,15 @@ int send_request(int fd, char *hostname, char *port, char *path)
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
+  int request_length = sprintf(request, "GET %s HTTP/1.1\nHost: %s:s\Connection: close\n\n", path, hostname, port);
 
-  return 0;
+  rv = send(fd, request, request_length, 0);
+
+  if (rv < 0) {
+    perror("send");
+  }
+
+  return rv;
 }
 
 int main(int argc, char *argv[])
@@ -85,14 +92,22 @@ int main(int argc, char *argv[])
     exit(1);
   }
 
-  /*
-    1. Parse the input URL
-    2. Initialize a socket by calling the `get_socket` function from lib.c
-    3. Call `send_request` to construct the request and send it
-    4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
-    5. Clean up any allocated memory and open file descriptors.
-  */
-
+  
+    //1. Parse the input URL
+    urlinfo_t *url = parse_url(argv[1]);
+    //2. Initialize a socket by calling the `get_socket` function from lib.c
+    sockfd = get_socket(url->hostname, url->port);
+    //3. Call `send_request` to construct the request and send it
+    send_request(sockfd, url->hostname, url->port, url->path);
+    //4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
+    while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
+      printf(stdout, &buf);
+    }
+    //5. Clean up any allocated memory and open file descriptors.
+    close(sockfd);
+    free(url);
+    free(buf);
+  
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
