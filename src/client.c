@@ -36,7 +36,6 @@ urlinfo_t *parse_url(char *url)
 
   /*
     We can parse the input URL by doing the following:
-
     1. Use strchr to find the first backslash in the URL (this is assuming there is no http:// or https:// in the URL).
     2. Set the path pointer to 1 character after the spot returned by strchr.
     3. Overwrite the backslash with a '\0' so that we are no longer considering anything after the backslash.
@@ -48,6 +47,12 @@ urlinfo_t *parse_url(char *url)
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
+  
+  char path = strchr(hostname, '/');
+
+  path++;
+
+  path[0] = '\0';
 
   return urlinfo;
 }
