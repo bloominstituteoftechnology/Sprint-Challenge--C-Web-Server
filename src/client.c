@@ -30,7 +30,7 @@ urlinfo_t *parse_url(char *url)
   // copy the input URL so as not to mutate the original
   char *hostname = strdup(url);
   char *port;
-  char *path;
+  char *path = '\0';
 
   char *first_backslash = strchr(hostname, '/');
   path = first_backslash + 1;
@@ -65,7 +65,7 @@ int send_request(int fd, char *hostname, char *port, char *path)
 
   sprintf(request, "GET /%s HTTP/1.1\n"
     "Host: %s:%s\n"
-    "Connection: close", path, hostname, port);
+    "Connection: close\n\n", path, hostname, port);
   
   rv = send(fd, request, strlen(request), 0);
 
@@ -89,6 +89,10 @@ int main(int argc, char *argv[])
   urlinfo_t *urlinfo = parse_url(argv[1]);
   sockfd = get_socket(urlinfo->hostname, urlinfo->port);
   int rv = send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
+
+  if (rv < 0) {
+      perror("send");
+  }
 
   while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0)
   {
