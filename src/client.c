@@ -84,8 +84,8 @@ int send_request(int fd, char *hostname, char *port, char *path)
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
-  sprintf(request, "GET /%s HTTP/1.1\nHost: %s:%s\nConnection: close\n\n", path, hostname, port);
-  send(fd, request, strlen(request), 0);
+  int request_length = sprintf(request, "GET /%s HTTP/1.1\nHost: %s:%s\nConnection: close\n\n", path, hostname, port);
+  send(fd, request, request_length, 0);
 
   return 0;
 }
@@ -117,7 +117,7 @@ int main(int argc, char *argv[])
   send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
 
   while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0){
-    printf("%s\n", buf)
+    fwrite(buf, 1, numbytes, stdout);
   }
   close(sockfd);
   free(urlinfo);
