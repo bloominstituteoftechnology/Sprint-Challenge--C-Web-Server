@@ -5,6 +5,7 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <time.h>
 #include "lib.h"
 
 #define BUFSIZE 4096 // max number of bytes we can get at once
@@ -73,15 +74,20 @@ int send_request(int fd, char *hostname, char *port, char *path)
   char request[max_request_size];
   int rv;
 
-  // GET REQUEST
+  // REMEMBER ITS ONLY GET REQUEST
+
+  const int max_response_size = 65536*5;
+  char response[max_response_size];
+  int response_length;
+
+  // Build HTTP response and store it in response
 
   
+  sprintf(request,"GET /%s HTTP/1.1\nHost: %s:%s\nConnection: close\n\n",path,hostname,port);
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  rv = send(fd,request,strlen(request),0);
 
-  return 0;
+  return rv;
 }
 
 int main(int argc, char *argv[])
@@ -96,13 +102,21 @@ int main(int argc, char *argv[])
     printf("Port: %s\n", url->port);
     printf("Path: %s\n", url->path);
 
-    unsigned int socket = get_socket(url->hostname, url->port);
+    sockfd = get_socket(url->hostname, url->port);
 
-    if (socket == -1){
+    if (sockfd == -1){
       fprintf(stderr, "ERROR: Could not get socket. Try again.\n");
     }
 
-    send_request(socket, url->hostname, url->port, url->path);
+    int req_status = send_request(sockfd, url->hostname, url->port, url->path);
+
+    while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
+  // print the data we got back to stdout
+    printf("%s\n", buf);
+}
+
+  close(sockfd);
+  free(url);
     
   } else {
 
@@ -111,6 +125,7 @@ int main(int argc, char *argv[])
 
   }
 
+  
   /*
     1. Parse the input URL
     2. Initialize a socket by calling the `get_socket` function from lib.c
@@ -118,10 +133,6 @@ int main(int argc, char *argv[])
     4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
     5. Clean up any allocated memory and open file descriptors.
   */
-
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
 
   return 0;
 }
