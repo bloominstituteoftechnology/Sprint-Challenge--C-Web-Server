@@ -129,5 +129,9 @@ int main(int argc, char *argv[])
   {
     fprintf( stdout, "%s\n", buf);
   }
+  
+  free(parsed_url);
+
+  close(sockfd);
   return 0;
 }
