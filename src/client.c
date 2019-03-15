@@ -117,9 +117,9 @@ int main(int argc, char *argv[])
 
   send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
 
-  while ()
+  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) 
   {
-    recv();
+    fprintf(stdout, "%s\n", buf);
   }
 
   return 0;
