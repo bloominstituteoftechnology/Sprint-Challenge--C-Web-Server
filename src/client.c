@@ -33,7 +33,6 @@ urlinfo_t *parse_url(char *url)
   char *path;
 
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
-
   /*
     We can parse the input URL by doing the following:
 
@@ -46,7 +45,23 @@ urlinfo_t *parse_url(char *url)
   */
 
   ///////////////////
-  // IMPLEMENT ME! //
+  char *fs = strchr(hostname, '/');
+  if(fs != NULL) {
+    path = fs + 1;
+    *fs = '\0';
+    // printf("%s\n", path);
+  }
+
+  char *fc = strchr(hostname, ':');
+  if(fc != NULL) {
+    port = fc + 1;
+    *fc = '\0';
+    // printf("%s\n", port);
+  }
+  urlinfo->hostname = hostname;
+  urlinfo->port = port;
+  urlinfo->path = path;
+
   ///////////////////
 
   return urlinfo;
@@ -85,6 +100,10 @@ int main(int argc, char *argv[])
     exit(1);
   }
 
+  urlinfo_t *urlinfo = parse_url(argv[1]);
+  printf("hostname: %s\n", urlinfo->hostname);
+  printf("port: %s\n", urlinfo->port);
+  printf("path: %s\n", urlinfo->path);
   /*
     1. Parse the input URL
     2. Initialize a socket by calling the `get_socket` function from lib.c
