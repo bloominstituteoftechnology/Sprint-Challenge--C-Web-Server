@@ -90,7 +90,14 @@ int send_request(int fd, char *hostname, char *port, char *path)
                                 "\n",
                                 path, hostname, port);
 
-  return 0;
+  rv = send(fd, request, request_length, 0);
+
+  if (rv < 0)
+  {
+    perror("send");
+  }
+
+  return rv;
 }
 
 int main(int argc, char *argv[])
