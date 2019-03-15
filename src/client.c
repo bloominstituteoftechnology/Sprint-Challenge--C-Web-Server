@@ -30,20 +30,28 @@ urlinfo_t *parse_url(char *url)
   // copy the input URL so as not to mutate the original
   char *hostname = strdup(url);
   char *port;
-  char *path = '\0';
+  char *path;
+  
+  urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
 
   char *first_backslash = strchr(hostname, '/');
   path = first_backslash + 1;
   *first_backslash = '\0';
   char *first_colon = strchr(hostname, ':');
-  port = first_colon + 1;
-  *first_colon = '\0';
+  if (first_colon == NULL)
+  {
+    port = "80";
+    urlinfo->port = port;
+  }
+  else
+  {
+    port = first_colon + 1;
+    *first_colon = '\0';
+    urlinfo->port = port;
+  }
   
-  urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
-  urlinfo->port = port;
   urlinfo->path = path;
   urlinfo->hostname = hostname;
-
   return urlinfo;
 }
 
@@ -66,7 +74,7 @@ int send_request(int fd, char *hostname, char *port, char *path)
   sprintf(request, "GET /%s HTTP/1.1\n"
     "Host: %s:%s\n"
     "Connection: close\n\n", path, hostname, port);
-  
+  printf("%s\n", request);
   rv = send(fd, request, strlen(request), 0);
 
   if (rv < 0) {
