@@ -46,13 +46,24 @@ urlinfo_t *parse_url(char *url)
   */
 
     // 1 & 2
+    if (strstr(hostname, "://")) {
+        hostname = &strstr(hostname, "://")[3];
+    }
+    
     path = &strchr(hostname, '/')[1];
     // 3
     strchr(hostname, '/')[0] = '\0';
-    // 4 & 5
-    port = &strchr(hostname, ':')[1];
-    // 6
-    strchr(hostname, ':')[0] = '\0';
+    
+    // Check if the url contains a port
+    if (strchr(hostname, ':')) {
+        // 4 & 5
+        port = &strchr(hostname, ':')[1];
+        // 6
+        strchr(hostname, ':')[0] = '\0';
+    } else {
+        // If not port provided, then set default to port 80
+        port = "80";
+    }
     
     urlinfo->hostname = hostname;
     urlinfo->port = port;
@@ -144,7 +155,6 @@ int main(int argc, char *argv[])
     }
     
     // Free allocated memory
-    free(urlinfo->hostname);
     free(urlinfo);
     
     // Close open file descriptors
