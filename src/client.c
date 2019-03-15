@@ -32,7 +32,20 @@ urlinfo_t *parse_url(char *url)
   char *port;
   char *path;
 
+  // HOSTNAME:PORT/PATH\n
+
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
+
+  urlinfo->hostname = strtok(hostname, ":");
+
+  urlinfo->port = strtok(NULL, "/");
+
+  // printf("TOKENIZED:%s\n", tokenized_hn);
+
+  urlinfo->path = strtok(NULL, "/");
+
+  // printf("TOKENIZED:%s\n", tokenized_hn);
+  
 
   /*
     We can parse the input URL by doing the following:
@@ -82,9 +95,18 @@ int main(int argc, char *argv[])
   int sockfd, numbytes;  
   char buf[BUFSIZE];
 
-  if (argc != 2) {
+  if (argc == 2) {
+    struct urlinfo_t *url = parse_url(argv[1]);
+    // printf("%s\n", argv[1]);
+    printf("HostName: %s\n", url->hostname);
+    printf("Port: %s\n", url->port);
+    printf("Path: %s\n", url->path);
+    
+  } else {
+
     fprintf(stderr,"usage: client HOSTNAME:PORT/PATH\n");
     exit(1);
+
   }
 
   /*
