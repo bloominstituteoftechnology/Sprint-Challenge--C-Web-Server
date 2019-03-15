@@ -68,6 +68,8 @@ int send_request(int fd, char *hostname, char *port, char *path)
   char request[max_request_size];
   int rv;
 
+  // GET REQUEST
+
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
