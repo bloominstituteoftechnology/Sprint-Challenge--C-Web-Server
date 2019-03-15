@@ -29,40 +29,62 @@ urlinfo_t *parse_url(char *url)
 {
   // copy the input URL so as not to mutate the original
   char *hostname = strdup(url);
-  //char *port;
-  //char *path;
+  char *port;
+  char *path;
+  char *host;
 
-  char host[256];
-  char port[256];
-  char path[256];
+  char host1[256];
+  char port1[256];
+  char path1[256*2];
 
   char *ret;
   char *ret2;
 
-    //printf("parsed URL: %s %s %s", hostname, path, port);
 
-
-  urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
+  //printf("parsed URL: %s %s %s", hostname, path, port);
 
     //printf("parsed URL: %s %s %s", hostname, path, port);
 
-    sscanf(hostname, "%s:%s/%s", host, port, path);
+    //sscanf(hostname, "%s:%s/%s", host, port, path);
     //We can parse the input URL by doing the following:
-/*
+
     //1. Use strchr to find the first backslash in the URL (this is assuming there is no http:// or https:// in the URL).
-    ret = strchr(hostname, '/');
+    //ret = strchr(hostname, '/');
     //2. Set the path pointer to 1 character after the spot returned by strchr.
-    *path = *ret++;
+    //path = ret++;
+
+    int i = 0;
+    while(hostname[i] != '/') {
+      i++;
+    }
+    hostname[i] = ' ';
+    
+    int j = 0;
+    while(hostname[j] != ':') {
+      j++;
+    }
+    hostname[j] = ' ';
+    
+
     //3. Overwrite the backslash with a '\0' so that we are no longer considering anything after the backslash.
-    hostname[*ret] = '\0';
+    //ret = '\0';
     //4. Use strchr to find the first colon in the URL.
-    ret2 = strchr(hostname, ':');
+    //ret2 = strchr(hostname, ':');
     //5. Set the port pointer to 1 character after the spot returned by strchr.
-    *port = *ret2++;
     //6. Overwrite the colon with a '\0' so that we are just left with the hostname.
-    hostname[*ret2] = '\0';
-    */
+    sscanf(hostname, "%s %s %s", host1, port1, path1);
+
+    //host = strtok(hostname, ":");
+
+    //strcat("/%s", path1);
+    //strcat(":%s", port1);
+
+    path = path1;
+    host = host1;
+    port = port1;
+  
    
+    urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
 
     urlinfo->hostname = host;
     urlinfo->port = port;
@@ -94,7 +116,7 @@ int send_request(int fd, char *hostname, char *port, char *path)
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
-  int request_length = sprintf(request, "GET %s HTTP/1.1\nHost: %s:%s\nConnection: close\n\n", path, hostname, port);
+  int request_length = sprintf(request, "GET /%s HTTP/1.1\nHost: %s:%s\nConnection: close\n\n", path, hostname, port);
 
   rv = send(fd, request, request_length, 0);
 
@@ -121,7 +143,7 @@ int main(int argc, char *argv[])
     //1. Parse the input URL
     printf("Got URL: %s\n", req);
     urlinfo_t *url = parse_url(req);
-    printf("parsed URL: %s:%s/%s\n", url->hostname, url->path, url->port);
+    printf("parsed URL: Hostname %s Port %s Path %s\n", url->hostname, url->port, url->path);
 
     //2. Initialize a socket by calling the `get_socket` function from lib.c
     sockfd = get_socket(url->hostname, url->port);
@@ -138,7 +160,7 @@ int main(int argc, char *argv[])
     }
     //5. Clean up any allocated memory and open file descriptors.
     close(sockfd);
-    //free(url);
+    free(url);
   
   ///////////////////
   // IMPLEMENT ME! //
