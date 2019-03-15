@@ -44,11 +44,17 @@ urlinfo_t *parse_url(char *url)
     5. Set the port pointer to 1 character after the spot returned by strchr.
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
-  strchr(hostname, '/');
+  char *backslash = strchr(urlinfo->hostname, '/');  //struct? 
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  urlinfo->path = strdup(backslash + 1);
+
+  *backslash = '\0';  //pointer?
+
+  char *colon = strchr(hostname, ':');  
+
+  urlinfo->port = strdup(colon + 1);
+
+  *colon = '\0';
 
   return urlinfo;
 }
