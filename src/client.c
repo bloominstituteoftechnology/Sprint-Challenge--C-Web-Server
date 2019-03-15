@@ -12,7 +12,8 @@
 /**
  * Struct to hold all three pieces of a URL
  */
-typedef struct urlinfo_t {
+typedef struct urlinfo_t
+{
   char *hostname;
   char *port;
   char *path;
@@ -35,19 +36,45 @@ urlinfo_t *parse_url(char *url)
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
 
   /*
-    We can parse the input URL by doing the following:
+   We can parse the input URL by doing the following:
 
-    1. Use strchr to find the first backslash in the URL (this is assuming there is no http:// or https:// in the URL).
-    2. Set the path pointer to 1 character after the spot returned by strchr.
-    3. Overwrite the backslash with a '\0' so that we are no longer considering anything after the backslash.
-    4. Use strchr to find the first colon in the URL.
-    5. Set the port pointer to 1 character after the spot returned by strchr.
-    6. Overwrite the colon with a '\0' so that we are just left with the hostname.
-  */
+  1. Use strchr to find the first backslash in the URL (this is assuming there is no http:// or https:// in the URL).
+  2. Set the path pointer to 1 character after the spot returned by strchr.
+  3. Overwrite the backslash with a '\0' so that we are no longer considering anything after the backslash.
+  4. Use strchr to find the first colon in the URL.
+  5. Set the port pointer to 1 character after the spot returned by strchr.
+  6. Overwrite the colon with a '\0' so that we are just left with the hostname.
+*/
 
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
+
+  if (strchr(hostname, '/'))
+  {
+    path = strchr(hostname, '/') + 1;
+    *(path - 1) = '\0';
+  }
+  else
+  {
+    path = "";
+  }
+
+  if (strchr(hostname, ':'))
+  {
+    port = strchr(hostname, ':') + 1;
+    *(port - 1) = '\0';
+  }
+  else
+  {
+    port = "";
+  }
+
+  urlinfo->path = path;
+  urlinfo->port = port;
+  urlinfo->hostname = hostname;
+
+  printf("hostname: %s port: %s path: %s", hostname, port, path);
 
   return urlinfo;
 }
@@ -76,12 +103,13 @@ int send_request(int fd, char *hostname, char *port, char *path)
 }
 
 int main(int argc, char *argv[])
-{  
-  int sockfd, numbytes;  
+{
+  int sockfd, numbytes;
   char buf[BUFSIZE];
 
-  if (argc != 2) {
-    fprintf(stderr,"usage: client HOSTNAME:PORT/PATH\n");
+  if (argc != 2)
+  {
+    fprintf(stderr, "usage: client HOSTNAME:PORT/PATH\n");
     exit(1);
   }
 
@@ -97,5 +125,6 @@ int main(int argc, char *argv[])
   // IMPLEMENT ME! //
   ///////////////////
 
+  parse_url(argv[1]);
   return 0;
 }
