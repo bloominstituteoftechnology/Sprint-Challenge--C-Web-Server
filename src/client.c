@@ -51,11 +51,11 @@ urlinfo_t *parse_url(char *url)
 
 
   forward_slash = strchr(hostname, '/');
-  path = forward_slash + 1;
+  path = strdup(forward_slash + 1);
   *forward_slash = '\0';
 
-  colon = strchr(hostname, '/');
-  port = colon + 1;
+  colon = strchr(hostname, ':');
+  port = strdup(colon + 1);
   *colon = '\0';
 
 
@@ -100,7 +100,7 @@ int main () {
   // IMPLEMENT ME! //
   ///////////////////
 
-  return urlinfo;
+  // return urlinfo;
 }
 
 /**
@@ -201,7 +201,7 @@ int main(int argc, char *argv[])
 
 
   if (argc != 2) {
-    fprintf(stderr,"usage: client HOSTNAME:PORT/PATH\n");
+    printf("usage: client HOSTNAME:PORT/PATH\n");
         // fprintf(stderr,"usage: client %s:%s/%s\n", urlinfo->hostname, urlinfo->port, urlinfo->path);
     exit(1);
   }
@@ -240,12 +240,8 @@ int main(int argc, char *argv[])
     fprintf(stdout, "%s\n", buf);
   }
 
-  free(urlinfo->hostname);
-  free(urlinfo->port);
-  free(urlinfo->path);
   free(urlinfo);
-  
-  // close(fd);
+
   close(sockfd);
 
   return 0;
