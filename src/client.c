@@ -58,11 +58,11 @@ urlinfo_t *parse_url(char *url)
   }
 
   // 2. Set the path pointer to 1 character after the spot returned by strchr.
-  if (strchr(hostname, '/'))
+  if (strchr(hostname, "/"))
   {
-    path = strchr(hostname, '/') + 1;
-    // 3. Overwrite the backslash with a '\0' so that we are no longer considering anything after the backslash.
-    path[-1] = '\0';
+    path = strchr(hostname, "/") + 1;
+    // 3. Overwrite the backslash with a "\0" so that we are no longer considering anything after the backslash.
+    path[-1] = "\0";
   }
   else
   {
@@ -71,11 +71,21 @@ urlinfo_t *parse_url(char *url)
 
   // 4. Use strchr to find the first colon in the URL.
   // 5. Set the port pointer to 1 character after the spot returned by strchr.
-  // 6. Overwrite the colon with a '\0' so that we are just left with the hostname.
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  // 6. Overwrite the colon with a "\0" so that we are just left with the hostname.
+  if (strchr(":"))
+  {
+    port = strchr(hostname, ":") + 1;
+    port[-1] = "\0";
+  }
+  else
+  {
+    port = "80";
+  }
+
+  urlinfo->path = path;
+  urlinfo->port = port;
+  urlinfo->hostname = hostname;
 
   return urlinfo;
 }
