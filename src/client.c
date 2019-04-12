@@ -62,7 +62,18 @@ urlinfo_t *parse_url(char *url)
   {
     hostname = strdup(url);
   }
-  if (strchr(hostname, ":"))
+
+  if (strchr(hostname, '/'))
+  {
+    path = strchr(hostname, '/') + 1;
+    *(path - 1) = '\0';
+  }
+  else
+  {
+    path = "";
+  }
+
+  if (strchr(hostname, ':'))
   {
     port = strchr(hostname, ':') + 1;
     *(port - 1) = '\0';
@@ -97,17 +108,21 @@ int send_request(int fd, char *hostname, char *port, char *path)
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
-  int request_length = snprintf(request, max_request_size, "GET/%s HTTP/1.1\n"
-                                                           "Host:%s:%s\n"
-                                                           "Connection: close\n"
-                                                           "\n",
+  int request_length = snprintf(request, max_request_size,
+                                "GET /%s HTTP/1.1\n"
+                                "Host: %s:%s\n"
+                                "Connection: close\n"
+                                "\n",
                                 path, hostname, port);
-  rv= send(fd, request, request_length,0);
-  if(rv<0)
+
+  rv = send(fd, request, request_length, 0);
+
+  if (rv < 0)
   {
     printf("request err");
     exit(2);
   }
+
   return rv;
 }
 
