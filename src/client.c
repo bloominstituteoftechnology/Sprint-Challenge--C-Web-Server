@@ -11,6 +11,7 @@
 
 /**
  * Struct to hold all three pieces of a URL
+ * initial
  */
 typedef struct urlinfo_t {
   char *hostname;
