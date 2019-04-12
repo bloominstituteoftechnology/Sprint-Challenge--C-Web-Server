@@ -70,12 +70,11 @@ urlinfo_t *parse_url(char *url)
   }
 
   // 4. Use strchr to find the first colon in the URL.
-  // 5. Set the port pointer to 1 character after the spot returned by strchr.
-
-  // 6. Overwrite the colon with a "\0" so that we are just left with the hostname.
   if (strchr(hostname, ':'))
   {
+    // 5. Set the port pointer to 1 character after the spot returned by strchr.
     port = strchr(hostname, ':') + 1;
+    // 6. Overwrite the colon with a "\0" so that we are just left with the hostname.
     *(port - 1) = '\0';
   }
   else
@@ -102,15 +101,25 @@ urlinfo_t *parse_url(char *url)
 */
 int send_request(int fd, char *hostname, char *port, char *path)
 {
-  const int max_request_size = 16384;
+  const int max_request_size = 16384; //buffer size
   char request[max_request_size];
-  int rv;
+  int rv; // response length??
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  int req_length = sprintf(request,
+                           "GET %s HTTP 1.1\n"
+                           "HOST: %s:%s\n"
+                           "Connection: close\n",
+                           path,
+                           hostname, port);
 
-  return 0;
+  rv = send(fd, request, req_length, 0);
+
+  if (rv < 0)
+  {
+    perror("send");
+  }
+
+  return rv;
 }
 
 int main(int argc, char *argv[])
