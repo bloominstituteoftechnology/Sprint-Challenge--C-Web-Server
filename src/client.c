@@ -48,6 +48,34 @@ urlinfo_t *parse_url(char *url)
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
+  if (strstr(url, "https://")) {
+    hostname = strdup(url + 8);
+  } else if (strstr(url, "http://")) {
+    hostname = strdup(url + 7);
+  } else {
+    hostname = strdup(url);
+  }
+
+  char *backslash = strchr(hostname, '/');
+  if (backslash) {
+    path = backslash + 1;
+    *backslash = '\0';
+  } else {
+    path = "/";
+  }
+
+  char *colon = strchr(hostname, ':');
+  if (colon) {
+    port = colon + 1;
+    *colon = '\0';
+  } else {
+    port = "80";
+  }
+
+
+  urlinfo->hostname = hostname;
+  urlinfo->port = port;
+  urlinfo->path = path;
 
   return urlinfo;
 }
