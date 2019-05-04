@@ -48,7 +48,35 @@ urlinfo_t *parse_url(char *url)
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
+  if (strstr(url, "https://")) {
+    hostname = strdup(url + 8);
+  } else if (strstr(url, "http://")) {
+    hostname = strdup(url + 7);
+  } else {
+    hostname = strdup(url);
+  }
 
+  char *backslash = strchr(hostname, '/');
+  if (backslash) {
+    path = backslash + 1;
+    *backslash = '\0';
+  } else {
+    path = "/";
+  }
+
+  char *colon = strchr(hostname, ':');
+  if (colon) {
+    port = colon + 1;
+    *colon = '\0';
+  } else {
+    port = "80";
+  }
+
+
+  urlinfo->hostname = hostname;
+  urlinfo->port = port;
+  urlinfo->path = path;
+  //printf("%s %s %s", urlinfo->hostname, urlinfo->port, urlinfo->path);
   return urlinfo;
 }
 
@@ -71,8 +99,15 @@ int send_request(int fd, char *hostname, char *port, char *path)
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
+  int request_length = sprintf(request, "GET /%s HTTP/1.1\nHost: %s:%s\nConnection: close\n\n", path, hostname, port);
 
-  return 0;
+  rv = send(fd, request, request_length, 0);
+
+  if (rv < 0) {
+    perror("Error sending request.");
+  }
+
+  return 0; // also could return rv;
 }
 
 int main(int argc, char *argv[])
@@ -96,6 +131,18 @@ int main(int argc, char *argv[])
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
+  urlinfo_t *urlinfo = parse_url(argv[1]);
+
+  sockfd = get_socket(urlinfo->hostname, urlinfo->port);
+
+  send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
+
+  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
+    printf("\nResponse: %s\n", buf);
+  }
+
+  free(urlinfo);
+  close(sockfd);
 
   return 0;
 }
