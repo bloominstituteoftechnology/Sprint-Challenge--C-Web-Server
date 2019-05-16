@@ -27,13 +27,6 @@ typedef struct urlinfo_t {
 */
 urlinfo_t *parse_url(char *url)
 {
-  // copy the input URL so as not to mutate the original
-  char *hostname = strdup(url);
-  char *port;
-  char *path;
-
-  urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
-
   /*
     We can parse the input URL by doing the following:
 
@@ -45,10 +38,28 @@ urlinfo_t *parse_url(char *url)
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
 
+  // Copy the input url so we don't mutate the original
+  // hostname = localhost:3490/something\0
+  urlinfo->hostname = strdup(url); 
+  
+  // Find the first backslash
+  // Copy the path after the backslash
+  // Replace the backslash with \0
+  // hostname = localhost:3490\0something\0
+  char *backslash = strchr(urlinfo->hostname, '/');
+  urlinfo->path = strdup(backslash+1);
+  backslash[0] = '\0';
+  
+  // Find the first colon
+  // Copy the port after the colon
+  // Replace the colon with \0
+  // hostname = localhost\03490\0something\0
+  char *colon = strchr(urlinfo->hostname, ':');
+  urlinfo->port = strdup(colon+1);
+  colon[0] = '\0';
+  
   return urlinfo;
 }
 
@@ -62,22 +73,25 @@ urlinfo_t *parse_url(char *url)
  *
  * Return the value from the send() function.
 */
-int send_request(int fd, char *hostname, char *port, char *path)
+int send_request(int socket, char *hostname, char *port, char *path)
 {
   const int max_request_size = 16384;
   char request[max_request_size];
-  int rv;
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  int stringLength = sprintf(request, "GET /%s HTTP/1.1\r\nHost: %s:%s\r\nConnection: close\r\n\r\n", path, hostname, port);
+  
+  int result = send(socket, request, stringLength, 0);
+  
+  if (result < 0) {
+    perror("send");
+  }
 
-  return 0;
+  return result;
 }
 
 int main(int argc, char *argv[])
 {  
-  int sockfd, numbytes;  
+  int numbytes;  
   char buf[BUFSIZE];
 
   if (argc != 2) {
@@ -93,9 +107,31 @@ int main(int argc, char *argv[])
     5. Clean up any allocated memory and open file descriptors.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  char *url = argv[1];
+  
+  urlinfo_t *urlinfo = parse_url(url);
+  
+  int socket = get_socket(urlinfo->hostname, urlinfo->port);
+  printf("\n");
+  
+  int sendResult = send_request(socket, urlinfo->hostname, urlinfo->port, urlinfo->path);
+  if (sendResult >= 0) {
+    // success
+    
+    while ((numbytes = recv(socket, buf, BUFSIZE - 1, 0)) > 0) {
+      buf[numbytes] = '\0';
+      printf("%s", buf);
+    }
+  }
+  
+  printf("\n");
+  
+  free(urlinfo->hostname);
+  free(urlinfo->port);
+  free(urlinfo->path);
+  free(urlinfo);
+  
+  close(socket);
 
   return 0;
 }
