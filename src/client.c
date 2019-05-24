@@ -48,8 +48,37 @@ urlinfo_t *parse_url(char *url)
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
+  path = strchr(hostname, '/');
+  //Todo error check if path is NULL
+  *path = '\0';
+  path++;
+
+  port = strchr(hostname, ':');
+  if(port==NULL){
+    port == "80";
+  }else{
+  *port = '\0';
+  port++;
+  }
+  //Todo error check if port is NULL
+  
+  urlinfo->port = port;
+  urlinfo->hostname = hostname;
+  urlinfo->path = path;
 
   return urlinfo;
+  // parse_url(argv[1])
+  // const char str[] = "www.google.com/";
+  //  const char ch = '.';
+  //  char *ret;
+
+  //  ret = strchr(str, ch);
+
+  //  printf("String after |%c| is - |%s|\n", ch, ret);
+   
+  //  return(0);
+
+  // return urlinfo;
 }
 
 /**
@@ -71,8 +100,22 @@ int send_request(int fd, char *hostname, char *port, char *path)
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
+  int request_length = sprintf(
+    request,
+    "%s\nfd: %s\nhostname: %s\nport: %s\npath: %s\n",
+    hostname,
+    port,
+    path
+  );
+ int rv = send(fd, request, request_length, 0);
 
-  return 0;
+    if (rv < 0)
+    {
+        perror("send");
+    }
+
+    return rv;
+  //return 0;
 }
 
 int main(int argc, char *argv[])
@@ -96,6 +139,28 @@ int main(int argc, char *argv[])
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
+
+urlinfo_t* urlinfo = parse_url(argv[1]);
+
+  printf("Hostname: \"%s\"\n", urlinfo->hostname);
+  printf("Port: \"%s\"\n",urlinfo->port);
+  printf("Path: \"%s\"\n",urlinfo->path);
+  int fd = get_socket(urlinfo->hostname, urlinfo->port);
+
+  if (fd == -1){
+    perror("get_socket");
+    exit(2);
+  };
+
+send_request(fd, urlinfo->hostname, urlinfo->port, urlinfo->path);
+
+while ((numbytes = recv(fd,buf,BUFSIZE, 0))>0){
+  fwrite(buf, sizeof(char),numbytes, stdout);
+}
+
+if(numbytes < 0){
+  perror("recv");
+}
 
   return 0;
 }
