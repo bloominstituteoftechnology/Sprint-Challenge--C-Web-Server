@@ -25,8 +25,7 @@ typedef struct urlinfo_t {
  *
  * Store hostname, path, and port in a urlinfo_t struct and return the struct.
 */
-urlinfo_t *parse_url(char *url)
-{
+urlinfo_t *parse_url(char *url){
   // copy the input URL so as not to mutate the original
   char *hostname = strdup(url);
   char *port;
@@ -45,10 +44,35 @@ urlinfo_t *parse_url(char *url)
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  char *substr_pointer = strstr(hostname, "://"); //returns pointer to beginning of substring
+  if(substr_pointer != NULL){
+    hostname = substr_pointer + 3; // moves hostname pointer 3 places ahead of substring pointer
+  }
 
+  char *char_pointer = strchr(hostname, '/'); // returns pointer to first occurence of character
+  if(char_pointer != NULL){
+    path = char_pointer + 1; // moves path pointer 1 place ahead of character pointer
+    *char_pointer = '\0';  //changes "/" to '\0' to terminate the string at the occurence of '\0'. Nothing will be considered after that character.
+  }else{
+    path = "/";
+  }
+
+  char *char2_pointer = strchr(hostname, ':'); // returns pointer to first occurence of character 
+  char *default_port = "80";
+  if(char2_pointer != NULL){
+    port = char2_pointer + 1; // moves port pointer 1 place ahead of character pointer
+    *char2_pointer = '\0'; // changes ":" to '\0' to terminate the string at the occurence of '\0'. Nothing will be considered after that. Leaving hostname isolated  
+  }else{
+    port = default_port;
+    *char2_pointer = '\0';
+  }
+
+  urlinfo->hostname = hostname;
+  urlinfo->port = port;
+  urlinfo->path = path;
+  printf("%s\n", urlinfo->hostname);
+  printf("%s\n", urlinfo->port);
+  printf("%s\n", urlinfo->path);
   return urlinfo;
 }
 
@@ -68,11 +92,22 @@ int send_request(int fd, char *hostname, char *port, char *path)
   char request[max_request_size];
   int rv;
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  // GET /path HTTP/1.1
+  //    Host: hostname:port
+  //    Connection: close
 
-  return 0;
+  int request_length = sprintf(
+    request,  // stores formatted string
+    "GET /%s HTTP/1.1\n"
+    "Host: %s:%s\n"
+    "Connection: close\n\n",
+    path,
+    hostname,
+    port
+  );
+
+  rv = send(fd, request, request_length, 0); 
+  return rv;
 }
 
 int main(int argc, char *argv[])
@@ -91,11 +126,15 @@ int main(int argc, char *argv[])
     3. Call `send_request` to construct the request and send it
     4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
     5. Clean up any allocated memory and open file descriptors.
-  */
-
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  */ 
+  urlinfo_t *urlinfo = parse_url(argv[1]); // create urlinfo struct type to store the result of parse_url.
+  sockfd = get_socket(urlinfo->hostname, urlinfo->port); //store result of get_socket in sockfd
+  send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path); //Send request
+  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {  
+        printf("%s\n", buf);// print the data we got back to stdout 
+      }
+  free(urlinfo);// free memory allocated
+  close(sockfd); // close socket file
 
   return 0;
 }
