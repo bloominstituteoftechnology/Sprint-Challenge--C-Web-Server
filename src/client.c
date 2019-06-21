@@ -34,16 +34,15 @@ urlinfo_t *parse_url(char *url)
 
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
 
-  /*
-    We can parse the input URL by doing the following:
+  char *httpsStart = strstr(url, "https://");
+  if (httpsStart != NULL) {
+    url += 8;
+  }
 
-    1. Use strchr to find the first slash in the URL (this is assuming there is no http:// or https:// in the URL).
-    2. Set the path pointer to 1 character after the spot returned by strchr.
-    3. Overwrite the slash with a '\0' so that we are no longer considering anything after the slash.
-    4. Use strchr to find the first colon in the URL.
-    5. Set the port pointer to 1 character after the spot returned by strchr.
-    6. Overwrite the colon with a '\0' so that we are just left with the hostname.
-  */
+  char *httpStart = (strstr(url, "http://"));
+  if (httpStart != NULL) {
+    url += 7;
+  }
 
   char *pathStart = strstr(url, "/");
   if (pathStart != NULL) {
@@ -53,11 +52,13 @@ urlinfo_t *parse_url(char *url)
     urlinfo->path = "";
   }
 
-
   char *portStart = strstr(url, ":");
-  urlinfo->port = portStart +1;
-
-  *portStart = '\0';
+  if (portStart != NULL) {
+    urlinfo->port = portStart +1;
+    *portStart = '\0';
+  } else {
+    urlinfo->port = "80";
+  }
 
   urlinfo->hostname = url;
 
