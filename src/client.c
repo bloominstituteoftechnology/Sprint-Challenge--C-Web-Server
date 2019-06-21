@@ -8,6 +8,7 @@
 #include "lib.h"
 
 #define BUFSIZE 4096 // max number of bytes we can get at once
+#define MAX_PROTOCOL_LEN 16
 
 /**
  * Struct to hold all three pieces of a URL
@@ -115,8 +116,31 @@ int main(int argc, char *argv[])
   send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
 
   while ((numbytes = recv(sockfd, buf, BUFSIZE-1, 0)) > 0) {
-    fprintf(stdout, "%s", buf);
-    fflush(stdout);
+    char *redirect = strstr(buf, "301");
+    if (redirect != NULL && (redirect - buf) < MAX_PROTOCOL_LEN) {
+      // Find the start of the url
+      if ((redirect = strstr(buf, "Location: ")) != NULL) {
+        redirect += 10;
+        // Trim off the rest of the response
+        char *newline = strstr(redirect, "\r");
+        if (newline != NULL) {
+          *newline = '\0';
+        } else if ((newline = strstr(redirect, "\n")) != NULL) {
+          *newline = '\0';
+        }
+        printf("Got a 301 response. Redirecting to: %s\n", redirect);
+        // Reset variables and make a new request.
+        free(urlinfo);
+        urlinfo = parse_url(redirect);
+        close(sockfd);
+        sockfd = get_socket(urlinfo->hostname, urlinfo->port);
+        send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
+      }
+
+    } else {
+      fprintf(stdout, "%s", buf);
+      fflush(stdout);
+    }
   }
   printf("\n");
 
