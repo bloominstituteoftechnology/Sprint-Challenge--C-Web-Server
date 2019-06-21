@@ -121,20 +121,15 @@ int main(int argc, char *argv[])
   int sockfd, numbytes;  
   char buf[BUFSIZE];
 
-  if (argc != 2) {
-    fprintf(stderr,"usage: client HOSTNAME:PORT/PATH\n");
+  if (argc < 2 || argc > 3) {
+    fprintf(stderr,"usage: client [-h] HOSTNAME:PORT/PATH\n");
     exit(1);
   }
 
-  /*
-    1. Parse the input URL
-    2. Initialize a socket by calling the `get_socket` function from lib.c
-    3. Call `send_request` to construct the request and send it
-    4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
-    5. Clean up any allocated memory and open file descriptors.
-  */
+  int hide_header = strcmp(argv[1], "-h");
+  char *url = argv[argc - 1];
 
-  struct urlinfo_t *urlinfo = parse_url(argv[1]);
+  struct urlinfo_t *urlinfo = parse_url(url);
   sockfd = get_socket(urlinfo->hostname, urlinfo->port);
   send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
 
@@ -146,15 +141,20 @@ int main(int argc, char *argv[])
       int handled_redirect = 0;
       if (redirect != NULL && (redirect - buf) < MAX_PROTOCOL_LEN) {
         handled_redirect = handle_redirect(sockfd, urlinfo, redirect);
-      } else if ((redirect = strstr(buf, "\r\n\r\n")) != NULL) {
-        redirect += 4;
-      } else if ((redirect = strstr(buf, "\r\r")) != NULL || (redirect = strstr(buf, "\n\n")) != NULL ) {
-        redirect += 2;
-      }
-      if (handled_redirect) {
         continue;
-      } else {
+      } else if (hide_header && (redirect = strstr(buf, "\r\n\r\n")) != NULL) {
+        // Skip header
+        redirect += 4;
         fprintf(stdout, "%s", redirect);
+        fflush(stdout);
+      } else if (hide_header && ((redirect = strstr(buf, "\r\r")) != NULL || (redirect = strstr(buf, "\n\n")) != NULL )) {
+        // Skip header
+        redirect += 2;
+        fprintf(stdout, "%s", redirect);
+        fflush(stdout);
+      } else {
+        // Just print everything
+        fprintf(stdout, "%s", buf);
         fflush(stdout);
       }
     } else {
