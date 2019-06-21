@@ -93,6 +93,29 @@ int send_request(int fd, char *hostname, char *port, char *path)
   return rv;
 }
 
+int handle_redirect(int fd, struct urlinfo_t *urlinfo, char *response) {
+  int rv = 0;
+  char *redirect = NULL;
+  // Find the start of the url
+  if ((redirect = strstr(response, "Location: ")) != NULL || (redirect = strstr(response, "location: ")) != NULL) {
+    redirect += 10;
+    // Trim off the rest of the response
+    char *newline = strstr(redirect, "\r");
+    if (newline != NULL) {
+      *newline = '\0';
+    } else if ((newline = strstr(redirect, "\n")) != NULL) {
+      *newline = '\0';
+    }
+    printf("Got a 301 response. Redirecting to: %s\n", redirect);
+    // Reset variables and make a new request.
+    urlinfo = parse_url(redirect);
+    close(fd);
+    fd = get_socket(urlinfo->hostname, urlinfo->port);
+    rv = send_request(fd, urlinfo->hostname, urlinfo->port, urlinfo->path);
+  }
+  return rv;
+}
+
 int main(int argc, char *argv[])
 {  
   int sockfd, numbytes;  
@@ -115,32 +138,30 @@ int main(int argc, char *argv[])
   sockfd = get_socket(urlinfo->hostname, urlinfo->port);
   send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
 
+  int is_first_pass = 1;
   while ((numbytes = recv(sockfd, buf, BUFSIZE-1, 0)) > 0) {
-    char *redirect = strstr(buf, "301");
-    if (redirect != NULL && (redirect - buf) < MAX_PROTOCOL_LEN) {
-      // Find the start of the url
-      if ((redirect = strstr(buf, "Location: ")) != NULL) {
-        redirect += 10;
-        // Trim off the rest of the response
-        char *newline = strstr(redirect, "\r");
-        if (newline != NULL) {
-          *newline = '\0';
-        } else if ((newline = strstr(redirect, "\n")) != NULL) {
-          *newline = '\0';
-        }
-        printf("Got a 301 response. Redirecting to: %s\n", redirect);
-        // Reset variables and make a new request.
-        free(urlinfo);
-        urlinfo = parse_url(redirect);
-        close(sockfd);
-        sockfd = get_socket(urlinfo->hostname, urlinfo->port);
-        send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
+    if (is_first_pass) {
+      // Check for redirect
+      char *redirect = strstr(buf, "301");
+      int handled_redirect = 0;
+      if (redirect != NULL && (redirect - buf) < MAX_PROTOCOL_LEN) {
+        handled_redirect = handle_redirect(sockfd, urlinfo, redirect);
+      } else if ((redirect = strstr(buf, "\r\n\r\n")) != NULL) {
+        redirect += 4;
+      } else if ((redirect = strstr(buf, "\r\r")) != NULL || (redirect = strstr(buf, "\n\n")) != NULL ) {
+        redirect += 2;
       }
-
+      if (handled_redirect) {
+        continue;
+      } else {
+        fprintf(stdout, "%s", redirect);
+        fflush(stdout);
+      }
     } else {
       fprintf(stdout, "%s", buf);
       fflush(stdout);
     }
+    is_first_pass = 0;
   }
   printf("\n");
 
