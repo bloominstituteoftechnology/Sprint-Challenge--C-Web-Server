@@ -43,11 +43,40 @@ urlinfo_t *parse_url(char *url)
     4. Use strchr to find the first colon in the URL.
     5. Set the port pointer to 1 character after the spot returned by strchr.
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
+
+    STRETCH:
+
+    - handle url without port number (default to 80)
+    - strip http:// or https:// if included.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  if (strstr(hostname, "http://")) {
+    hostname[6] = '\0';
+    hostname = strdup(hostname + 7);
+  }
+
+  if (strstr(hostname, "https://")) {
+    hostname[7] = '\0';
+    hostname = strdup(hostname + 8);
+  }
+
+  char *slash = strchr(hostname, '/');
+  path = slash + 1;
+  *slash = '\0';
+
+  char *colon = strchr(hostname, ':');
+
+  if (colon == NULL) {
+    char *default_port = "80";
+    port = default_port;
+  } else {
+    port = colon + 1;
+    *colon = '\0';
+  }
+
+  urlinfo->hostname = hostname;
+  urlinfo->port = port;
+  urlinfo->path = path;
 
   return urlinfo;
 }
@@ -66,13 +95,17 @@ int send_request(int fd, char *hostname, char *port, char *path)
 {
   const int max_request_size = 16384;
   char request[max_request_size];
-  int rv;
+  int rv, request_length;
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  request_length = sprintf(request, "GET /%s HTTP/1.1\nHost: %s:%s\nConnection: close\n\n", path, hostname, port);
 
-  return 0;
+  rv = send(fd, request, request_length, 0);
+
+  if (rv < 0) {
+    perror("send");
+  }
+
+  return rv;
 }
 
 int main(int argc, char *argv[])
@@ -96,6 +129,22 @@ int main(int argc, char *argv[])
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
+
+  struct urlinfo_t *url = parse_url(argv[1]);
+
+  sockfd = get_socket(url->hostname, url->port);
+
+  int request = send_request(sockfd, url->hostname, url->port, url->path);
+
+  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
+    printf("%s\n", buf);
+  }
+  printf("\n");
+
+  free(url->hostname);
+  free(url);
+
+  close(sockfd);
 
   return 0;
 }
