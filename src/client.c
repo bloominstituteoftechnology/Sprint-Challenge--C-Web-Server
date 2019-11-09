@@ -49,6 +49,133 @@ urlinfo_t *parse_url(char *url)
   // IMPLEMENT ME! //
   ///////////////////
 
+  if (!(strstr(url, "http") || strstr(url, "https"))) // Case where there is no http(s) in the url
+  {
+    // Parse the url find the path
+    path = strchr(url, '/');
+    path++; // Will want to double check this line to make sure it is implementing properly
+
+    urlinfo->path = path;
+
+    char *cur_position = strchr(url, '/');
+    while (cur_position)
+    {
+      *cur_position = '\0';
+      cur_position = strchr(cur_position, '/');
+    }
+
+    // Parse the url to find the port
+
+    if (strchr(url, ':'))
+    {
+      port = strchr(url, ':');
+      port++;
+
+      urlinfo->port = port;
+
+      cur_position = strchr(url, ':');
+      while (cur_position)
+      {
+        *cur_position = '\0';
+        cur_position = strchr(cur_position, ':');
+      }
+    } else
+    {
+      urlinfo->port = "80";
+    }
+    
+
+    // Wants the port has been found and stripped, only host name remains
+    urlinfo->hostname = url;
+  }
+  else if (strstr(url, "http"))
+  {
+    url = strchr(url, '/');
+    url = url + 2;
+
+    // Parse the url find the path
+    path = strchr(url, '/');
+    path++; // Will want to double check this line to make sure it is implementing properly
+
+    urlinfo->path = path;
+
+    char *cur_position = strchr(url, '/');
+    while (cur_position)
+    {
+      *cur_position = '\0';
+      cur_position = strchr(cur_position, '/');
+    }
+
+    // Parse the url to find the port
+
+    if (strchr(url, ':'))
+    {
+      port = strchr(url, ':');
+      port++;
+
+      urlinfo->port = port;
+
+      cur_position = strchr(url, ':');
+      while (cur_position)
+      {
+        *cur_position = '\0';
+        cur_position = strchr(cur_position, ':');
+      }
+    } else
+    {
+      urlinfo->port = "80";
+    }
+
+    urlinfo->hostname = url;
+  }
+
+  else if (strstr(url, "https"))
+  {
+    url = strchr(url, '/');
+    url = url + 2;
+
+    // Parse the url find the path
+    path = strchr(url, '/');
+    path++; // Will want to double check this line to make sure it is implementing properly
+
+    urlinfo->path = path;
+
+    char *cur_position = strchr(url, '/');
+    while (cur_position)
+    {
+      *cur_position = '\0';
+      cur_position = strchr(cur_position, '/');
+    }
+
+    // Parse the url to find the port
+
+    if (strchr(url, ':'))
+    {
+      port = strchr(url, ':');
+      port++;
+
+      urlinfo->port = port;
+
+      cur_position = strchr(url, ':');
+      while (cur_position)
+      {
+        *cur_position = '\0';
+        cur_position = strchr(cur_position, ':');
+      }
+    } else
+    {
+      urlinfo->port = "80";
+    }
+
+    urlinfo->hostname = url;
+  }
+
+  else
+  {
+    printf("how'd we get here?");
+  }
+
+  // printf("You put in %s %s %s \n", urlinfo->hostname, urlinfo->port, urlinfo->path);
   return urlinfo;
 }
 
@@ -72,7 +199,27 @@ int send_request(int fd, char *hostname, char *port, char *path)
   // IMPLEMENT ME! //
   ///////////////////
 
-  return 0;
+  int request_length = sprintf(request,
+    "GET /%s HTTP/1.1\n"
+    "Host: %s:%s\n"
+    "Connection: close\n\n",
+    path, hostname, port);
+
+
+    // printf(" HEYEGET /%s HTTP/1.1\n"
+    // "Host: %s:%s\n"
+    // "Connection: close\n",
+    // path, hostname, port);
+
+    rv = send(fd, request, request_length, 0);
+
+    if (rv < 0)
+    {
+      perror("send");
+      return 0;
+    }
+
+  return rv;
 }
 
 int main(int argc, char *argv[])
@@ -96,6 +243,21 @@ int main(int argc, char *argv[])
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
+
+  struct urlinfo_t *urlinfo = parse_url(argv[1]);
+
+  sockfd = get_socket(urlinfo->hostname, urlinfo->port);
+
+  send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
+
+  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
+    fwrite(buf, 1, numbytes, stdout);
+  }
+
+  free(urlinfo);
+  close(sockfd);
+
+
 
   return 0;
 }
