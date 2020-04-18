@@ -44,10 +44,39 @@ urlinfo_t *parse_url(char *url)
     5. Set the port pointer to 1 character after the spot returned by strchr.
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
+  if (strstr(hostname, "https://") != NULL) {
+    hostname += 8;
+  } else if (strstr(hostname, "http://")) {
+    hostname +=7;
+  }
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  port = strchr(hostname, ':');
+  if (port != NULL) {
+    *port = '\0';
+    port++;
+    path = strchr(port, '/');
+    *path = '\0';
+    path++;
+  } else {
+    port = "80";
+    path = strchr(hostname, '/');
+    if (path != NULL) {
+      *path = '\0';
+      path++;
+    } else {
+      path = "/";
+    }
+  }
+  
+  // sprintf(path, "/%s", path);
+
+  urlinfo->port = strdup(port);
+  urlinfo->path = strdup(path);
+  urlinfo->hostname = strdup(hostname);
+  printf("Hostname: %s\n", urlinfo->hostname);
+  printf("Port: %s\n", urlinfo->port);
+  printf("Path: %s\n", urlinfo->path);
+
 
   return urlinfo;
 }
@@ -68,11 +97,10 @@ int send_request(int fd, char *hostname, char *port, char *path)
   char request[max_request_size];
   int rv;
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
-
-  return 0;
+  sprintf(request, "GET /%s HTTP/1.1\nHost: %s:%s\nConnection: close\n\n", path, hostname, port);
+  printf("Request:\n%s\n", request);
+  rv = send(fd, request, strlen(request), 0);
+  return rv;
 }
 
 int main(int argc, char *argv[])
@@ -93,9 +121,17 @@ int main(int argc, char *argv[])
     5. Clean up any allocated memory and open file descriptors.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  urlinfo_t *parsed_struct = malloc(sizeof(struct urlinfo_t));
+  parsed_struct = parse_url(argv[1]);
+  sockfd = get_socket(parsed_struct->hostname, parsed_struct->port);
+  send_request(sockfd, parsed_struct->hostname, parsed_struct->port, parsed_struct->path);
+  numbytes = 100;
+  while (numbytes > 0) {
+    numbytes = recv(sockfd, buf, BUFSIZE - 1, 0);
+    printf("%s\n", buf);
+  }
+  close(sockfd);
+  free(parsed_struct);
 
   return 0;
 }
