@@ -31,6 +31,7 @@ urlinfo_t *parse_url(char *url)
   char *hostname = strdup(url);
   char *port;
   char *path;
+  char *ptr;
 
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
 
@@ -45,13 +46,43 @@ urlinfo_t *parse_url(char *url)
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+
+  ptr = strchr(hostname,'/');
+
+
+  if (ptr == NULL){
+    path = "/";
+  } else {
+    if(*ptr == *(ptr+1)){
+      hostname = ptr+2;
+      ptr = strchr(hostname,'/');
+    }
+    
+    if (ptr == NULL){
+      path = "/";
+    } else {
+    path = ptr + 1;
+    *ptr = '\0'; 
+    }
+  }
+
+
+  ptr = strchr(hostname, ':');
+  if(ptr == NULL){
+    port = "80";
+  } else {
+    port = ptr + 1;
+    *ptr = '\0';  
+  }
+  
+
+  urlinfo->hostname = hostname;
+  urlinfo->path = path;
+  urlinfo->port = port;
+  // printf("URLINFO:\n%s\n%s\n%s\n",hostname,path,port );
 
   return urlinfo;
 }
-
 /**
  * Constructs and sends an HTTP request
  *
@@ -67,12 +98,14 @@ int send_request(int fd, char *hostname, char *port, char *path)
   const int max_request_size = 16384;
   char request[max_request_size];
   int rv;
+  int socket;
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  //Construct request
+  sprintf(request,"GET /%s HTTP/1.1\nHost: %s:%s\nConnection: close\n\n",path,hostname,port);
+  //send request
+  rv = send(fd,request,strlen(request),0);
 
-  return 0;
+  return rv;
 }
 
 int main(int argc, char *argv[])
@@ -92,10 +125,18 @@ int main(int argc, char *argv[])
     4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
     5. Clean up any allocated memory and open file descriptors.
   */
+  
+  urlinfo_t *urlinfo = parse_url(argv[1]);
+  sockfd = get_socket(urlinfo->hostname,urlinfo->port);
+  
+  send_request(sockfd,urlinfo->hostname,urlinfo->port,urlinfo->path);
+  
+  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
+    printf("%s\n",buf);
+  }
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  close(sockfd);
+  free(urlinfo);
 
   return 0;
 }
