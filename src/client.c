@@ -12,7 +12,8 @@
 /**
  * Struct to hold all three pieces of a URL
  */
-typedef struct urlinfo_t {
+typedef struct urlinfo_t
+{
   char *hostname;
   char *port;
   char *path;
@@ -44,10 +45,14 @@ urlinfo_t *parse_url(char *url)
     5. Set the port pointer to 1 character after the spot returned by strchr.
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
+  path = (strchr(hostname, '/') + 1);
+  strchr(hostname, '/')[0] = '\0';
+  port = (strchr(hostname, ':') + 1);
+  strchr(hostname, ':')[0] = '\0';
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  urlinfo->hostname = strdup(hostname);
+  urlinfo->path = strdup(path);
+  urlinfo->port = strdup(port);
 
   return urlinfo;
 }
@@ -68,20 +73,25 @@ int send_request(int fd, char *hostname, char *port, char *path)
   char request[max_request_size];
   int rv;
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  int request_length = snprintf(request, max_request_size,
+                                "GET /%s HTTP/1.1\n"
+                                "Host: %s:%s\n"
+                                "Connection: close\n\n",
+                                path, hostname, port);
 
-  return 0;
+  rv = send(fd, request, request_length, 0);
+
+  return rv;
 }
 
 int main(int argc, char *argv[])
-{  
-  int sockfd, numbytes;  
+{
+  int sockfd, numbytes;
   char buf[BUFSIZE];
 
-  if (argc != 2) {
-    fprintf(stderr,"usage: client HOSTNAME:PORT/PATH\n");
+  if (argc != 2)
+  {
+    fprintf(stderr, "usage: client HOSTNAME:PORT/PATH\n");
     exit(1);
   }
 
@@ -93,9 +103,18 @@ int main(int argc, char *argv[])
     5. Clean up any allocated memory and open file descriptors.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  urlinfo_t *url = parse_url(argv[1]);
+
+  sockfd = get_socket(url->hostname, url->port);
+  send_request(sockfd, url->hostname, url->port, url->path);
+  numbytes = recv(sockfd, buf, BUFSIZE - 1, 0);
+
+  while (numbytes > 0)
+  {
+    printf("%s\n", buf);
+    numbytes = recv(sockfd, buf, BUFSIZE - 1, 0);
+  }
+  close(sockfd);
 
   return 0;
 }
