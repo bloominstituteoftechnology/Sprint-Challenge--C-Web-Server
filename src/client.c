@@ -49,6 +49,47 @@ urlinfo_t *parse_url(char *url)
   // IMPLEMENT ME! //
   ///////////////////
 
+  // Check the if the URL contains HTTP
+  if (strstr(url, "http://")) {
+    // If URL contains 'http://'
+    hostname = strdup(url + 7);
+  } else if (strstr(url, "https://")) {
+    // If URL contains 'https://'
+    hostname = strdup(url + 8);
+  } else {
+    // If URL does not contain any HTTP
+    hostname = strdup(url);
+  }
+
+  // Set the path
+  // If the hostname contains a /, set the path = /
+  if (strchr(hostname, '/')) {
+    path = strchr(hostname, '/') + 1;
+
+    *(path - 1) = NULL;
+  } else {
+    path = '/';
+  }
+
+  // Set the port
+  // If the hostname contains a :, set the port to the number after
+  if (strchr(hostname, ':')) {
+    port = strchr(hostname, ':') + 1;
+
+    *(port - 1) = NULL;
+  } else {
+    char buffer[3];
+
+    sprintf(buffer, "%i", 80);
+
+    port = buffer;
+  }
+
+  // Set the properties in the urlinfo
+  urlinfo->hostname = hostname;
+  urlinfo->path = strdup(path);
+  urlinfo->port = strdup(port);
+
   return urlinfo;
 }
 
@@ -66,18 +107,36 @@ int send_request(int fd, char *hostname, char *port, char *path)
 {
   const int max_request_size = 16384;
   char request[max_request_size];
+  int request_length;
   int rv;
 
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
 
+  // Set the request length
+  request_length = sprintf(
+    request,
+    "GET /%s HTTP/1.1\nHost: %s:%s\nConnection:close\n\n",
+    path,
+    hostname,
+    port
+  );
+
+  // Send the request
+  rv = send(fd, request, request_length, 0);
+
+  // If returned error, send error
+  if (rv < 0) {
+    perror("send");
+  }
+
   return 0;
 }
 
 int main(int argc, char *argv[])
-{  
-  int sockfd, numbytes;  
+{
+  int sockfd, numbytes;
   char buf[BUFSIZE];
 
   if (argc != 2) {
@@ -96,6 +155,26 @@ int main(int argc, char *argv[])
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
+
+  // Parse the input URL
+  urlinfo_t *urlinfo = parse_url(argv[1]);
+
+  // Initialize a socket
+  sockfd = get_socket(urlinfo->hostname, urlinfo->port);
+
+  // Send the request
+  send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
+
+  // Print the response from the server
+  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
+    printf("%s", buf);
+  }
+
+  // Close the socket
+  close(sockfd);
+
+  // Free the URL
+  free(urlinfo);
 
   return 0;
 }
