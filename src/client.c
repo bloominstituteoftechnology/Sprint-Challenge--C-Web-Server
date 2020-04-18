@@ -7,6 +7,19 @@
 #include <sys/socket.h>
 #include "lib.h"
 
+// header: HTTP/1.1 200 OK || HTTP/1.1 200 OK
+// body: the data to send.
+// Date: Wed Dec 20 13:05:11 PST 2017
+// v     v       v        v
+//     time_t time1 = time(NULL);
+//     struct tm *localtime1 = localtime(&time1);
+//     asctime(localtime1)
+
+
+// Connection: close
+// Content-Length: 41749
+// Content-Type: text/html
+
 #define BUFSIZE 4096 // max number of bytes we can get at once
 
 /**
@@ -45,11 +58,32 @@ urlinfo_t *parse_url(char *url)
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  // char *backslash;
+  // char *colon;
 
-  return urlinfo;
+  path = strchr(hostname, '/');
+
+  *path = '\0';
+  path++;
+
+  // printf("PATH -> %s\n", backslash);
+
+  port = strchr(hostname, ':');
+
+  *port = '\0';
+  port++;
+
+// printf("PORT -> %s\n", colon);
+
+//  printf("%s\n", url);
+
+// hostname = hostname;
+
+  urlinfo->hostname = hostname;
+  urlinfo->port = port;
+  urlinfo->path = path;
+
+return urlinfo;
 }
 
 /**
@@ -68,11 +102,34 @@ int send_request(int fd, char *hostname, char *port, char *path)
   char request[max_request_size];
   int rv;
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  // time_t time1 = time(NULL);
+  // struct tm *localtime1 = localtime(&time1);
 
-  return 0;
+
+  
+  // stringify the passed data into the request packet buffer
+  int request_length = sprintf(request,
+      "GET PATH: %s\n"
+      "Host: %s\n"
+      "Port: %s\n"
+      "Connection Closed\n\n", // end
+      path,
+      hostname,
+      port
+      );
+
+
+  // send function
+  rv = send(fd, request, request_length, 0);
+
+
+  // error checking, if value returned is -1
+  if (rv < 0) {
+    perror("Send");
+  }
+
+
+  return rv;
 }
 
 int main(int argc, char *argv[])
@@ -93,9 +150,20 @@ int main(int argc, char *argv[])
     5. Clean up any allocated memory and open file descriptors.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  urlinfo_t *urlinfo = parse_url(argv[1]);
+  sockfd = get_socket(urlinfo->hostname, urlinfo->port);
+  send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
+
+
+  // might be wrong
+  numbytes = recv(sockfd, buf, BUFSIZE - 1, 0);
+
+  while (numbytes > 0) {
+    fwrite(buf, 1, numbytes, stdout);
+  }
+
+  free(urlinfo);
+  close(sockfd);
 
   return 0;
 }
