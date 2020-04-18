@@ -12,7 +12,8 @@
 /**
  * Struct to hold all three pieces of a URL
  */
-typedef struct urlinfo_t {
+typedef struct urlinfo_t
+{
   char *hostname;
   char *port;
   char *path;
@@ -32,6 +33,8 @@ urlinfo_t *parse_url(char *url)
   char *port;
   char *path;
 
+  char *result;
+
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
 
   /*
@@ -45,9 +48,39 @@ urlinfo_t *parse_url(char *url)
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  //Strip out the http:// text from the URL
+
+  result = strstr(hostname, "//");
+  printf("result: %s\n", result);
+  if (result != NULL)
+  {
+    hostname = result + 2;
+  }
+
+  //Retrieve path from URL
+  char ch = '/';
+  char *ret = strchr(hostname, ch);
+  path = strdup(ret);
+  *ret = '\0';
+
+  //Retrieve port from URL ------- need to modify to handle URLs without port number
+  char ch2 = ':';
+  char *tmp = strchr(hostname, ch2);
+
+  if (tmp == NULL)
+  {
+    port = "80";
+  }
+  else
+  {
+    port = tmp + 1;
+    *tmp = '\0';
+  }
+
+  //Store in urlinfo struct
+  urlinfo->hostname = hostname;
+  urlinfo->port = port;
+  urlinfo->path = path;
 
   return urlinfo;
 }
@@ -66,22 +99,40 @@ int send_request(int fd, char *hostname, char *port, char *path)
 {
   const int max_request_size = 16384;
   char request[max_request_size];
+  int request_size;
   int rv;
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  sprintf(request, "GET %s HTTP/1.1\nHost: %s:%s\nConnection: Close\n\n", path, hostname, port);
+  printf("%s\n", request);
+  request_size = strlen(request);
 
-  return 0;
+  //Send the request
+  rv = send(fd, request, request_size, 0);
+
+  if (rv < 0)
+  {
+    printf("error sending the request");
+    exit(1);
+  }
+
+  return rv;
 }
 
 int main(int argc, char *argv[])
-{  
-  int sockfd, numbytes;  
+{
+  int sockfd, numbytes;
   char buf[BUFSIZE];
 
-  if (argc != 2) {
-    fprintf(stderr,"usage: client HOSTNAME:PORT/PATH\n");
+  if (argc != 2)
+  {
+
+    //------debug0-------
+
+    urlinfo_t *url = parse_url("http://localhost:3490/index.html");
+    printf("\nlets send req, with hostname: %s\n", url->hostname);
+    send_request(1, url->hostname, url->port, url->path);
+
+    fprintf(stderr, "usage: client HOSTNAME:PORT/PATH\n");
     exit(1);
   }
 
@@ -93,9 +144,18 @@ int main(int argc, char *argv[])
     5. Clean up any allocated memory and open file descriptors.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  urlinfo_t *url = parse_url(argv[1]);
+  sockfd = get_socket(url->hostname, url->port);
+  int rv = send_request(sockfd, url->hostname, url->port, url->path);
+
+  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0)
+  {
+    // print the data we got back to stdout
+    printf("%d\n", numbytes);
+    printf("%s\n", buf);
+  }
+  close(sockfd);
+  free(url);
 
   return 0;
 }
