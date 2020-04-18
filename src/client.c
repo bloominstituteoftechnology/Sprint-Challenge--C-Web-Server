@@ -45,9 +45,36 @@ urlinfo_t *parse_url(char *url)
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  char *robust;
+  robust = strstr(hostname, "//");
+  if (robust != NULL) {
+    hostname = robust;
+    hostname +=2;
+  }
+
+  path = strchr(hostname, '/');
+  *path = '\0';
+  path++;
+  port = strchr(hostname, ':');
+  if (port == NULL) {
+    port = "80";
+  } else {
+      *port = '\0';
+      port++;
+  }
+
+
+  // urlinfo->hostname = malloc(strlen(hostname) + 1);
+  // strcpy(urlinfo->hostname, hostname);
+  urlinfo->hostname = hostname;
+
+  // urlinfo->path = malloc(strlen(path) + 1);
+  // strcpy(urlinfo->path, path);
+  urlinfo->path = path;
+
+  // urlinfo->port = malloc(strlen(port) + 1);
+  // strcpy(urlinfo->port, port);
+  urlinfo->port = port;
 
   return urlinfo;
 }
@@ -68,11 +95,24 @@ int send_request(int fd, char *hostname, char *port, char *path)
   char request[max_request_size];
   int rv;
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  int request_length = sprintf(request,
+      "GET /%s HTTP/1.1\n"
+      "Host: %s:%s\n"
+      "Connection: close\n"
+      "\n",
+      path,
+      hostname,
+      port
+      );
 
-  return 0;
+  rv = send(fd, request, request_length, 0);
+
+  if (rv < 0) {
+      perror("send");
+  }
+
+  return rv;
+
 }
 
 int main(int argc, char *argv[])
@@ -93,9 +133,20 @@ int main(int argc, char *argv[])
     5. Clean up any allocated memory and open file descriptors.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  urlinfo_t *urlinfo = parse_url(argv[1]);
+  sockfd = get_socket(urlinfo->hostname, urlinfo->port);
+  send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
+
+  while ((numbytes = recv(sockfd, buf, BUFSIZE, 0)) > 0) {
+    // buf[numbytes] = '\0';
+    // printf("Response: %s\n", buf);
+    fwrite(buf, sizeof(char), numbytes, stdout);
+  }
+
+  close(sockfd);
+  // free(urlinfo->hostname);
+  free(urlinfo);
+  
 
   return 0;
 }
