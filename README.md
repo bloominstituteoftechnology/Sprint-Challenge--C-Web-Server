@@ -1,3 +1,19 @@
+Task List
+
+- [x] Parse the input URL;
+  - [x] Server is able to handle URLs such as `localhost:3490/d20` and `www.google.com:80/`;
+  - [x] Implement the `parse_url()` function;
+  - [x]  use the `strchr` function to look for specific characters in a string;
+- [x] Construct the HTTP request;
+  - [x] use `sprintf` in order to construct the request from the `hostname`, `port`, and `path`;
+- [x] Connect to the server;
+  - [ ] call the `get_socket()`;
+- [x] Send the request string down the socket;
+- [x] Receive the response from the server and print it to `stdout`;
+- [x] Clean up.
+  - [x] `free` any allocated memory and `close` any open file descriptors.
+
+
 # Sprint Challenge: C Web Server Sprint
 
 This challenge allows you to practice the concepts and techniques learned over
@@ -37,7 +53,7 @@ client that will run from the command line.
 
 [cURL](https://en.wikipedia.org/wiki/CURL), which stands for "Client URL", is a
 command line tool that can make requests to servers, just like browsers can. You
-may have been using cURL in order to test your web server implementation. 
+may have been using cURL in order to test your web server implementation.
 
 If you've never played around with cURL, open up a terminal window and type in
 
@@ -48,7 +64,7 @@ curl -D - www.google.com
 When that command gets executed, you'll see that you get back an HTTP response
 with a whole bunch of HTML in the body. You just requested Google's home page,
 but since cURL is just a command line tool, it isn't capable of taking the HTML
-in the response and rendering it. 
+in the response and rendering it.
 
 Your program for the Sprint Challenge will be a stripped down version of cURL
 that can only make GET requests. Your MVP implementation will need to be able to
@@ -99,9 +115,9 @@ The steps that your client will need to execute are the following:
 
    * You can use the `strchr` function to look for specific characters in a
      string. You can also use the `strstr` function to look for specific
-     substrings in a string. 
+     substrings in a string.
 
-2. Construct the HTTP request. 
+2. Construct the HTTP request.
    * Just like in the web server, use `sprintf` in order to construct the
      request from the `hostname`, `port`, and `path`. Requests should look like
      the following:
@@ -122,7 +138,7 @@ The steps that your client will need to execute are the following:
    * All of the networking logic that you'll need to connect to an arbitrary
      server is provided in the `lib.h` and `lib.c` files. All you have to do
      call the `get_socket()` function in order to get a socket that you can then
-     send and receive data from using the `send` and `recv` system calls. 
+     send and receive data from using the `send` and `recv` system calls.
 
    * Make sure that your web server implementation (built during project days 1
      & 2 from Web Server I) is running in another terminal window when testing
@@ -150,7 +166,7 @@ The steps that your client will need to execute are the following:
 6. Clean up.
 
    * Don't forget to `free` any allocated memory and `close` any open file
-     descriptors. 
+     descriptors.
 
 In your solution, it is essential that you follow best practices and produce
 clean and professional results. Schedule time to review, refine, and assess your
@@ -221,12 +237,12 @@ goals:
      the fact that oftentimes, URLs don't actually include the port number. In
      such cases, clients just assume a default port number of 80. Improve the
      URL parsing logic such that it can handle being passed a URL without a port
-     number, such as `www.google.com/`. 
+     number, such as `www.google.com/`.
 
    * Also improve the parsing logic so that it can receive URLs prepended with
      `http://` or `https://`. Such URLs should not be treated any differently by
      the client, you'll just need to strip them off the input URL so that they
-     don't become part of the hostname. 
+     don't become part of the hostname.
 
 2. Implement the ability for the client to follow redirects.
 
