@@ -45,9 +45,37 @@ urlinfo_t *parse_url(char *url)
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  char *tmp = strstr(hostname, "://");
+
+  if (tmp != NULL)
+  {
+    hostname = tmp + 3;
+  }
+
+  tmp = strchr(hostname, '/');
+  // printf("path: %s\n", path + 1);
+  path = tmp + 1;
+  *tmp = '\0';
+  urlinfo->path = path;
+
+  // printf("url: %s\n", hostname);
+
+  tmp = strchr(hostname, ':');
+
+  if (tmp != NULL)
+  {
+    port = tmp + 1;
+    // printf("port: %s\n", port + 1);
+    *tmp = '\0';
+    urlinfo->port = port;
+  }
+  else
+  {
+    urlinfo->port = "80";
+  }
+
+  // printf("hostname: %s\n", hostname);
+  urlinfo->hostname = hostname;
 
   return urlinfo;
 }
@@ -68,11 +96,18 @@ int send_request(int fd, char *hostname, char *port, char *path)
   char request[max_request_size];
   int rv;
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  int request_length = sprintf(
+    request,
+    "GET /%s HTTP/1.1\nHost: %s:%s\nConnection: close\n\n",
+    path, hostname, port);
+  send(fd, request, sizeof request, 0); 
 
-  return 0;
+  if ((rv = send(fd, request, request_length, 0) < 0))
+  {
+    perror("Error sending request"); 
+  }
+
+  return rv;
 }
 
 int main(int argc, char *argv[])
@@ -93,9 +128,32 @@ int main(int argc, char *argv[])
     5. Clean up any allocated memory and open file descriptors.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  urlinfo_t *url = parse_url(argv[1]);
+
+  sockfd = get_socket(url->hostname, url->port);  
+
+  if (sockfd < 0)
+  {
+    perror("Failed to get a socket");
+    exit(1);
+  }
+
+  send_request(sockfd, url->hostname, url->port, url->path);
+
+  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
+    fwrite(buf, 1, numbytes, stdout);
+  }
+
+  if (numbytes < 0)
+  {
+    perror("Error receiving response");
+    exit(2);
+  }
+
+  printf("\n");
+
+  free(url);
+  close(sockfd); 
 
   return 0;
 }
