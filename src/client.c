@@ -49,6 +49,20 @@ urlinfo_t *parse_url(char *url)
   // IMPLEMENT ME! //
   ///////////////////
 
+  //example localhost:3490/d20
+
+  path = strchr(hostname, '/');
+  *path = '\0';
+  path++;
+
+  port = strchr(hostname, ':');
+  *port = '\0';
+  port++;
+
+  urlinfo->hostname = hostname; // = localhost
+  urlinfo->port = port; // = 3490
+  urlinfo->path = path; // = d20
+
   return urlinfo;
 }
 
@@ -71,6 +85,24 @@ int send_request(int fd, char *hostname, char *port, char *path)
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
+
+
+  // GET /path HTTP/1.1
+  // Host: hostname:port
+  // Connection: close
+
+  int r_len = sprintf(
+    request,
+    "GET /%s HTTP/1.1\n"
+    "HOST: %s:%s\n"
+    "Connection: close\n"
+    "\n",
+    path,
+    hostname,
+    port
+  );
+
+  rv = send(fd, request, r_len, 0);
 
   return 0;
 }
@@ -96,6 +128,17 @@ int main(int argc, char *argv[])
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
+  urlinfo_t *u = parse_url(argv[1]); //get my struct of values passed in from the url
+  sockfd = get_socket(u->hostname, u->port); //use heper function to get my socket int value
+  send_request(sockfd, u->hostname, u->port, u->path); //pass in my struct values and socket value to send_request
+
+  while((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0){
+    printf("%s\n", buf);
+  }
+
+  free(u);
+  close(sockfd);
+
 
   return 0;
 }
