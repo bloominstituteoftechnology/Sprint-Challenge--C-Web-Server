@@ -48,6 +48,36 @@ urlinfo_t *parse_url(char *url)
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
+  char *duplicate1 = strdup(url);
+  char *duplicate2 = strdup(url);
+  duplicate1[7] = '\0';
+  duplicate2[8] = '\0';
+  char *p = hostname;
+  if(!strcmp(duplicate1, "http://")){
+    hostname += 7;
+    hostname = strdup(hostname);
+    free(p);
+  }else if(!strcmp(duplicate2, "https://")){
+    hostname += 8;
+    hostname = strdup(hostname);
+    free(p);
+  }
+  free(duplicate1);
+  free(duplicate2);
+  path = strchr(hostname, '/');
+  *path = '\0';
+  path++;
+  port = strchr(hostname, ':');
+  if(port == NULL){
+    port = "80";
+  }else{
+    *port = '\0';
+    port++;
+  }
+
+  urlinfo->hostname = hostname;
+  urlinfo->port = port;
+  urlinfo->path = path;
 
   return urlinfo;
 }
@@ -71,8 +101,23 @@ int send_request(int fd, char *hostname, char *port, char *path)
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
+  int response_length = sprintf(request,
+    "GET /%s HTTP/1.1\n"
+    "Host: %s:%s\n"
+    "Connection: close\n"
+    "\n",
+    path,
+    hostname,
+    port
+  );
+  int reqv = send(fd, request, response_length, 0);
+  printf("request: %s\n", request);
 
-  return 0;
+  if(reqv < 0){
+    perror("send request\n");
+  }
+
+  return reqv;
 }
 
 int main(int argc, char *argv[])
@@ -96,6 +141,17 @@ int main(int argc, char *argv[])
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
+  urlinfo_t *urlinfo = parse_url(argv[1]);
+  sockfd = get_socket(urlinfo->hostname, urlinfo->port);
+  int srr = send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
+  while((numbytes = recv(sockfd, buf, BUFSIZE-1, 0)) > 0){
 
+    fprintf(stdout, "%s\n", buf);
+  }
+
+  free(urlinfo->hostname);
+  free(urlinfo);
+  close(sockfd);
+  
   return 0;
 }
