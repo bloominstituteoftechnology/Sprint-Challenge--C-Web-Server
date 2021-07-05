@@ -32,8 +32,30 @@ urlinfo_t *parse_url(char *url)
   char *port;
   char *path;
 
+  
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
 
+  if (strncmp(url, "http://", 7) == 0)
+  {
+    hostname = hostname + 7;
+  }
+  if (strncmp(url, "https://", 8) == 0)
+  {
+    hostname = hostname + 8;
+  }
+
+  char *tmp = strchr(hostname, '/');
+  path  = tmp + 1;  
+  *tmp = '\0'; 
+  urlinfo->path = path;
+
+  char *tmp2 = strchr(hostname, ':');
+  port  = tmp2 + 1;  
+  *tmp2 = '\0'; 
+  urlinfo->port = port;
+
+  urlinfo->hostname = hostname;
+ 
   /*
     We can parse the input URL by doing the following:
 
@@ -72,18 +94,39 @@ int send_request(int fd, char *hostname, char *port, char *path)
   // IMPLEMENT ME! //
   ///////////////////
 
-  return 0;
+  int request_length = sprintf(request, "GET /%s HTTP/1.1\r\nHost %s:%s\r\nConnection: close\r\n\r\n", path, hostname, port );
+
+ 
+  rv = send(fd, request, request_length, 0);  
+  if (rv < 0) 
+  {
+    perror("send");
+  }
+
+  return rv;
 }
 
 int main(int argc, char *argv[])
 {  
   int sockfd, numbytes;  
-  char buf[BUFSIZE];
+  char buf[BUFSIZE];  
 
   if (argc != 2) {
     fprintf(stderr,"usage: client HOSTNAME:PORT/PATH\n");
     exit(1);
   }
+
+  urlinfo_t *url = parse_url(argv[1]);  
+  sockfd = get_socket(url->hostname, url->port);  
+  int request = send_request(sockfd, url->hostname, url->port, url->path);
+  
+
+  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0)
+  {
+    fprintf(stdout, buf);
+  }
+
+  free(url);
 
   /*
     1. Parse the input URL
