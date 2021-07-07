@@ -45,9 +45,30 @@ urlinfo_t *parse_url(char *url)
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  path = strchr(hostname, '/');
+  // printf("hostname: %s\n", hostname);
+  // printf("path found\n");
+  // printf("path: %s\n", path);
+  path[0] = '\0';
+  // printf("hostname null terminated\n");
+
+  // printf("%s\n", path);
+  if (path) {
+    path ++;
+    // printf("inside if >> %s\n", path);
+  }
+  printf("hostname: %s\n", hostname);
+
+
+  port = strchr(hostname, ':');
+  port[0] = '\0';
+  port ++;
+  printf("path: %s\n", path);
+  printf("port: %s\n", port);
+
+  urlinfo->hostname = hostname;
+  urlinfo->path = path;
+  urlinfo->port = port;
 
   return urlinfo;
 }
@@ -68,16 +89,18 @@ int send_request(int fd, char *hostname, char *port, char *path)
   char request[max_request_size];
   int rv;
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  sprintf(request, "GET %s HTTP/1.1\nHost: %s:%s\nConnection: close\n", path, hostname, port);
+  printf("request configured:\n");
+  printf("%s\n", request);
+  rv = send(fd, request, max_request_size, 0);
 
-  return 0;
+
+  return rv;
 }
 
 int main(int argc, char *argv[])
-{  
-  int sockfd, numbytes;  
+{
+  int sockfd, numbytes;
   char buf[BUFSIZE];
 
   if (argc != 2) {
@@ -92,10 +115,15 @@ int main(int argc, char *argv[])
     4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
     5. Clean up any allocated memory and open file descriptors.
   */
+  printf("about to call parse_url\n");
+  urlinfo_t *urlinfo = parse_url(argv[1]);
+  printf("parse_url called\n");
+  sockfd = get_socket(urlinfo->hostname, urlinfo->port);
+  send_request(sockfd, urlinfo->hostname, urlinfo->port, urlinfo->path);
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  while ((numbytes = recv(sockfd, buf, BUFSIZE - 1, 0)) > 0) {
+    printf("%s", buf);
+  }
 
   return 0;
 }
