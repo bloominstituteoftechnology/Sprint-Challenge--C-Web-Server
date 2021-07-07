@@ -202,8 +202,8 @@ Your cURL client will receive a 2 when it satisfies the following:
    Accept-Ranges: none
    Vary: Accept-Encoding
    Connection: close
-
    ```
+  
 
 ## Stretch Problems
 
