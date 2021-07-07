@@ -12,7 +12,8 @@
 /**
  * Struct to hold all three pieces of a URL
  */
-typedef struct urlinfo_t {
+typedef struct urlinfo_t
+{
   char *hostname;
   char *port;
   char *path;
@@ -49,6 +50,27 @@ urlinfo_t *parse_url(char *url)
   // IMPLEMENT ME! //
   ///////////////////
 
+  // Use strchr to get url path
+  path = strchr(hostname, '/');
+
+  // set path pointer to 1 cahracter after ret
+  *path = '\0';
+
+  path++;
+
+  // Use strchr to find first colon in url
+  port = strchr(hostname, ':');
+
+  // set port pointer
+  *port = '\0',
+
+  port++;
+
+  // set values
+  urlinfo->hostname = hostname;
+  urlinfo->port = port;
+  urlinfo->path = path;
+
   return urlinfo;
 }
 
@@ -72,16 +94,25 @@ int send_request(int fd, char *hostname, char *port, char *path)
   // IMPLEMENT ME! //
   ///////////////////
 
+  // Create request
+  int request_length = sprintf(request, "GET /%s HTTP/1.1 \nHost: %s%s \nConnection: close\n\n",
+                               path, hostname,
+                               port);
+
+  // Send response
+  rv = send(fd, request, request_length, 0);
+
   return 0;
 }
 
 int main(int argc, char *argv[])
-{  
-  int sockfd, numbytes;  
+{
+  int sockfd, numbytes;
   char buf[BUFSIZE];
 
-  if (argc != 2) {
-    fprintf(stderr,"usage: client HOSTNAME:PORT/PATH\n");
+  if (argc != 2)
+  {
+    fprintf(stderr, "usage: client HOSTNAME:PORT/PATH\n");
     exit(1);
   }
 
@@ -96,6 +127,26 @@ int main(int argc, char *argv[])
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
+
+  // Parse input
+  urlinfo_t *parse = parse_url(argv[1]);
+
+  // Call get_socket
+  sockfd = get_socket(parse->hostname, parse->port);
+
+  // Call send_request
+  send_request(sockfd, parse->hostname, parse->port, parse->path);
+
+  // Call recieve in loop until no more data
+  while ((numbytes = recv(sockfd, buf, BUFSIZE, 0)) > 0)
+  {
+    printf("Buf: %s\n", buf);
+  }
+
+  // Free allocated memory
+  close(sockfd);
+  free(parse->hostname);
+  free(parse);
 
   return 0;
 }
