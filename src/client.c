@@ -31,6 +31,7 @@ urlinfo_t *parse_url(char *url)
   char *hostname = strdup(url);
   char *port;
   char *path;
+  char *to_null;
 
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
 
@@ -44,11 +45,18 @@ urlinfo_t *parse_url(char *url)
     5. Set the port pointer to 1 character after the spot returned by strchr.
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
-
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
-
+if (strstr(hostname, "https://") != NULL) {
+    hostname += 8;
+  } else if (strstr(hostname, "http://")) {
+    hostname +=7;
+  }
+ urlinfo->hostname = hostname;
+ urlinfo->path = strchr(hostname, '/');
+ *urlinfo->path = '\0';
+  urlinfo->path++;
+ urlinfo->port = strchr(hostname, ':');
+ *urlinfo->port = '\0';
+  urlinfo->port++;
   return urlinfo;
 }
 
@@ -66,20 +74,19 @@ int send_request(int fd, char *hostname, char *port, char *path)
 {
   const int max_request_size = 16384;
   char request[max_request_size];
+  int request_size;
   int rv;
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  request_size = snprintf(request, max_request_size, "GET %s HTTP/1.1\nHost: %s:%s\nConnection: close\n\n", path, hostname, port);
 
-  return 0;
+  rv = send(fd, request, request_size, 0);
+  return rv;
 }
 
 int main(int argc, char *argv[])
 {  
   int sockfd, numbytes;  
   char buf[BUFSIZE];
-
   if (argc != 2) {
     fprintf(stderr,"usage: client HOSTNAME:PORT/PATH\n");
     exit(1);
@@ -93,9 +100,23 @@ int main(int argc, char *argv[])
     5. Clean up any allocated memory and open file descriptors.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  urlinfo_t *purl = parse_url(argv[1]);
+  printf("hostname:%s\n port:%s\n path:%s\n", purl->hostname, purl->port, purl->path );
+  int fd = get_socket(purl->hostname, purl->port);
+  if (fd == -1) {
+    perror("get_socket");
+    exit(2);
+  }
+  send_request(fd, purl->hostname, purl->port, purl->path);
+  while ((numbytes = recv(fd, buf, BUFSIZE, 0)) > 0) {
+       // print the data we got back to stdout
+       fwrite(buf, sizeof(char), numbytes, stdout);
+     }
+    if (numbytes < 0) {
+      perror("recv");
+    }
 
+  free(purl);
+  
   return 0;
 }
